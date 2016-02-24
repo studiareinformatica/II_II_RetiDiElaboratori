@@ -1,0 +1,84 @@
+\section{Note del corso}
+Il corso di Reti di Elaboratori segue i capitoli del Kurose-Ross.
+I tre macro-argomenti sono:
+\begin{enumerate}
+  \item Fondamenti di fisica
+  \item TCP/IP
+  \item Reti wireless, sicurezza delle reti, e così via \ldots
+\end{enumerate}
+
+\section{Componenti della rete Internet}
+Centinaia di milioni di dispositivi (\textbf{hosts} o endsystems) che ospitano \textbf{network apps} sono interconnessi insieme ai router tramite \textit{connection links}. 
+
+\begin{itemize}
+    \item
+        \textit{Hosts} (o \textit{End-Systems}), sui quali girano applicazioni web. \textit{End-Systems} perché sono le foglie di un albero di collegamenti che passano per diversi \textit{router} (i quali permettono lo scambio di informazioni tra i vari hosts);
+    \item
+        \textit{Communication Links} (fibra, radio, satellite, e così via \ldots), a cui è associato un determinato insieme di frequenze, detto \textit{banda}. Conoscendo la banda è possibile ricavare il quantitativo di bit massimo che posso far attraversare, il \textit{tasso di trasmissione}. La \textit{collisione} è la sovrapposizione di pacchetti di comunicazione da sorgenti diverse, e causa la mancata decodifica dei pacchetti da parte del router;
+    \item
+        \textit{router} è l'elemento cui viene affidato il compito di gestire l'inoltro dei pacchetti dalla sorgente alla destinazione. È formato da link di ingresso, sui quali esegue il \textit{forwarding} verso i link d'uscita. Per poterlo fare, necessita di un'informazione, l'indirizzo del destinatario. Controlla quindi una \textit{tabella d'inoltro}, composta da due colonne: l'indirizzo del destinatario e \textit{next hop}. Seguendo ogniqualvolta necessario i riferimenti associati all'indirizzo richiesto sulla tabella, il pacchetto arriva a destinazione;
+    \item
+        \textit{Protocolli} implementano funzionalità necessarie per la rete; controllano la ricezione e la trasmissione di messaggi. Alcuni esempi di protocolli sono TCP, IP, HTTP, ETHERNET e SKYPE.
+    \item
+        \textit{Standard}: definiscono le regole attraverso cui vengono applicati tutti i protocolli in \textit{internet}.
+        \begin{itemize}
+            \item L'\textit{RFC} (\textit{request for comments}) contiene tutti gli standard pubblicamente riconosciuti e in vigore su internet.
+            \item Lo \textit{IETF} (\textit{internet engineering task force}) viene consultato ogniqualvolta giunge una richiesta di inclusione di un nuovo standard. Dopo essere stato sufficientemente vagliato, lo standard può essere incluso tra gli RFC.
+        \end{itemize}
+\end{itemize}
+
+\section{Rete Logica e Rete Fisica}
+\begin{itemize}
+    \item Una \textbf{Rete Fisica} è il diagramma che costituisce l'assetto fisico di una rete. Contiene una serie di nodi - ciascun elemento di rete - legati tra loro da un mezzo trasmissivo;
+    \item Una \textbf{Rete Logica} è il diagramma che costituisce l'assetto logico di una rete. Partendo da quello fisico, in questo caso, per ogni nodo possono essere applicate delle policies che permettono - o meno - la trasmissione di dati attraverso mezzi trasmissivi, verso un dato elemento di rete ad esso fisicamente collegato.
+\end{itemize}
+
+\section{Internet: Servizi di comunicazione}
+I protocolli definiscono come avvengono i colloqui tra dispositivi attraverso specifici set di regole.
+
+\subsection{TCP}
+Il \textit{Transmission Control Protocol} è un protocollo di rete che si occupa di controllo di rendere affidabile la comunicazione dati in rete tra mittente e destinatario.
+In particolare, questo protocollo fornisce:
+    \begin{itemize}
+        \item trasferimento dati ordinato e affidabile
+        \begin{itemize}
+            \item permette riconoscimento e ritrasmissione di eventuali perdite di dati
+        \end{itemize}
+        \item controllo del flusso
+        \begin{itemize}
+            \item il mittente non sovraccaricherà il ricevente
+        \end{itemize}
+        \item controllo della congestione
+        \begin{itemize}
+            \item il mittente rallenterà la velocità di invio quando la rete è congestionata
+        \end{itemize}
+    \end{itemize}
+
+    \subsubsection{Handshake}
+    Si definisce \textit{handshake}(lett. \textit{stretta di mano}) il processo attraverso il quale due calcolatori stabiliscono le regole comuni, ovvero la velocità, i protocolli di compressione, di criptazione, di controllo degli errori etc.
+    
+    Prima di iniziare la connessione vera e propria tra due macchine si crea questo tipo di connessione che consiste nella trasmissione dei pacchetti per regolare i parametri di connessione.
+
+\subsection{UDP} (\textit{User Datagram Protocol}
+A differenza del protocollo TCP non esegue alcun tipo di \textit{handshake} o controllo: questoè utile (o necessario) per alcuni tipi di applicativi che fanno loro componente fondamentale la rapidità d trasmissione di dati, come i servizi di streaming o voip, per i quali diventa di fondamentale importanza la rapidità di ricezione dei pacchetti, piuttosto che la loro qualità.
+
+\section{Trasmissione Dati}
+\begin{itemize}
+    \item \textbf{Commutazione di Circuito}: si stabilisce un circuito (percorso) tra mittente e destinatario, soltanto dopo aver appurato che le risorse necessarie per effettuare l'effettiva trasmissione dei dati siano disponibili.
+    Qualora ci fossero diversi utenti, la suddivisione delle risorse potrebbe avvenire attraverso due modalità:
+    \begin{itemize}
+        \item \textbf{FDM}: \textit{Frequence Division Multiplexing}, che consiste nel suddividere le risorse in canali, uno per utente. In questo modo ogni utente avrà 1/x risorse a disposizione, dove x è il numero di utenti che utilizza la rete;
+        \item \textbf{TDM}: \textit{Time Division Multiplexing}, che consiste nel suddividere le risorse in base al tempo. Ogni utente utilizza la totalità delle risorse disponibili per un determinato lasso di tempo, a conclusione del quale l'utilizzo delle risorse passa all'utente successivo fino a ricominciare il ciclo con il primo utente.
+    \end{itemize}
+    
+    \item \textbf{Commutazione di Pacchetto}: ogni informazione da trasmettere viene suddivisa in \textit{n} pacchetti. Ogni host condivide in questo caso le stesse risorse di rete, ogni pacchetto utilizza tutta la banda disponibile e le risorse vengono adoperate soltanto quando necessario.
+    Solitamente le code di pacchetti sono gestite in ordine di arrivo.
+\end{itemize}
+Il paradigma a commutazione di pacchetto permette a più utenti di utilizzare - in tutta la sua banda e potenza - la stessa rete.
+
+\section{Tipi di Sorgenti}
+Le sorgenti di trasmissione dei dati possono utilizzare tassi di frequenza di trasmissione diversi:
+\begin{itemize}
+    \item \textbf{Tasso costante}: nel caso della telefonia, per esempio, i pacchetti hanno una dimensione fissa e vengono trasmessi ad intervalli regolari. La frequenza è di 64Kbps;
+    \item \textbf{Tasso variabile}: facendo riferimento all'esempio precedente, alcuni software gestiscono in maniera ottimale la trasmissione dei dati: associaziono ad una variabile il rumore di sottofondo. Ogniqualvolta riconosceranno - utilizzando quella variabile - che l'utente non sta parlando, non invieranno alcun pacchetto.
+\end{itemize}

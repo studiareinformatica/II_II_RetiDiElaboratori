@@ -70,9 +70,24 @@ A differenza del protocollo TCP non esegue alcun tipo di \textit{handshake} o co
         \item \textbf{FDM}: \textit{Frequence Division Multiplexing}, che consiste nel suddividere le risorse in canali, uno per utente. In questo modo ogni utente avrà 1/x risorse a disposizione, dove x è il numero di utenti che utilizza la rete;
         \item \textbf{TDM}: \textit{Time Division Multiplexing}, che consiste nel suddividere le risorse in base al tempo. Ogni utente utilizza la totalità delle risorse disponibili per un determinato lasso di tempo, a conclusione del quale l'utilizzo delle risorse passa all'utente successivo fino a ricominciare il ciclo con il primo utente.
     \end{itemize}
+    \textbf{ESEMPIO}. Vogliamo ricavarci il tempo necessario per trasmettere 640.000 bit da un host A ad un host B, sapendo che la rete ha una banda di 1,536Mbps.
+    \begin{equation}
+        1,536/24 = 64K \to 64.000/640.000 = 1/10s
+    \end{equation}
+    \textbf{ESEMPIO}. Trasmettiamo 7,5Mbit con una banda massima di 1,5Mbps.
+    \begin{equation}
+        3*7,5/1,5 = 3*5 = 15s
+    \end{equation}
     
     \item \textbf{Commutazione di Pacchetto}: ogni informazione da trasmettere viene suddivisa in \textit{n} pacchetti. Ogni host condivide in questo caso le stesse risorse di rete, ogni pacchetto utilizza tutta la banda disponibile e le risorse vengono adoperate soltanto quando necessario.
     Solitamente le code di pacchetti sono gestite in ordine di arrivo.
+    \textbf{ESEMPIO}. Trasmettiamo 7,5Mbit con una banda massima di 1,5Mbps.
+    \begin{enumerate}
+        \item Dividiamo l'informazione da trasmettere in 5000 pacchetti da 1500 bit;
+        \item Occorre quindi 1ms per trasmettere pacchetti su un link
+        \item Ogni link lavora in parallelo (\textit{pipelining})
+        \item Il delay è ridotto da 15s (nel caso dello stesso esempio applicato in un paradigma a commutazione di circuito) a 5,003s.
+    \end{enumerate}
 \end{itemize}
 Il paradigma a commutazione di pacchetto permette a più utenti di utilizzare - in tutta la sua banda e potenza - la stessa rete.
 

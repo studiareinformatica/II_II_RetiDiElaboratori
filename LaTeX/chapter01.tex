@@ -98,87 +98,122 @@ Le sorgenti di trasmissione dei dati possono utilizzare tassi di frequenza di tr
     \item \textbf{Tasso variabile}: facendo riferimento all'esempio precedente, alcuni software gestiscono in maniera ottimale la trasmissione dei dati: associaziono ad una variabile il rumore di sottofondo. Ogniqualvolta riconosceranno - utilizzando quella variabile - che l'utente non sta parlando, non invieranno alcun pacchetto.
 \end{itemize}
 
-
+\section{Network Edge}
+Come già anticipato, ogni \textit{end-system} (\textit{host}) esegue applicativi. Questo può avvenire secondo diverse modalità:
+\begin{itemize}
+	\item \textbf{Client-Server}: un host (\textit{server}) esegue applicativi adibiti alla manipolazione di informazioni, ma soprattutto allo scambio di informazioni con altri host (\textit{client}). Quindi, essenzialmente, i \textit{client} effettuano richieste ai \textit{server}, che eseguono servizi perennemente in esecuzione (\textit{always-on});
+	\item \textbf{Peer-Peer}: non esiste differenziazione tra \textit{server} e \textit{client}, perché in questo caso gli host eseguono le stesse attività, ma comunicando tra loro (come nei casi di servizi come \textit{Torrent}, \textit{Skype}, e così via \ldots).
+\end{itemize}
 
 \section{access networks and physical media	}
-..Questi sistemi sono interconnessi a Internet tramite \textit{reti di accesso}. Possono essere:
+Ogni dispositivo può essere connesso ad internet tramite diverse \textit{reti di accesso}. Possono essere:
 \begin{itemize}
-	\item residential access nets
-	\item institutional access networks (school, company)
-	\item mobile access networks
+	\item Reti residenziali
+	\item Reti istituzionali (scuole, aziende, e così via \ldots)
+	\item Reti mobili (come quelle utilizzate dagli smartphones)
 \end{itemize}
 Elementi essenziali della rete di accesso sono la banda (bit/s), l'affidabilità (bit error rates) e se è dedicata o condivisa.
-\paragraph{Punti di accesso}
-Un altro elemento fondamentale è il punto di accesso alla rete: essa dev'essere in grado di riconoscere che si sta degradando il segnale e individuare un altro punto di accesso al quale ci stiamo avvicinando [--> non degradare la qualità della rete quando si è in movimento].
-\\
+\paragraph{Punti di accesso mobili}
+Un altro elemento fondamentale è il punto di accesso alla rete: essa dev'essere in grado di riconoscere che si sta degradando il segnale e individuare un altro punto di accesso al quale ci stiamo avvicinando, così da evitare un'eventuale degradazione della qualit della rete quando si è in movimento.
 
 \section{Transmission across a physical link}
 Ciò che viene trasmesso è una sequenza di bit che codifica il contenuto.
 \begin{itemize}
-	\item \textbf{Bits}: propagate between transmitter and receiver
-	\item \textbf{Physical link}: what lies between transmitter \& receiver
-	\item \textbf{guided media}: signals propagate in solid media [...]
-	\item :missing item:
+	\item \textbf{Bit}: valori che si propagano tra il trasmettitore e il ricevitore
+	\item \textbf{Link}: tracce attraverso cui passano i bit
+	\begin{itemize}
+		\item \textbf{Tracce guidate}: cavi fisici (fibra, e così via \ldots)
+		\item \textbf{Tracce radio}: le informazioni vengono trasmesse attraverso onde radio
+	\end{itemize}
 \end{itemize}
 
-Il segnale inviato subisce un'attenuazione durante la propagazione dell'informazione.
-Ciò non avviene in maniera uniforme; bisogna anche mettere in conto eventuali interferenze elettromagnetiche (spesso introdotte dalle stesse apparecchiature utilizzate per la connessione). Il risultato è che la sequenza ricevuta potrebbe non essere corretta.\\
-\textit{Bit error rate}: Varia da un dispositivo all'altro.
-In questo caso, occorre che il dispositivo sia error-aware, individuare la presenza di errori e tentare di correggerli (possibile fino a un certo numero di bit, possibile sia necessario scartare il pacchetto).
+Le informazioni trasmesse tramite onde radio subisce un'\textit{attenuazione} durante la propagazione dell'informazione, e quindi una \textit{distorsione}.
+Ciò non avviene in maniera uniforme; bisogna anche mettere in conto eventuali interferenze elettromagnetiche (spesso introdotte dalle stesse apparecchiature utilizzate per la connessione). Il risultato è che la sequenza ricevuta potrebbe non essere corretta. Questo introduce la definizione di \textit{bit error rate}, ovvero la frequenza con cui si verifica un errore nella trasmissione delle informazioni. Minore è il suo valore, migliore e più stabile è la rete.
+In questo caso, occorre che il dispositivo sia \textit{error-aware}, così da essere autonomo nell'individuare la presenza di errori e tentare di correggerli (possibile fino a un certo numero di bit, altrimenti viene scartato il pacchetto e richiesto indietro).
 
 \subsection{Codifica NRZ}
 \textit{NRZ: Non Return to Zero}. Il tempo è diviso in slot - unità temporali che corrispondono ad un bit.
 Ogni bit ha associato un valore stabile per la sua intera durata (1: High, 0: Low).
-Problema: sincronizzazione con il ricevitore (nessuna transizione nel caso di sequenze di 0 o 1).
-\subsection{Codifica Manchester}
-Utilizzata in Ethernet.
-È forzata una transizione basso-alto (se 0) o alto-basso (se 1) in corrispondenza di ogni bit.
+Il problema in questo tipo di codifica è la spesso asicronizzazione tra trasmettitore e ricevitre.
 
-\section{Tecnologie di accesso odierne}
+\subsection{Codifica Manchester}
+Utilizzata in Ethernet. Essenzialmente viene associato un valore ad ogni transizione. Quando la frequenza di trasmissione va dal basso all'alto - di intensità - il valore associato è 1, dall'alto al basso, invece, 0.
+
+\section{Tecnologie di accesso}
 \subsection{Dial-up modem}
 Velocità trasmissiva: ~56Kbps
-Utilizza la stessa infrastruttura telefonica: non \textit{always-on}, impossibile chiamare+navigare.
-La rete telefonica arrivava al central office, veniva convertita e raggiungeva direttamente l'InternetServiceProvider.
+Utilizza la stessa infrastruttura telefonica: non \textit{always-on}, impossibile poter usufruire della linea per internet e telefonia allo stesso tempo.
+Il modem reindirizza le richieste al \textit{central office}, che - qualora si cerchi di navigare in internet - converte la richiesta e la reindirizza al \textit{ISP} (\textit{Internet Service Provider}).
 
 \subsection{Digital Subscriber Line}
-Anch'essa utilizza un'infrastruttura telefonica esistente.\\Spesso ADSL (A: asimmetrico).\\
-Essendo la frequenza del segnale vocale sempre in un intervallo tra 0 e 4KHz, il segnale può essere campionato fino a 8M volte/s ed essere successivamente ricostruito; in quella frequenza il segnale è trasmesso \textit{solo} attraverso via telefonica.\\
-Le risorse del canale sono divise attraverso \textit{Frequency Division Multiplexing}.\\
-Velocità : fino a 1Mbps up (tipicamente < 256K), fino a 8Mbps (tipicamente < 1M) down. La grande differenza di velocità trasmissiva è causata da un paradigma client/server che dà la precedenza al download dei dati piuttosto che alla loro trasmissione.
+Anch'essa utilizza un'infrastruttura telefonica esistente. Spesso chiamata anche A-DSL (la \textit{A} indica l'\textit{asimmetria} tra la velocità di trasmissione modem \to \textit{central office} e \textit{central office} \to modem).
+Essendo la frequenza del segnale vocale sempre in un intervallo tra 0 e 4KHz, il segnale può essere campionato fino a 8M volt/s ed essere successivamente ricostruito; in quella frequenza il segnale è trasmesso \textit{solo} attraverso via telefonica. Tutte le trasmissioni fuori da quell'intervallo vengono quindi campionate come richieste per internet.
+Le risorse del canale sono divise attraverso \textit{FDM} (\textit{Frequency Division Multiplexing}).\\
+Velocità: fino a 1Mbps up (tipicamente < 256Kbps), fino a 8Mbps (tipicamente < 1Mbps) down. La grande differenza di velocità trasmissiva è causata da un paradigma client/server che dà la precedenza al download dei dati piuttosto che alla loro trasmissione.
 \\
 Tecnologie di tipo DSL sono progettate per raggiungere distanze non molto elevate (fino a 4/5 km).
-\\
 \paragraph{ADSL loop extender} 
 Dispositivo posizionato tra il cliente e il central office dalla compagnia telefonica per estendere la distanza ed aumentare la velocità di trasmissione.
-\\
-\subsection{Residential access: cable modems}
-Utilizzato spesso negli USA.
-Non utilizza l'infrastruttura telefonica ma quella della TV via cavo.
-\textbf{HTC}:\textit{hybrid fiber coax}, fino a 20Mbps down, 2Mbps up
-	\subsection{Fibra ottica}
-	Collegamenti ottici dal central office a casa.
-	Due tipologie di accesso:
+
+\subsection{HFC (in \textit{USA})}
+Velocità: fino a 20Mbps down, 2Mbps up.
+Utilizza - invece dell'infrastruttura telefonica, quella della TV via cavo.
+Sostanzialmente il \textit{central office}, in questo caso il \textit{cable headend}, gestisce degli anelli di fibra, composti da moltissimi nodi che li collegano ad ogni abitazione. A questo punto, la connessione passa per uno splitter (che utilizza l'\textit{FDM}), che la indirizza alla TV o al dispositivo che richiede la connessione internet. 
+
+\subsection{Fibra ottica}
+Collegamenti ottici dal \textit{central office} all'abitazione. Raggiunge distanza lunghissime praticamente senza alcuna distorsione del segnale.
+Due tipologie di accesso:
+\begin{itemize}
+	\item \textit{Passive Optical Network} (\textit{PON}): un'unica fibra \& uno splitter ottico che smista le informazioni verso diverse abitazioni. Comporta costi decisamente bassi, a scompenso però della qualità:
 	\begin{itemize}
-		\item Passive Optical Network - un'unica fibra \& uno splitter ottico che smista le informazioni.\\
-		Efficienti: fino a 32 utenti per un solo cavo, bassi costi
-		\\Più utenze ricevono le trasmissioni per un determinato utente --> informazioni sono crittate per permettere solo all'utente interessato possa leggerle.\\%[...]
-		
-		\item Active Optical Network
+		\item Si possono spesso verificare \textit{collisioni}, evitate attraverso il \textit{TDM}
+		\item Essendo una linea condivisa si presenta la necessità di dover criptare i messaggi
+		\item Non raggiunge distanze massime
+		\item Diventa più difficile isolare eventuali problemi
+		\item Velocità di accesso non ottimale
 	\end{itemize}
-	\subsection{Ethernet}
-	Evoluzione che risale agli '80; tecnologia basata su formati e protocolli che sono rimasti immutati.
-	Elemento centrale (switch) + diverse utenze di vario tipo: endsystem di entrambi i tipi + router che connette all'ISP.
-	\subsection{Wireless Access Networks}
-	In questo caso, le informazioni sono trasmesse andando a modulare opportunamente %COSA?
-	Mezzo radio condiviso trasmette lungo un determinato raggio di azione ai dispositivi.
-	\begin{itemize}
-		\item dati non possono essere "in chiaro".
-		\item rischio elevato di accavallamento di trasmissioni
-	\end{itemize}
-	Protocolli appositi individuano e "scavallano" collisioni.
-	
-	
-	\section{Internet Structure: network of networks}
-	La maggior parte degli ISP hanno copertura regionale/nazionale; richiedono accesso ai pochissimi service provider \textit{Tier One}, che hanno copertura mondiale (Verizon, Sprint, AT\&T,). Questi ISP non popolano letteralmente tutte le zone del mondo; interconnettono i router tramite POP (point of presence).\\ 
-	
-	Gli ISP Tier 2 fanno degl accordi con i t1 (sono dei clienti!) e a loro volta spesso offrono copertura maggiore a ISP locali (tier3).
+	\item \textit{Active Optical Network} (\textit{PAN})
+\end{itemize}
+
+\subsection{Ethernet}
+Evoluzione che risale agli anni '80; tecnologia basata su formati e protocolli che sono rimasti immutati, se non per supportare il decisivo incremento della velocità di navigazione.
+Uno switch - con ingressi ethernet, appunto - viene frapposto tra router/modem e diversi host.
+
+\subsection{Wireless Access Networks}
+In questo caso, le informazioni sono modulate opportunamente, per raggiungere le frequenze delle onde radio supportate dal ricetrasmettitore radio.
+Ne esistono due tipi:
+\begin{enumerate}
+	\item \textit{Wireless LAN} (o \textit{WiFi}) 802.11b/g: raggiunge una velocità comresa tra gli 11Mbps e i 54Mbps.
+	\item \textit{Wide-area Wireless Access}: mezzo radio adibito condiviso che raggiunge una velocità compresa tra 1Mbps (\textit{EVDO}/\textit{HSDPA}) e diverse decine di Mbps (\textit{LTS}).
+\end{enumerate}
+Essendo la rete condivisa, neccessità di essere criptata. Non utilizza né \textit{FDM} né \textit{TDP}, ma un sistema di gestione proprietario e specifico.
+
+\section{Reti Mobili}
+\begin{center}
+	\begin{tabular}{| c | c | c | c | c |}
+		\hline
+		\textbf{Generazione} & \textbf{Simbolgia} & \textbf{Tecnologia } & \textbf{DL Massima} in Mbit/s & \textbf{DL Tipica} in Mbit/s \\ \hline
+		2G & G & GPRS & 0,1 & 0,03 \\ \hline
+		2G & E & EDGE & 0,3 & 0,1 \\ \hline
+		3G & 3G & 3G (basic) & 0,3 & 0,1 \\ \hline
+		3G & H & HSPA & 7,2 & 1,5 \\ \hline
+		3G & H+ & HSPA+ & 21 & 1 \\ \hline
+		3G & H+ & DC-HSPA+ & 42 & 8 \\ \hline
+		4G & 4G & LTE & 100 & 15 \\ \hline
+	\end{tabular}
+\end{center}
+
+\section{Componenti attuali}
+\begin{enumerate}
+	\item \textit{DSL Fast-Technology} (combinata con fibra): 1Gbps
+	\item \textit{Ethernet}: 25-40Gbps (con più linee 100-400Gbps)
+	\item \textit{WiFi IEEE 802.11ac}: 1Gbps
+	\item \textit{Fibra}: diverse decine di Tbps
+	\item \textit{Reti mobili}: diverse centinaia di Mbps
+\end{enumerate}
+
+\section{Internet Structure: network of networks}
+Internet ha una struttura gerarchica, composta da moltissimi \textit{ISP} (\textit{Internet Service Provider}).
+La prima categoria è composta dai \textit{Tier-1 (Verizon, Sprint, AT\&T, e così via \ldots). Questi sono interconnessi - per maggiore copertura - tramite dei \textit{POP} (\textit{Point of presence}).
+Poi ci sono i \textit{Tier-2}, anche loro interconnessi tra loro e con i \textit{Tier-1}.
+La gerarchia continua seguendo questo schema, fino a raggiungere gli \textit{ISP} regionali/pronvinciali e, infine, le reti residenziali.

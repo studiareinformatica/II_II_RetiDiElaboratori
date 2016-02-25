@@ -1,15 +1,21 @@
-\section{caravan analogy}
+\section{Informazioni utili}
+Esistono diversi tipi di ritardi:
 \begin{itemize}
-	\item cars "propagate" at 1000km/h
-	\item toll booth takes 1m to service a car
-	\item \textit{Will cars arrive to 2nd booth before all cars serviced at 1st booth?}
+	\item \textbf{Processing Delay}: ritardo nel processare i dati ricevuti (per analizzare se contengono errori o meno e per verificare l'indirizzo del destinatario)
+	\item \textbf{Queue Delay}: tempo di attesa prima che il link adibito alla consegna dei dati accolga il pacchetto
+	\item \textbf{Transmission Delay}
+	\begin{itemize}
+		\item R = banda link (bps)
+		\item L = grandezza pacchetto (bit)
+		\item a = frequenza di arrivo pacchetti
+		\item \textit{Tempo di trasmissione sul link} = L/R
+		\item \textit{Intensità di traffico} = L*a/R (se pari a 0 non si verifica ritardo nella maniera più assoluta)
+	\end{itemize}
+	\item \textbf{Propagation Delay}
+	\begin{itemize}
+		\item d = lunghezza fisica del link
+		\item s = tempo di propagazione in media
+		\item \textit{Ritardo di propagazione} = d/s
+	\end{itemize}
+	\item \textbf{Nodal delay} = Processing delay + Queue delay + Transmission delay + Propagation delay
 \end{itemize}
-After 7m, 1st car at 2nd booth and 2 cars still at 1st.
-\textit{1st bit of packel can arrive at} %....}
-
-
-\paragraph{nodal delay} d(nodal) = d(processing) + d(queue) + d(transmission) + d(propagation).
-
-
-\section{Packet loss}
-

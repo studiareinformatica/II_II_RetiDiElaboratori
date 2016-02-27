@@ -14,7 +14,7 @@ Centinaia di milioni di dispositivi (\textbf{hosts} o endsystems) che ospitano \
     \item
         \textit{Hosts} (o \textit{End-Systems}), sui quali girano applicazioni web. \textit{End Systems} perché sono le foglie di un albero di collegamenti che passano per diversi \textit{router} (i quali permettono lo scambio di informazioni tra i vari hosts);
     \item
-        \textit{Communication Links} (fibra, radio, satellite, e così via \ldots), a cui è associato un determinato insieme di frequenze, detto \textit{banda}. Conoscendo la banda è possibile ricavare il quantitativo di bit massimo che posso far attraversare, il \textit{tasso di trasmissione}. La \textit{collisione} è la sovrapposizione di pacchetti di comunicazione da sorgenti diverse, e causa la mancata decodifica dei pacchetti da parte del router;
+        \textit{Communication Links} (fibra, radio, satellite, e così via \ldots), a cui è associato un determinato insieme di frequenze, detto \textit{banda}. Conoscendo la banda è possibile ricavare il quantitativo di bit massimo che posso far attraversare, il \textit{datarate} (o \textit{tasso di trasmissione}). La \textit{collisione} è la sovrapposizione di pacchetti di comunicazione da sorgenti diverse, e causa la mancata decodifica dei pacchetti da parte del router;
     \item
         \textit{router} è l'elemento cui viene affidato il compito di gestire l'inoltro dei pacchetti dalla sorgente alla destinazione. È formato da link di ingresso, sui quali esegue il \textit{forwarding} verso i link d'uscita. Per poterlo fare, necessita di un'informazione, l'indirizzo del destinatario. Controlla quindi una \textit{tabella d'inoltro}, composta da due colonne: l'indirizzo del destinatario e \textit{next hop}. Seguendo ogniqualvolta necessario i riferimenti associati all'indirizzo richiesto sulla tabella, il pacchetto arriva a destinazione;
     \item
@@ -105,7 +105,7 @@ Come già anticipato, ogni \textit{end-system} (\textit{host}) esegue applicativ
 	\item \textbf{Peer-Peer}: non esiste differenziazione tra \textit{server} e \textit{client}, perché in questo caso gli host eseguono le stesse attività, ma comunicando tra loro (come nei casi di servizi come \textit{Torrent}, \textit{Skype}, e così via \ldots).
 \end{itemize}
 
-\section{access networks and physical media	}
+\section{Accesso alla rete}
 Ogni dispositivo può essere connesso ad internet tramite diverse \textit{reti di accesso}. Possono essere:
 \begin{itemize}
 	\item Reti residenziali
@@ -116,7 +116,7 @@ Elementi essenziali della rete di accesso sono la banda (bit/s), l'affidabilità
 \paragraph{Punti di accesso mobili}
 Un altro elemento fondamentale è il punto di accesso alla rete: essa dev'essere in grado di riconoscere che si sta degradando il segnale e individuare un altro punto di accesso al quale ci stiamo avvicinando, così da evitare un'eventuale degradazione della qualit della rete quando si è in movimento.
 
-\section{Transmission across a physical link}
+\section{Trasmissione attraverso link fisici}
 Ciò che viene trasmesso è una sequenza di bit che codifica il contenuto.
 \begin{itemize}
 	\item \textbf{Bit}: valori che si propagano tra il trasmettitore e il ricevitore
@@ -146,7 +146,7 @@ Utilizza la stessa infrastruttura telefonica: non \textit{always-on}, impossibil
 Il modem reindirizza le richieste al \textit{central office}, che - qualora si cerchi di navigare in internet - converte la richiesta e la reindirizza al \textit{ISP} (\textit{Internet Service Provider}).
 
 \subsection{Digital Subscriber Line}
-Anch'essa utilizza un'infrastruttura telefonica esistente. Spesso chiamata anche A-DSL (la \textit{A} indica l'\textit{asimmetria} tra la velocità di trasmissione modem \to \textit{central office} e \textit{central office} \to modem).
+Anch'essa utilizza un'infrastruttura telefonica esistente. Spesso chiamata anche A-DSL (la \textit{A} indica l'\textit{asimmetria} tra la velocità di trasmissione modem-\textit{central office} e \textit{central office}-modem).
 Essendo la frequenza del segnale vocale sempre in un intervallo tra 0 e 4KHz, il segnale può essere campionato fino a 8M volt/s ed essere successivamente ricostruito; in quella frequenza il segnale è trasmesso \textit{solo} attraverso via telefonica. Tutte le trasmissioni fuori da quell'intervallo vengono quindi campionate come richieste per internet.
 Le risorse del canale sono divise attraverso \textit{FDM} (\textit{Frequency Division Multiplexing}).\\
 Velocità: fino a 1Mbps up (tipicamente < 256Kbps), fino a 8Mbps (tipicamente < 1Mbps) down. La grande differenza di velocità trasmissiva è causata da un paradigma client/server che dà la precedenza al download dei dati piuttosto che alla loro trasmissione.
@@ -214,6 +214,38 @@ Essendo la rete condivisa, neccessità di essere criptata. Non utilizza né \tex
 
 \section{Internet Structure: network of networks}
 Internet ha una struttura gerarchica, composta da moltissimi \textit{ISP} (\textit{Internet Service Provider}).
-La prima categoria è composta dai \textit{Tier-1 (Verizon, Sprint, AT\&T, e così via \ldots). Questi sono interconnessi - per maggiore copertura - tramite dei \textit{POP} (\textit{Point of presence}).
+La prima categoria è composta dai \textit{Tier-1} (Verizon, Sprint, AT\&T, e così via \ldots). Questi sono interconnessi - per maggiore copertura - tramite dei \textit{POP} (\textit{Point of presence}).
 Poi ci sono i \textit{Tier-2}, anche loro interconnessi tra loro e con i \textit{Tier-1}.
 La gerarchia continua seguendo questo schema, fino a raggiungere gli \textit{ISP} regionali/pronvinciali e, infine, le reti residenziali.
+
+\section{Loss \& Delay}
+Esistono diversi tipi di ritardi:
+\begin{itemize}
+	\item \textbf{Processing Delay}: ritardo nel processare i dati ricevuti (per analizzare se contengono errori o meno, per leggere l'header e per instradarli nella coda giusta).
+	\item \textbf{Queue Delay}: tempo di attesa prima che il link adibito alla consegna dei dati processi il pacchetto.
+	\item \textbf{Transmission Delay}: il tempo necessario a trasmettere tutta la sequenza del pacchetto.
+	\begin{itemize}
+		\item R = banda link (bps)
+		\item L = grandezza pacchetto (bit)
+		\item a = frequenza di arrivo pacchetti
+		\item \textit{Tempo di trasmissione sul link}: \[\frac{\text{L}}{\text{R}}\]
+		\item \textit{Intensità di traffico}: \[\frac{\text{L}\times\text{a}}{\text{R}}\]
+	\end{itemize}
+	L'arrivo dei pacchetti segue una distribuzione di \textit{Poisson}, e quindi:
+	\begin{itemize}
+	    \item se l'intensità di traffico è 0 ca., si è verificato un delay piccolo;
+	    \item se l'intensità di traffico è 0,5 ca., si è verificato un delay medio;
+	    \item se l'intensità di traffico è 1 ca., si è verificato un delay alto e basta pochissimo per congestionare la rete.
+	\end{itemize}
+	\item \textbf{Propagation Delay}: tempo utilizzato dai bit per propagarsi (alla velocità della luce, ca.) lungo tutta la linea fino alla destinazione.
+	\begin{itemize}
+		\item d = lunghezza fisica del link
+		\item s = tempo di propagazione in media
+		\item \textit{Ritardo di propagazione} = d/s
+	\end{itemize}
+	\item \textbf{Nodal delay} = Processing delay + Queue delay + Transmission delay + Propagation delay
+\end{itemize}
+\\
+Il \textit{trace route program} conta il tempo mandando pacchetti con un contatore \textit{time-to-live} che decrementa di 1 all'incrontro con ogni router.
+\\
+Il \textit{throughput} indica i bit trasmessi al secondo: il collo di bottiglia sarà il link che avrà il \textit{throughput} minore. Viene quindi inviata la massima quantità pari al \textit{throughput} del link più piccolo.

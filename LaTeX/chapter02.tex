@@ -1,21 +1,75 @@
-\section{Informazioni utili}
-Esistono diversi tipi di ritardi:
+\section{Protocolli}
 \begin{itemize}
-	\item \textbf{Processing Delay}: ritardo nel processare i dati ricevuti (per analizzare se contengono errori o meno e per verificare l'indirizzo del destinatario)
-	\item \textbf{Queue Delay}: tempo di attesa prima che il link adibito alla consegna dei dati accolga il pacchetto
-	\item \textbf{Transmission Delay}
-	\begin{itemize}
-		\item R = banda link (bps)
-		\item L = grandezza pacchetto (bit)
-		\item a = frequenza di arrivo pacchetti
-		\item \textit{Tempo di trasmissione sul link} = L/R
-		\item \textit{Intensità di traffico} = L*a/R (se pari a 0 non si verifica ritardo nella maniera più assoluta)
-	\end{itemize}
-	\item \textbf{Propagation Delay}
-	\begin{itemize}
-		\item d = lunghezza fisica del link
-		\item s = tempo di propagazione in media
-		\item \textit{Ritardo di propagazione} = d/s
-	\end{itemize}
-	\item \textbf{Nodal delay} = Processing delay + Queue delay + Transmission delay + Propagation delay
+    \item \textbf{TCP}: protocollo di trasporto
+    \item \textbf{IP}: protocollo di instradamento
 \end{itemize}
+\\
+In una \textif{TCP connection request/response} i protocolli devono specificare:
+\begin{itemize}
+    \item il formato delle informazioni (ordine dei bit, e quant'altro \ldots)
+    \item messaggio da scambiare
+    \item ordine degli eventi
+\end{itemize}
+\\
+TCP prevede che prima dello scambio delle informazioni ci sia la \textit{request/response}, un dialogo il cui fine è assicurare che:
+\begin{itemize}
+    \item i dati siano in ordine e completi
+    \item avvenga il \textit{controllo di flusso} (consente di sapere la velocità e la quantità di dati che è possibile trasferire)
+    \item avvenga il \textit{controllo di congestione} (i router si accorgono se il flusso in arrivo è maggiore di quello in uscita)
+\end{itemize}
+\\
+A differenza del \textit{TCP}, l'\textit{UDP} non prevede alcuno scambio \textit{request/response}, prima dell'effettivo trasferimento dell'informazione. Il sistema dei \textit{DNS} utilizza \textit{UDP}: quando si ha un \textit{URL}, bisogna ottenerne l'\textit{indirizzo IP} associato, perciò viene richiesta l'informazione tramite il protocollo \textit{UDP}, che garantisce una trasmissione rapida, ma non da certezze che questa vada a buon fine.
+
+\section{Pila TCP/IP}
+La \textit{pila TCP/IP} è una pila protocollare, che indica i livelli di protocollo, organizzata a livelli (modularità, così che se variano le regole di un livello, questo cambiamento non tange il funzionamento degli altri).
+Tutte le funzionalità logiche si dividono in gruppi, per rendere la progettazione più semplice e più estensibile.
+\\
+Ciascuna funzionalità ha diversi protocolli.
+Il gruppo più in alto corrisponde alla logica applicativa.
+Spesso si arricchisce ogni gruppo con microfunzionalità e questo da un servizio aggiuntivo al livello superiore, e queste microfunzionalità possono essere mappate (duplicate) in livelli diversi.
+Diverse entità della rete hanno diversi sottoinsiemi delle funzionalità.
+Vengono stabiliti gli \textit{access service point} che sono i punti in cui - nell'architettura - c'è il passaggio da un livello ad un altro.
+Lo svantaggio di un'architettura di questo tipo è che livelli non adiacenti non hanno la possibilità di comunicare (esiste però un sistema, chiamato \textit{cross layering}, che permette di leggere dati di livelli non adiacenti).
+\\
+I livelli sono solitamente i seguenti:
+\begin{enumerate}
+    \item \textbf{Lv "applicativo"} (\textit{software}): molte funzionalità diverse (come la sincronia);
+    \item \textbf{Lv di "trasporto"} (\textit{software}): utilizza di base il protocollo \textit{UDP} e controlla che il messaggio venga consegnato al giusto destinatario. Col protocollo \textit{TCP} c'è anche il controllo se il pacchetto è arrivato ed è stato realmente consegnato al giusto destinatario;
+    \item \textbf{Lv di "rete"} (\textit{network}): adibito al tentativo di capire il percorso da intraprendere, attraverso algoritmi di instradamenti, per poi inviare il pacchetto attraverso quel percorso;
+    \item \textbf{Lv "link"}, o \textbf{datalink} (\textit{hardware}): lavora con i \textit{frame} (\textit{trama}). Verifica se ci sono stati errori di trasmissione, analizzando anche gli indirizzi \textit{MAC} (\textit{Medium Access Control});
+    \item \textbf{Lv "fisico"} (\textit{hardware}): enormi eterogeneità.
+\end{enumerate}
+Sugli \textit{end-systems} ci saranno tutti e 4 i livelli.
+Sugli elementi intermedi di commutazione ci saranno solamente i 3 livelli più bassi.
+L'\textit{ack} (\textit{acknowledge}) è un tipo di messaggio che viene utilizzato per far capire al sorgente/destinatario che il pacchetto è arrivato.
+Ogni livello aggiunge un \textit{header}, che per il livello successivo diventa parte integrante del messaggio stesso da consegnare. Per ciascun livello, ecco l'header:
+\begin{itemize}
+    \item Applicativo: il messaggio stesso (\textit{messaggio}, o \textit{message});
+    \item Trasporto: il \textit{segmento}, o \textit{segment};
+    \item Rete: il \textit{pacchetto}, o \textit{datagram};
+    \item Datalink: la \textit{trama}, o \textit{frame}.
+\end{itemize}
+I vantaggi della stratificazione sono la modularità e la gestione dell'eterogeneità.
+
+\section{Storia}
+Internet è stato inventato da \textit{Leonard Kleinrock}, quand'era ancora studente ed ebbe l'idea dell'architettura a pacchetto, nel 1961.
+Nel 1969, 8 anni dopo aver concepito questa idea, viene attivata la prima rete con 4 nodi (le 4 importanti università della California), utilizzando il protocollo \textit{NCP}.
+\\
+Nel 1972 viene allargata a 15 nodi.
+Negli anni successivi altri studenti hanno avuto l'idea di una rete \textit{wireless}, utilzzando il protocollo \textit{ALOHA}, o anche quella di connettere stampanti - o altri dispositivi -, concependo per la prima volta il concetto di \textit{LAN}.
+\\
+\textit{Robert E. Kahn} e \textit{Vinton Cerf} capirono l'importanza di mantenere l'eterogeneità della rete. Definirono l'architettura di internet odierna.
+\\
+Così:
+\begin{itemize}
+    \item 1979: raggiungimento di 200 nodi;
+    \item 1982: nasce l'\textit{SMTP} per le email;
+    \item 1983: inventato il \textit{TCP/IP};
+    \item 1985: nasce l'\textit{FTP} per lo scambio di file;
+    \item 1988: viene aggiunto il controllo di congestione al protocollo TCP.
+\end{itemize}
+Ciononostante, la rete rimaneva una realtà legata all'ambito accademico.
+\\
+Nei primi anni '90, \textit{Tim Berners-Lee} ebbe l'idea di web così come oggi è conosciuto, inventando l'\textit{HTTP} e l'\textit{HTML}, sulla base di documenti del 1945 di \textit{Vannevar Bush} che accennava agli \textit{ipertesti}.
+\\
+Da qui in poi internet ha avuto una crescita esponenziale, sia in velocità che in applicazioni.

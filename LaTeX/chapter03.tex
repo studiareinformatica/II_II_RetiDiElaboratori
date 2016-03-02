@@ -1,2 +1,185 @@
+\section{Accenni}
+Il \textit{Protocollo Applicativo} della pila \textit{TCP/IP} definisce:
+\begin{itemize}
+    \item i tipi di messaggi scambiati;
+    \item la sintassi del messaggio;
+    \item la sementica dei campi;
+    \item le regole che stabiliscono quando inviare richieste/risposte.
+\end{itemize}
+
 \section{HTTP}
+Prima di introdurre il concetto di \textit{HTTP} occorre spiegare il paradigma \textit{client-server}:
+\begin{itemize}
+    \item \textit{Client}: processo client (come un browser, quando richiede una \textit{URL} - \textit{Uniform Resource Locator}) che può fare richieste ed interpretare le risposte;
+    \item \textit{Server}: processo server, che fornisce le risposte.
+\end{itemize}
+Il \textit{client} viene attivato solo quando server, mentre invece il \textit{server} è sempre in ascolto.
+Un \textit{IP} identifica univocamente un host nella rete (in realtà una scheda di rete).
+Attraverso l'indirizzo \textit{IP} si può raggiungere l'host ma non il processo cui occorre effettivamente consegnare il messaggio. Per questo, vengono utilizzate porte differenti. \\
+Il binomio \textit{IP-porta} permette a due processi su due host diversi di comunicare. \\
+\textit{IANA} è l'\textit{ente} che definisce l'uso delle porte: generalmente, le porte 0-1023 sono riservate, mentre le successive sono per le \textit{user applications}. \\
+Sostanzialmente il processo che è in ascolto di messaggi apre un \textit{socket} sulla porta specifica e rimane in attesa di connessioni dall'esterno su quella porta e quel socket (per ogni connessione entrante, nell'header del livello di trasporto viene specificata la porta di destinazione, mentre invece l'IP e l'ID nel livello di rete). \\
+Quando viene richiesta una pagina \textit{HTML}, la reazione del protocollo \textit{HTTP} varia in base alla versione:
+\begin{itemize}
+    \item \textit{HTTP/1.0} faceva tante connessioni quanti erano gli oggetti (caso non persistente) in canali dedicati;
+    \item \textit{HTTP/1.1} fa invece una sola connessione che rimane aperta e richiede tutti gli oggetti tramite questa sola connessione.
+\end{itemize}
+Si definisce \textit{RTT} (\textit{Round Trip Time}), il tempo che un pacchetto impiega ad arrivare al server e tornare indietro.
+Per \textit{HTTP} esistono quattro metodi essenziali:
+\begin{enumerate}
+    \item \textit{GET}: richiede una pagina
+    \item \textit{HEAD}: con lo stesso principio del \textit{GET}, riceve soltanto l'header della pagina HTML (utilizzato per motivi di debug)
+    \item \textit{POST}: invia dati al server tramite form
+    \item \textit{PUT}: carica un file sul server
+\end{enumerate}
+Esistono poi quattro tipi di header:
+\begin{enumerate}
+    \item generali
+    \item \textit{request} header
+    \item \textit{response} header
+    \item \textit{entity} header
+\end{enumerate}
+Un caso specifico da sottolineare è quello dell'\textit{if-modified-since}, che fa parte dei \textit{request} headers: il client specifica una data e richiede al server la risorsa solo se questa è stata modificata dopo quella data. \\
+Tra il client e il server ci sono degli intermediari chiamati \textit{proxy-servers}, che mantengono risorse in cache e forniscono le risorse al posto del server interessato. Sostanzialmente, sono delle macchine che lavorano a livello applicativo, con grandi quantità di memoria; leggono le richieste dei client e se possono servire la richiesta lo fanno al posto del server. Chiaramente, sono in costante aggiornamento così da evitare problemi di consistenza. \\
+Esistono diversi tipi di \textit{proxy}:
+\begin{itemize}
+    \item \textit{caching proxy} (più vicino al client);
+    \item \textit{forwarding proxy}:
+    \begin{itemize}
+        \item \textit{trasparent proxy};
+        \item \textit{non-trasparent proxy}.
+    \end{itemize}
+    \item \textit{reverse proxy} (più vicino al server, intercetta le richieste e le invia ai server - in maniera bilanciata -; fanno spesso un lavoro di criptaggio dei messagi).
+\end{itemize}
+Utilizzando il parametro \textit{no-cache} si specifica il desiderio di non passare per il sistema di \textit{caching} dei \textit{proxy-servers}. \\
+Chiaramente tutti i sistemi di \textit{caching} utilizzati seguono una gerarchia, a capo della quale vi è quella locale del proprio browser.
+
 \section{Cookies}
+I \textit{cookies} rappresentano una sorta di gettone identificativo, usato dai server web per poter riconoscere i browser durante comunicazioni con il protocollo HTTP usato per la navigazione web.
+Tale riconoscimento permette di realizzare meccanismi di autenticazione, di memorizzare dati utili alla sessione di navigazione - come le preferenze sull'aspetto grafico o linguistico del sito -, di associare dati memorizzati dal server - ad esempio il contenuto del carrello di un negozio elettronico -, di tracciare la navigazione dell'utente - ad esempio per fini statistici o pubblicitari. \\
+Date le implicazioni per la riservatezza dei naviganti del web, l'uso dei \textit{cookies} è categorizzato e disciplinato negli ordinamenti giuridici di numerosi paesi, tra cui quelli europei, inclusa l'Italia. \\
+Nel \textit{cookie} solitamente possiamo trovare quattro attributi:
+\begin{itemize}
+    \item Nome/valore è una variabile ed un campo obbligatorio;
+    \item Scadenza (\textit{expiration date}) è un attributo opzionale che permette di stabilire la data di scadenza del \textit{cookie}. Può essere espressa come data, come numero massimo di giorni oppure come \textit{Now} (adesso) (implica che il \textit{cookie} viene eliminato subito dal computer dell'utente in quanto scade nel momento in cui viene creato) o \textit{Never} (mai) (implica che il \textit{cookie} non è soggetto a scadenza e questi sono denominati persistenti);
+    \item Modalità d'accesso (\textit{HttpOnly}) rende il \textit{cookie} invisibile a \textit{javascript} e altri linguaggi \textit{client-side} presenti nella pagina;
+    \item Sicuro (\textit{secure}) indica se il \textit{cookie} debba essere trasmesso criptato con \textit{HTTPS}.
+\end{itemize}
+Il dominio (\textit{domain}) e il percorso (\textit{path}) definiscono l'ambito di visibilità del \textit{cookie}, indicano al browser che il \textit{cookie} può essere inviato al server solo per il dominio e il percorso indicati. Se non specificati, come predefiniti prendono il valore del dominio e del percorso che li ha inizialmente richiesti. \\
+\newpage
+
+Un esempio di \textit{cookie} è il seguente:
+\begin{lstlisting}
+Set-Cookie: LSID=DQAAAK...Eaem_vYg; Domain=docs.foo.com; Path=/accounts; Expires=Wed, 13-Jan-20021 22:23:01 GMT; Secure; HttpOnly
+Set-Cookie: HSID=AYQEVn...DKrdst; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-20021 22:23:01 GMT; HttpOnly
+Set-Cookie: SSID=Ap4P...GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-20021 22:23:01 GMT; Secure; HttpOnly
+\end{lstlisting}
+
+\section{Domain Name System}
+Il \textbf{DNS} identifica sia il\textit{database distribuito}, che contiene l'associazione tra nome e IP, sia il protocollo applicativo per l'effettiva risoluzione \textit{nome-IP} (o \textit{IP-nome}). \\
+I suoi principali servizi sono:
+\begin{itemize}
+	\item traduzione tra \textit{hostname} e \textit{IP};
+	\item gestione di aliasing degli host;
+	\item gestione di aliasing dei mail server;
+	\item distribuzione del carico, o \textit{load balancing} (per evitare di sovraccaricare il server, tramite l'associazione di più IP ad un unico nome).
+\end{itemize}
+È strutturato come database distribuito per i seguenti domini:
+\begin{itemize}
+	\item possibilità di isolamento di eventuali problemi;
+	\item gestione del traffico;
+	\item gestione delle distanze;
+	\item manutenzione.
+\end{itemize}
+Da qui è opportuno definire il concetto di \textbf{scalabilità}: capacità di un sistema di mantenere un comportamento ottimale alla crescita degli utenti che ne fanno uso. \\
+La distribuzione dei DNS avviene in maniera gerarchica:
+\begin{enumerate}
+    \item \textbf{Root} DNS Servers;
+    \item \textbf{TLD} (\textit{Top-level domain}) DNS Servers (ciascuno per gruppi di \textit{TLD} diversi: .com, .org, .edu, e così via \ldots);
+    \item \textbf{Authoritative} DNS Servers (per .com vi potrebbero essere amazon.com e yahoo.com, per .edu invece poly.edu, per esempio; e così via \ldots);
+    \item \textbf{Local} DNS Servers.
+\end{enumerate}
+
+\subsection{Risoluzione del nome}
+La risoluzione del nome avviene leggendo il dominio da destra (ogni dominio dopo il \textit{TLD} ha un punto). Nel caso di ebay.it(.), per esempio: si legge da destra fino al primo ".". Nel primo passaggio la stringa ottenuta sarà vuota, per questo si interrogherà il Root DNS Server circa la stringa successiva, ovvero da dove si è arrivati fino al "." successivo: si è ottenuta la stringa ".it". Una volta ottenuta risposta dal Root DNS, sapremo chi è delegato dei domini associati al \textit{TLD} .it. A questo punto, continuando con lo stesso criterio, chiederemo al DNS Server ottenuto la stringa ottenuta successivamente, ovvero ".ebay". Procedendo in questo modo, si arriva alla risoluzione completa del nome. \\
+Per questa procedura si possono usare due tipi di approcci:
+\begin{itemize}
+    \item \textbf{iterativo}:
+    \begin{enumerate}
+    	\item Il client chiede al nameserver locale la risoluzione del nome;
+    	\item Il nameserver locale chiede e ottiene la risposta dal Root DNS;
+    	\item Il nameserver locale chiede (l'informazione ottenuta nel passaggio precedente) e ottiene la risposta dal TLD DNS;
+    	\item Il nameserver locale chiede (l'informazione ottenuta nel passaggio precedente) e ottiene la risposta dall'Authoritative DNS;
+    	\item Ottenuta la risposta definitiva, la consegna al client.
+    \end{enumerate}
+    \item \textbf{ricorsivo}:
+    \begin{enumerate}
+    	\item Il client chiede al nameserver locale la risoluzione del nome;
+    	\item Il nameserver chiede al Root DNS la risoluzione del nome;
+    	\item Il Root DNS chiede al TLD DNS la risoluzione del TLD;
+    	\item Il TLD DNS chiede all'Authoritative DNS la risoluzione del nome;
+    	\item L'Authoritative DNS consegna la risposta.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Cache}
+I DNS utilizzano un parametro in ogni loro record, che ne gestisce il tempo di aggiornamento per il flush del record stesso, in modo tale da rendere l'aggiornamento periodico ogni tot tempo, e mantenerlo - nel restante - in cache, aumentando le prestazioni di risoluzione dei domini.
+
+\newpage
+
+\subsection{Records}
+Il DNS conserva \textit{resource records} di vari tipi, tutti con il seguente formato: \{name, value, type, ttl\}.
+I quattro formati più importanti:
+\begin{itemize}
+	\item \textbf{A}: 
+	\begin{itemize}
+		\item name: hostname
+		\item value: IP
+	\end{itemize}
+	\item \textbf{NS}: 
+	\begin{itemize}
+		\item name: alias
+		\item value: hostname server
+	\end{itemize}
+	\item \textbf{CNAME}:
+	\begin{itemize}
+		\item name: alias
+		\item value: nome a cui punta l'alias
+	\end{itemize}
+	\item \textbf{MX}
+	\begin{itemize}
+		\item name: dominio
+		\item value: hostname server
+	\end{itemize}
+\end{itemize}
+
+\section{FTP}
+L'\textit{FTP} (\textit{File Transfer Protocol}) è un protocollo utilizzato per il trasferimento di file da/a un host remoto. \\
+Lavora sulla porta 21, ma ne usa - in fasi particolari anche un'altra:
+\begin{itemize}
+    \item \textbf{Porta 21}: porta standard per la connessione di controllo (persistente), che gestisce i l'autenticazione e un set di comandi per navigare nella directory FTP;
+    \item \textbf{Porta 20}: porta - non persistente - utilizzata unicamente per l'effettivo trasferimento del file, che la chiude a trasferimento concluso.
+\end{itemize}
+Tutte le richieste FTP sono inviate come messaggi ASCII attraverso il canale di controllo.
+
+\newpage
+
+\section{Mail}
+Composta da:
+\begin{itemize}
+    \item Agents (\textit{Thunderbird}, e così via \ldots);
+    \item Servers (contenente \textit{mailboxes} e le code dei messaggi in uscita - \textit{message queues});
+    \item Protocolli (\textit{SMTP}, \textit{POP}, \textit{IMAP}).
+\end{itemize}
+Ciascun protocollo gestisce funzioni diverse:
+\begin{itemize}
+    \item \textbf{SMTP} (in TCP, sulla porta 25, RFC 2821) (\textit{Simple Mail Transfer Protocol}): a questo protocollo è delegato il trasferimento delle emails. Segue tre fasi:
+    \begin{enumerate}
+        \item handshaking;
+        \item transfer;
+        \item closure.
+    \end{enumerate}
+    Avviene tutto tramite comandi formati da un ID e un messaggio (codificati in 7 bit). Mentre HTTP è un protocollo \textit{pull} (che richiede risorse), SMTP è un protocollo \textit{push} (che le invia).
+    \item \textbf{POP} (in TCP, sulla porta 993, RFC 1939) (\textit{Post Office Protocol}): molto vecchio. Segue unicamente due fasi: l'autenticazione e la transazione (per il download delle email.
+    \item \textbf{IMAP} (in TCP, sulla porta 143, RFC 3501) (\textit{Internet Mail Access Protocol}): mantiene ben organizzate tutte le emails sul server, fornendone  un'interazione molto più completa.
+\end{itemize}

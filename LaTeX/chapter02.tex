@@ -3,21 +3,21 @@
     \item \textbf{TCP}: protocollo di trasporto
     \item \textbf{IP}: protocollo di instradamento
 \end{itemize}
-\\
-In una \textif{TCP connection request/response} i protocolli devono specificare:
+
+In una \textit{TCP connection request/response} i protocolli devono specificare:
 \begin{itemize}
     \item il formato delle informazioni (ordine dei bit, e quant'altro \ldots)
     \item messaggio da scambiare
     \item ordine degli eventi
 \end{itemize}
-\\
+
 TCP prevede che prima dello scambio delle informazioni ci sia la \textit{request/response}, un dialogo il cui fine è assicurare che:
 \begin{itemize}
     \item i dati siano in ordine e completi
     \item avvenga il \textit{controllo di flusso} (consente di sapere la velocità e la quantità di dati che è possibile trasferire)
     \item avvenga il \textit{controllo di congestione} (i router si accorgono se il flusso in arrivo è maggiore di quello in uscita)
 \end{itemize}
-\\
+
 A differenza del \textit{TCP}, l'\textit{UDP} non prevede alcuno scambio \textit{request/response}, prima dell'effettivo trasferimento dell'informazione. Il sistema dei \textit{DNS} utilizza \textit{UDP}: quando si ha un \textit{URL}, bisogna ottenerne l'\textit{indirizzo IP} associato, perciò viene richiesta l'informazione tramite il protocollo \textit{UDP}, che garantisce una trasmissione rapida, ma non da certezze che questa vada a buon fine.
 
 \section{Pila TCP/IP}

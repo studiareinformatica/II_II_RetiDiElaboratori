@@ -228,8 +228,8 @@ Esistono diversi tipi di ritardi:
 		\item R = banda link (bps)
 		\item L = grandezza pacchetto (bit)
 		\item a = frequenza di arrivo pacchetti
-		\item \textit{Tempo di trasmissione sul link}: \[\frac{\text{L}}{\text{R}}\]
-		\item \textit{Intensità di traffico}: \[\frac{\text{L}\times\text{a}}{\text{R}}\]
+		\item \textit{Tempo di trasmissione sul link}: $\frac{L}{R}$
+		\item \textit{Intensità di traffico}: $\frac{L\times a}{R}$
 	\end{itemize}
 	L'arrivo dei pacchetti segue una distribuzione di \textit{Poisson}, e quindi:
 	\begin{itemize}
@@ -245,7 +245,7 @@ Esistono diversi tipi di ritardi:
 	\end{itemize}
 	\item \textbf{Nodal delay} = Processing delay + Queue delay + Transmission delay + Propagation delay
 \end{itemize}
-\\
+
 Il \textit{trace route program} conta il tempo mandando pacchetti con un contatore \textit{time-to-live} che decrementa di 1 all'incrontro con ogni router.
 \\
 Il \textit{throughput} indica i bit trasmessi al secondo: il collo di bottiglia sarà il link che avrà il \textit{throughput} minore. Viene quindi inviata la massima quantità pari al \textit{throughput} del link più piccolo.

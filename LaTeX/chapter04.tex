@@ -1,0 +1,62 @@
+%P2P APPLICATIONS
+\section{Paradigma P2P}
+Nasce a fine anni '80 e diventa popolare ~ nel 2000 con Napster, chiuso da un ordinamento del 2001 per violazione di copyright.\\
+
+\section{P2P networks}
+Un tipo di network dove ogni peer può agire come client e come server e non deve essere sempre attivo: i peers entrano ed escono dalla rete continuamente.\\
+\subsection{Scopo}
+L'idea di base fondamentale è l'aumento di scalabilità, di disponibilità di risorse. 
+Diminuisce i costi; aumenta la privacy dei peer.
+
+\subsection{Challenges}
+I peer non sono affidabili a causa della possibilità di disconnesione.
+Scoperta delle risorse? Non è sempre facile.
+
+\subsection{Flavours}
+Sono spesso organizzate in maniera molto diversa tra loro.
+\begin{itemize}
+\item \textbf{Rete non strutturata}: (LimeWire) non c'è nessuna regola; entro nella rete, mi viene fornito un insieme di peer e stabilisco una connessione. Gestione semplice, richieste...un po' meno. Cercare una risorsa è fare flagging, se mi serve qualcosa vado dai peer vicini e la richiedo; se questi non la hanno essi stessi fanno la stessa richiesta ai peer a loro più vicini.
+\item \textbf{Rete strutturata}: (KAD, alcuni BitTorrent) i peer sono connessi secondo una certa logica. Una DistributedHashTable permette una ricerca efficiente e distribuita con contenuti specifici. La 'pecca' di questo 
+\item \textbf{Reti ibride}: Mescolano p2p e architetture client/server
+\item \textbf{Reti gerarchiche}: Dotate di super-peer, individuati per quantità di banda / velocità in connessione. Ogni peer è conneso ad un super-peer che gestisce un indice locale delle risorse
+\end{itemize}
+
+\section{BitTorrent}
+Sviluppato in Python nel 2001 da Bram Cohen.
+Prevede un torrent separato per ogni file. I peer scaricano e caricano simultaneamente tutti i torrent. L'insieme di peer attivi è chiamato \textit{swarm}. Questi si dividono in \textit{seed}, che hanno il file completo, e in \textit{leechers}, che lo stanno ancora scaricando. \\
+Gli utenti devono capire quali peers hanno una copia del file.
+Una volta ottenuto un torrent, questo include un tracker con un insieme di peer (~50 file). Questo non è assolutamente coinvolto con la reale distribuzione del file; è una lista di 50 peers al quale il client si connette via TCP.
+
+I chunk non vengono scaricati a caso. Alla connesione, il client tenta di scaricare per primi i chunk più rari (per il rischio di disconnessione).
+Eccezione: random first. Quando un utente accede al torrent, i primi chunk sono selezionati casualmente.
+
+
+%Alice seleziona top5 : 4 +rapidi in up e 1 random; ciò favorisce join di nuovi user nella rete. I peer unchoked sono quelli che riescono a scaricare, al contrario quelli choked.
+
+
+\section{Spotify}
+Servizio di streaming di musica on demand \textit{peer-assisted}.\\
+Utilizza un protocollo proprietario. Dal 2014 ha cominciato a dismettere la sua rete p2p per il grande numero di utenti e lasciare solo CDN.
+Utilizzava un metodo ibrido di distribuzione contenuti. Vantaggio principale: solo il 9 per cento circa dei dati veniva dai server spotify.
+
+Rete non strutturata con flagging limitato, possibile grazie alla CDN. Vantaggi: mantiene semplice il protocollo, basssa la banda di clients, riduce latenza.
+
+\subsection{Caching}
+Ogni canzone è criptata in una cache locale. Vantaggi: la canzone non va riscaricata e c'è più possibilità che un client riceva una traccia via p2p. Svantaggio: impatto sul disco dell'utente. Politica LRU (least recently used) per pulizia della traccia.
+Un client non può fare upload se non ha \textbf{l'intera traccia}. Ciò semplifica molto il protocollo: il client non deve comunicare con i peer di quali parti di traccia è in possesso.
+
+\subsection{Locating Peers}
+Un tracker gestisce un insieme di peer. Ogni server è responsabile per una rete p2p di client separata e indipendente. Per ogni traccia il server è a conoscenza solo degli ultimi 20 peer che l'hanno riprodotta. 
+Secondo modo: ogni client è connesso ad un insieme di \textit{vicini} nella rete. Il flagging viene fermato automaticamente dopo 2 hop.
+Un client fa upload a max 4 peers.
+%...
+Quando il limite \textit{soft} è raggiunto, il client inizia a pulire le connessioni per fare spazio a nuove in base al numero di byte trasmessi al peer %..
+Circa il 61 per cento delle tracce sono riprodotte in un ordine predicibile, il restante 39 per cento in maniera casuale.
+
+Quando le tracce sono riprodotte in maniere casuale, andare solo p2p sarebbe improponibile. Spotify utilizza in questo caso solo CDN; questo significa più peso sulla sua rete - quindi per questo non riproducono più dei primi 15 secondi tramite quella connessione. I 15s sono sufficienti per determinare se l'utente ascolterà quella canzone o cambierà traccia.\\
+
+Quando le tracce sono riprodotte in maniera sequenziale: un utente che ascolta gli ultimi 30 secondi di una canzone, in 92/100 casi ascolterà la canzone successiva. 20 sec di buffering sulla p2p, in caso di fallimento (skip track) 10sec di buffering sulla CDN. 
+
+Il client monitora in continuazione il playout buffer. Se va sotto ai 3 secondi va in emergenza. Stop uploading e usa CDN.
+
+Le tracce sono divise in chunks di 16KB. Una traccia può essere contemporaneamente scaricata da CDN e p2p; se entrambe sono utilizzate, il client non scarica da CDN più di 15 secondi dopo il current playback point.

@@ -183,3 +183,15 @@ Ciascun protocollo gestisce funzioni diverse:
     \item \textbf{POP} (in TCP, sulla porta 993, RFC 1939) (\textit{Post Office Protocol}): molto vecchio. Segue unicamente due fasi: l'autenticazione e la transazione (per il download delle email.
     \item \textbf{IMAP} (in TCP, sulla porta 143, RFC 3501) (\textit{Internet Mail Access Protocol}): mantiene ben organizzate tutte le emails sul server, fornendone  un'interazione molto più completa.
 \end{itemize}
+
+
+\section{Content Delivery Networks}
+Migliora il tempo di risposta percepito dal client portando i contenuti più vicino al network edge, quindi più vicino all'end-user.
+%...
+Migliora la disponibilità dei contenuti replicando i contenuti in base alla posizione.
+Request Routing: una volta inviata una richiesta, a quale server bisogna reindirizzare? Tipicamente l'utente fa una richiesta per la risoluzione del dominio; il router vede la richiesta e la inoltra al server della CDN più opportuno. Ciò viene eseguito utilizzando principalmente due meccanismi:
+\begin{itemize}
+\item \textbf{DNS Redirect}: la richiesta è inviata al request router e questo tenta di inviarla al server più 'vicino'. 
+Load balancer ricevono la richiesta del RR e rispondono. Quello da cui il RR riceve la risposta per primo è considerato il più vicino; la richiesta è inoltrata a quel server.
+\item \textbf{HTTP Redirect}: %...
+\end{itemize}

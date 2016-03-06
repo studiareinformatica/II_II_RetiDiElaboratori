@@ -186,12 +186,20 @@ Ciascun protocollo gestisce funzioni diverse:
 
 
 \section{Content Delivery Networks}
-Migliora il tempo di risposta percepito dal client portando i contenuti più vicino al network edge, quindi più vicino all'end-user.
-%...
-Migliora la disponibilità dei contenuti replicando i contenuti in base alla posizione.
-Request Routing: una volta inviata una richiesta, a quale server bisogna reindirizzare? Tipicamente l'utente fa una richiesta per la risoluzione del dominio; il router vede la richiesta e la inoltra al server della CDN più opportuno. Ciò viene eseguito utilizzando principalmente due meccanismi:
+I \textit{CDN Providers} sono infrastrutture che forniscono caching dei contenuti web su larga scala, al posto dei \textit{WSP} (\textit{Web Service Provider}).
+\paragraph{Esempio.}
+\textit{Akamai} è uno dei \textit{CDN Provider} più famosi e importanti al mondo, e ha raggiunto nell'ultimo anno 200.000 server, distribuiti in 110 paesi. Si stima che abbia raccolto 30 terabit di dati e 2 trilioni di interazioni al giorno.
+Le CDN vengono quindi utilizzate per migliorare il tempo di risposta percepito dal client portando i contenuti più vicini al network edge, quindi più vicino all'end-user. \\
+\newpage
+
+Sono composte delle seguenti componenti:
+\begin{enumerate}
+    \item \textit{Distribution System}: struttura effettiva di caching;
+    \item \textit{Request Router}: struttura delegata per il routing da dominio al CDN più \textit{vicino} (non necessariamente a livello geografico, tendenzialmente per tempi di \textit{ping});
+    \item \textit{Acounting-Billing}: struttura che gestisce le iscrizioni, i pagamenti e la configurazione degli IP/domini.
+\end{enumerate}
+Le CDN sfruttano un meccanismo di redirezione di due tipi:
 \begin{itemize}
-\item \textbf{DNS Redirect}: la richiesta è inviata al request router e questo tenta di inviarla al server più 'vicino'. 
-Load balancer ricevono la richiesta del RR e rispondono. Quello da cui il RR riceve la risposta per primo è considerato il più vicino; la richiesta è inoltrata a quel server.
-\item \textbf{HTTP Redirect}: %...
+    \item \textbf{DNS Redirect}: a livello DNS, tramite l'associazione del record \textit{A} del dato dominio su un IP della CDN;
+    \item \textbf{HTTP Redirect}: viene utilizzata un'URL apposita in cui specificato viene specificata sia la CDN, sia il dominio di riferimento.
 \end{itemize}

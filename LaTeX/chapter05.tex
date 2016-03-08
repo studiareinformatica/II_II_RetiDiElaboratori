@@ -1,0 +1,27 @@
+\section{Protocolli di Trasporto}
+I protocolli di trasporto sono un insieme di protocolli che risiedono sugli host e sugli endsystems; si occupano di fornire le regole per una comunicazione logica tra due entità remote.\\
+A livello di invio, si occupano della ricezione dei messaggi in segmenti e li inviano al network layer; alla ricezione, i segmenti sono riassemblati in messaggi e passati al livello applicativo.\\
+Mentre il livello di rete offre comunicazione tra due endsystems (trasportando informazioni da un host all'altro), il livello di trasporto crea un collegamento logico tra due \textit{processi}. Deve quindi essere in grado di raccogliere flussi informativi, utilizzare il livello di rete per trasportarli e successivamente smistarli nei vari processi applicativi.
+
+\section{Internet transport-layer protocols}
+A dispetto del fatto che il livello rete utilizza una best-effort policy che non dà nessuna garanzia di consegna, \textbf{TCP} si occuperà di applicare meccanismi per la traduzione di informazioni agli opportuni processi anche nel caso di perdita di dati.\\
+I principali tipi di perdita dei dati sono:
+\begin{itemize}
+	\item un eccesso di informazioni arrivate al router intermedio. \\
+	La conseguenza è un riempimento delle code fino al raggiungimento di una congestione in rete e all'inizio di una perdita di pacchetti.
+	\item il ricevimento a destinazione di un tasso di informazioni troppo elevato rispetto alla velocità di lettura. \\
+\end{itemize}
+Si noti che un controllo del flusso di informazioni richiede algoritmi diversi rispetto al controllo di congestione; entrambi i tipi di controllo sono implementati da TCP.
+
+\section{Multiplexing e Demultiplexing}
+L'invio di informazioni da parte di un processo è eseguito attraverso una determinata porta dotata di interfacce ben definite. Tale porta, che consente il colloqui con l'entità sottostante di livello trasporto, prende il nome di \textit{socket}.\\
+Poiché più flussi informativi sono trasmessi tramite lo stesso canale logico, occorre stabilire delle funzioni di smistamento di dati. Queste funzioni sono implementate nei protocolli TCP e UDP in maniera differente.\\
+
+\subsection{UDP: Connectionless demux}
+Il socket creato è dotato di un numero di porta dell'host locale; quando viene creato un \textit{datagram} (pacchetto) da inviare nel socket UDP, questo deve specificare l'indirizzo IP e il numero di porta dell'host di destinazione.
+Quando l'host remoto riceve un segmento via UDP, controlla il suo numero di porta di destinazione e lo indirizza alla porta corrispondente.
+Pacchetti con stesso numero di porta di destinazione, ma indirizzi IP o porte di origine differenti saranno quindi orientati allo stesso socket a destinazione.
+
+\section{TCP: Connection-oriented demux}
+In questo caso viene creato un socket dedicato al flusso di informazioni identificato dalla presenza di quattro campi: due per gli indirizzi IP del mittente e del destinatario, due per i numeri di porta del mittente e del destinatario.
+Nel caso di più client connessi allo stesso webserver, all'inizio viene fatta una richiesta su un \textit{welcome-socket} generale; successivamente le richieste sono smistate ad un socket dedicato su ciascuna delle connessioni: in questo modo è assicurato che il flusso di dati passerà per socket differenti.

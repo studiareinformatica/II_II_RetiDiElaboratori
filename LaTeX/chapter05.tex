@@ -25,3 +25,60 @@ Pacchetti con stesso numero di porta di destinazione, ma indirizzi IP o porte di
 \section{TCP: Connection-oriented demux}
 In questo caso viene creato un socket dedicato al flusso di informazioni identificato dalla presenza di quattro campi: due per gli indirizzi IP del mittente e del destinatario, due per i numeri di porta del mittente e del destinatario.
 Nel caso di più client connessi allo stesso webserver, all'inizio viene fatta una richiesta su un \textit{welcome-socket} generale; successivamente le richieste sono smistate ad un socket dedicato su ciascuna delle connessioni: in questo modo è assicurato che il flusso di dati passerà per socket differenti.
+\newpage
+
+\section{Reliable Data Transfer}
+La necessità di strutturare un protocollo di trasferimento di dati affidabile nasce dall'importanza che due entità, in comunicazione, siano in equilibrio in termini di velocità di produzione/trasmissione/consumo dei dati, senza che l'eventuale fallimento nella trasmissione tramite livelli inferiori - nella pila TCP/IP - causi il definitivo fallimento della trasmissione. \\
+Sarà fatto uso della rappresentazione FSM, una tipologia di rappresentazione utile alla sintetizzazione grafica dei servizi orientati alla connessione.
+\begin{center}
+    \includegraphics[width=.7\textwidth]{res/fsm.jpg} \hfill
+\end{center}
+
+\subsection{RDT 1.0}
+Il caso riguardante \textit{RDT 1.0} è contestualizzato in una situazione perfettamente affidabile:
+\begin{itemize}
+    \item non si verificano \textbf{mai} errori nei bit trasmessi;
+    \item non si verifica \textbf{mai} una perdita di pacchetti.
+\end{itemize}
+\begin{center}
+    \includegraphics[width=.7\textwidth]{res/fsm-rdt-10.jpg} \hfill
+\end{center}
+\newpage
+
+\subsection{RDT 2.0}
+In questo caso, il canale di trasmissione effettiva può confondere i bit nel pacchetto. Da qui la necessità di introdurre dei messaggi di risposta alla ricezione di un pacchetto:
+\begin{itemize}
+    \item \textbf{ACK} (\textit{ACKnowledgment}, o \textit{conferma di ricezione}): utilizzato per confermare che il pacchetto è stato ricevuto ed è integro;
+    \item \textbf{NAK} (\textit{Negative AcKnowledgment}, o \textit{conferma negativa}): il pacchetto contiene errori. Il mittente reinvia il pacchetto quando riceve indietro questo tipo di messaggio: motivo per cui si tratta di un protocollo \textit{ARQ} (\textit{Automatic Repeat reQuest}, o \textit{Richiesta Automatica di Ripetizione}.
+\end{itemize}
+\begin{center}
+    \includegraphics[width=.7\textwidth]{res/fsm-rdt-20.jpg} \hfill
+\end{center}
+\textit{RDT 2.0} può però andare incontro ad un difetto fatale: la mancata gestione degli eventi in cui i pacchetti \textit{ACK}/\textit{NAK} siano danneggiati.
+
+\subsection{RDT 2.1}
+Viene dunque aggiunto - alternativamente - un valore binario a ciascun pacchetto, un \textit{numero di sequenza}.
+In questo modo, viene comunicato non solo l'esito della ricezione al mittente, ma anche il pacchetto a cui questo fa riferimento. \\
+\begin{minipage}[t]{0.5\textwidth}
+    \begin{center}
+        \includegraphics[width=.8\textwidth]{res/fsm-rdt-21-sender.jpg} \hfill
+    \end{center}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+    \begin{center}
+        \includegraphics[width=.8\textwidth]{res/fsm-rdt-21-receiver.jpg} \hfill
+    \end{center}
+\end{minipage}
+\newpage
+
+\subsection{RDT 2.2}
+\textit{RDT 2.2} fornisce le stesse funzionalità di \textit{RDT 2.1}, utilizzando però soltanto gli \textit{ACK}, escludendo i \textit{NAK}.
+Nel caso in cui il destinatario dovesse inviare un \textit{NAK}, invia nuovamente un \textit{ACK} con numero di sequenza dell'ultimo pacchetto ricevuto correttamente.
+\begin{center}
+    \includegraphics[width=.7\textwidth]{res/fsm-rdt-22.jpg} \hfill
+\end{center}
+L'alternativa è invece introdurre una nuova funzione di timing. Per ogni pacchetto inviato, il mittente implementa un timer: una volta che questo raggiunge un timeout, se non ha ricevuto nessun pacchetto che gli comunichi l'esito (l'\textit{ACK}), allora reinvia il pacchetto. Per questo motivo:
+\begin{itemize}
+    \item il mittente deve tenere una copia del pacchetto spedito fino a che non ne riceve riscontro dell'esito;
+    \item per garantire il controllo di flusso, non si spedisce più di un pacchetto alla volta.
+\end{itemize}

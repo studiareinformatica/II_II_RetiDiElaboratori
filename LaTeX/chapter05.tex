@@ -77,8 +77,41 @@ Nel caso in cui il destinatario dovesse inviare un \textit{NAK}, invia nuovament
 \begin{center}
     \includegraphics[width=.7\textwidth]{res/fsm-rdt-22.jpg} \hfill
 \end{center}
+
+\subsection{RDT 3.0}
 L'alternativa è invece introdurre una nuova funzione di timing. Per ogni pacchetto inviato, il mittente implementa un timer: una volta che questo raggiunge un timeout, se non ha ricevuto nessun pacchetto che gli comunichi l'esito (l'\textit{ACK}), allora reinvia il pacchetto. Per questo motivo:
 \begin{itemize}
     \item il mittente deve tenere una copia del pacchetto spedito fino a che non ne riceve riscontro dell'esito;
     \item per garantire il controllo di flusso, non si spedisce più di un pacchetto alla volta.
+\end{itemize}
+Il parametro \textit{RTT} (o \textit{Round Trip Time}) viene definito come il tempo necessario per l'invio di un pacchetto sommato a quello per la ricezione di un pacchetto riferito all'esito del precedente.
+\paragraph{Esempio.}
+In un link da 1Gbps, con un \textit{propagation delay} di 15ms e 8000bit per ciascun pacchetto abbiamo:
+\begin{center}
+$ D = \frac{L}{R} = \frac{8000bit}{10^9 bit/s} = 8microsecs $ \\
+$ U = \frac{\frac{L}{R}}{RTT + \frac{L}{R}} = \frac{0,0008}{30,0008} = 0,00027 $
+\end{center}
+\newpage
+
+\subsection{Protocolli a Ritrasmissione Automatica (o \textit{a finetra})}
+A differenza dei precedenti, viene trasmessa sempre una sequenza di pacchetti. A man mano che si ricevono gli ACK, vengono aggiunti nuovi pacchtti in coda.
+In questo caso: $ U = \frac{\frac{3L}{R}}{RTT + \frac{L}{R}} $ \\
+\paragraph{Go-back-N.} Il mittente può avere fino a N pacchetti non riconosciuti nella pipeline. Il destinatario invia solo \textit{ACK cumulativi}, ovvero relativi ad un gruppo di pacchetti ricevuti. Il mittente utilizza un timer per legato al primo pacchetto inviato che ancora non ha ricevuto ACK: al suo raggiungimento, reinvia tutti i pacchetti a partire da quello per il quale ha impostato il timeout.
+\paragraph{Selective Repeat.} Il mittente può avere fino a N pacchetti. Il destinatario invia un \textit{ACK individuae}, relativo quindi ad ogni pacchetto. Il mittente utilizza invece un timer per ogni pacchetto di cui non ha ricevuto esito; quando raggiunge il timeout, ritrasmette solo quel dato pacchetto.
+
+\section{Ritrasmissione Automatica in TCP}
+TCP utilizza una versione ibrida dei protocolli \textit{Go-back-N} e \textit{Selective repeat}: invia un flusso di singoli bytes che formano - per mano del ricevente - un segmento, il cui \textit{sequence number} è quello del primo byte contenuto, e la cui lunghezza è determinata dal numero totale di bytes. Utilizza inoltre una variabile definita come \textit{MSS}, che indica la lunghezza massima di ciascun segmento. \\
+In una stessa connessione, il flusso di dati è bidirezionale, viene eseguito un \textit{handshake} per inizializzare i buffer e alcune variabili (come la \textit{MSS} stessa). La dimensione dei buffer varia nel tempo, sulla base delle informazioni raccolte dai controlli di flusso e congestione. \\
+Ogni segmento è composto dai seguenti campi (ciascuno da 32bit):
+\begin{itemize}
+	\item Porta sorgente / destinazione;
+	\item \textit{Sequence number};
+	\item \textit{Acknowledgment number}: eventuale ACK di riscontro per un pacchetto appena ricevuto (necessario perché la connessione è bidirezionale);
+	\item \textit{Checksum};
+	\item \textit{Header length}: se si desidera aggiungere informazioni addizionali, è necessario specificarne la lunghezza;
+	\item \textit{Receive window}: indica quanto spazio ho ancora nel buffer (necessario per la gestione del flusso);
+	\item \textit{RST}/\textit{SYN}/\textit{PIN}: variabili settate a \textit{1} in fase di apertura/chiusura della connessione;
+	\item \textit{ACK}: variabile settata a \textit{1} se il ricevente deve leggere il campo \textit{Acknowledgment number};
+	\item \textit{URG}: indica che si tratta di un pacchetto più urgente della media;
+	\item \textit{Application Data}: dati da trasmettere.
 \end{itemize}

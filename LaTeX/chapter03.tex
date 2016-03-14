@@ -265,4 +265,120 @@ Nel 92\% dei casi, quando un utente ascolta fino agli ultimi 30s di una canzone,
 \end{itemize}
 Il client monitora in continuazione il \textit{playout buffer}: se quest va sotto i 3 secondi va in emergenza, bloccando le trasmissioni in upload e richiedendo il file tramite CDN.
 
-\input{../140316.reti.tex}
+\section{Creazione di un sistema Client/Server}
+Essendo i protocolli TCP e UDP implementati direttamente dal SO, implementare le opportune funzioni per interagire con essi è l'unica cosa necessaria per permettere l'invio e la ricezione dei dati.
+I SO mettono a disposizione delle API, insiemi di funzioni per facilitare l'utilizzo di questi protocolli agli sviluppatori.
+I \textbf{socket} sono fondamentalmente delle Internet API.
+Un socket è una \textit{porta} che collega un'applicazione con un protocollo di trasporto; in Python è rappresentato da una struttura dati.
+\begin{lstlisting}
+import socket
+s = socket.socket(addr_family, type, protocol)
+\end{lstlisting}
+Gli argomenti della funzione socket() specificano le informazioni necessarie per la creazione di un nuovo socket.
+\begin{itemize}
+\item \textbf{addr\_family}: famiglia di protocolli.
+\begin{itemize}
+	 \item socket.AF\_INET: IPv4;
+	 \item socket.AF\_INET6: IPv6,
+	 \item socket.AF\_UNIX: per gestire comunicazioni tra processi sulla stessa macchina fisica.
+\end{itemize}
+\item \textbf{type}: specifica se il tipo di comunicazione è orientata allo stream o a pacchetto (sostanzialmente, la differenza tra TCP e UDP):
+\begin{itemize}
+	\item socket.SOCK\_STREAM: stream-oriented (TCP);
+	\item socket.SOCK\_DGRAM: message-oriented (UDP);
+	\item socket.SOCK\_RAW: fornisce accesso al network layer.
+\end{itemize}
+\item protocol: se 0, specifica che il protocollo - in definitiva - da utilizzare è quello definito dalla tupla \textit{(addr\_family, type)}.
+\end{itemize}
+
+\subsection{TCP}
+\begin{minipage}[t]{0.45\textwidth}
+    \subsubsection{SERVER-SIDE}
+    \paragraph{socket()}
+    Definito nella pagina precedente.
+
+    \paragraph{bind(\textit{address})}
+    \textit{address} rappresenta una tupla \textit{(host,port)}, dove \textit{host} può essere un hostname o un indirizzo IP. Qualora \textit{host} fosse una strina vuota, si farebbe un \textit{bind} su tutte le interfacce di rete; invece, se fosse \textit{localhost}, lo si farebbe soltanto su quella di \textit{loopback}.
+    \textit{port}: rappresenta il numero di porta su cui fare il \textit{bind}
+	
+    \paragraph{listen(\textit{backlog})}
+    Rimane in attesa di richieste di connessione su quel socket. Il \textit{backlog} specifica il numero massimo di connessioni accodate (su Linux di default a 5, per motivi di sicurezza, come prevenzione da \textit{SYN flood attacks}). Se il \textit{backlog} è pieno, nuove connessioni possono essere ignorate o rifiutate.
+
+    \paragraph{accept()}
+    Preleva e stabilisce una connessione dal \textit{backlog}, creando un nuovo \textit{socket attivo}.
+
+    \paragraph{send()}
+    Descritto nel \textit{client-side}.
+
+    \paragraph{recv(\textit{bufsize[, flags]})}
+    Ritorna la stringa di dati ricevuti, delimitati da una quota massima, il \textit{bufsize}. In caso di assenza di dati, si blocca e il programma è in pausa fino all'arrivo di dati. Se invece torna una stringa vuota, significa che l'host dall'altro capo ha chiuso la connessione.
+    \paragraph{close()}
+    Descritto nel \textit{client-side}.
+\end{minipage}
+\hspace{8mm}
+\begin{minipage}[t]{0.45\textwidth}
+    \subsubsection{CLIENT-SIDE}
+    \paragraph{socket()}
+    Definito nella pagina precedente.
+
+    \paragraph{connect(address)} Si connette ad un socket remoto. Il SO assegna automaticamente un indirizzo e un numero di porta.\\
+    Argomenti: come server-side.
+    Se è utilizzato un socket TCP, comunica al SO di iniziare la \textit{3-way handshake}.
+
+    \paragraph{send()}
+    Invia i dati in input, ritornando un intero che indica il numero di byte (rispetto alla lunghezza dell'input) effettivamente inviati. Possono verificarsi i seguenti casi:
+    \begin{itemize}
+        \item I dati sono correttamente ed interamente inviati;
+        \item I dati sono parzialmente inviati (buffer parzialmente pieno): TCP deve spezzare i dati e ritorna soltanto la lunghezza in byte che è stata effettivamente inviata (il comando \textit{sendall} si assicura che venga inviato tutto);
+        \item I dati non possono essere inviati (buffer pieno).
+    \end{itemize}
+
+    \paragraph{recv()}
+    Descritto nel \textit{server-side}.
+
+    \paragraph{close()}
+    Chiude il socket: tutte le operazioni future sull'oggetto falliranno. La connessione non è chiusa immediatamente, perché il SO deve prima finire di inviare tutti i dati ancora presenti nel buffer.
+\end{minipage}
+
+\subsubsection{Chiusura di un socket}
+Si è accennato all'utilizzo di una procedura \textit{close()}, che permette la chiusura - non propriamente immediata - di un socket \textit{attivo}. Qualora fosse però necessario definire in maniera più dettagliata il comportamento di un socket, o meglio, di una connessione relativa ad un socket, sarebbe più opportuno utilizzare il metodo \textit{shutdown()}. \\
+Questo - a differenza del \textit{close()} - chiude uno dei due sensi di comunicazione, senza distruggere il socket:
+    \begin{itemize}
+        \item SHUT\_RD: chiude il canale server-client;
+        \item SHUT\_WR: chiude il canale client-server;
+        \item SHUT\_RDWR: chiude entrambi i canali.
+    \end{itemize}
+
+\subsubsection{Interfaccia di \textit{Loopback}}
+Interfaccia network virtuale per gestire comunicazioni tra processi sullo stesso host. Bypassa l'hardware dell'interfaccia network locale e i livelli più bassi della pila TCP/IP
+
+\subsubsection{Socket Passivo / Attivo}
+Il socket di cui fino a questo punto si è parlato è il socket \textit{passivo}. Come accennato nelle procedure di implementazione di un socket in \textit{python}, si è parlato però dei socket \textit{attivi}. Questi si distinguono da quelli passivi per il fatto che sono effettivamente usati per la trasmissione dati. I primi sono creati da un processo, ma poi delegano a nuovi socket, con lo stesso \textit{address} (la tupla \textit{(indirizzo, porta)}), lo scambio effettivo dei dati. Un \textit{socket attivo} è definito univocamente dalla quadrupla \textit{(local\_ip, local\_port, remote\_ip, remote\_port)}.
+
+\subsubsection{Porte}
+I numeri di porta - essendo in \textit{16bit} - vanno dalla porta 0 alla 65535:
+\begin{itemize}
+    \item porte note: 0-1023 (dedicate, necessari i privilegi di root);
+    \item porte registrate: 1024-49151 (utilizzate da servizi noti, non necessari però i privilegi di root);
+    \item porte dinamiche: 49152-65535 (porte utilizzabili).
+\end{itemize}
+\textit{IANA} (o \textit{Internet Assigned Numbers Authority}) è l'organizzazione che si occupa di gestire la mappatura di associazioni \textit{porta-servizio}.
+
+\subsubsection{Implementazioni utili}
+\begin{lstlisting}
+def recv_all(sock, len):
+    data = ""
+    while len(data) < len:
+        read_data = sock.recv(len - len(data))
+        if read_data == ``:
+            raise EOFError('socket closed.')
+        data += read\_data
+    return data
+\end{lstlisting}
+
+\subsection{UDP}
+In UDP - non esistendo connessione - si utilizza soltanto il comando di creazione socket, il \textit{bind()}, il \textit{sendto()} (che prende in input anche un nuovo parametro \textit{address}, che specifica la destinazione dei dati da inviare), il \textit{recvfrom()} (che da in output un nuovo parametro \textit{address} in riferimento al client inviante). \\
+Si può usare la funzione \textit{connect()} con sockets UDP per evitare di specificare ogni volta l'indirizzo del server sul quale vogliamo chiamare una \textit{sendto()}. In questo modo il client non prevede la ricezione di pacchetti da altri mittenti. Si noti che l'utilizzo di \textit{connect()} non implica l'invio di dati. 
+
+\paragraph{socket.settimeout(\textit{value})}
+Imposta un timeout (in secondi) ricaricato ogni volta che si ricevono dati, al termine del quale il SO lancia una socket.timeout exception.

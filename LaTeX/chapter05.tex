@@ -1,106 +1,93 @@
-\section{Handshakes}
-Prima di scambiare dati, il ricevente e il destinatario compiono una "stretta di mano" (\textit{handshake}):
-questo si traduce nello stabilire che entrambi sono a conoscenza del fatto che l'altro vuole connettersi e che entrambi sono d'accordo sui parametri di connessione.\\
-Un handshake semplice prevede che il client mandi una richiesta di connessione, riceva una risposta positiva dal server e successivamente possa iniziare ad inviare dati.\\
-Il problema è che i dati possono essere intercettati, ritardati, duplicati o addirittura perduti. Prendendo in considerazione l'invio di dati importanti, questo potrebbe portare a conseguenze disastrose.
-Per questo motivo, al momento della richiesta si inseriscono un segmento di \textit{SYN} e una 'proposta' nel sequence number ($ seq = x $). Quando il destinatario riceve la richiesta, invia un segmento di SYNACK per comunicare di aver ricevuto la richiesta ($ seq = y; ack = x+1 $). Al momento della ricezione del segmento di SYNACK, il client stesso invia un segmento che contiene l'ACK della ricezione e i dati da inviare ($ seq = x+1; ack = y+1 $)
+\section{Introduzione}
+Il livello di rete di occupa dell'effettivo trasporto delle informazioni dal sender al receiver, incapsulandole in datagrammi - lato sender - e consegnandoli al livello di trasporto - lato receiver.
+Per la consegna, esamina il pacchetto, analizzando l'header e tutte le informazioni in esso contenute (principalmente l'IP), e determinandone l'instradamento più consono.
 
-\paragraph{Initial Sequence Number.}
-Per motivi di sicurezza, i sequence numbers dovrebbero cambiare nel tempo. \\
-RFC 793 suggerisce di generare sequence numbers iniziali (\textit{ISN}) semplici come un counter da 32 bit incrementati ogni $ 4 \mu s $ e trasmessi ogni volta che la flag SYN è attiva. \\
-Notare che sia il mittente sia il destinatario trasmettono il \textit{loro} ISN. %(cfr full duplex)
-A partire dall'ISN, i byte di dati sono numerati da $ ISN+1 $ in modo da permettere il \textit{synack}.
+\paragraph{Forwarding}
+Dirotta i pacchetti dall'input del router all'output dello stesso, associando un dato valore dell'header ad un link locale. \hfill \\
+\paragraph{Routing}
+Determina la rotta che collegherà la sorgente al destinatario, utilizzando appositi algoritmi di routing. \hfill \\
 
-\paragraph{Forbidden Region.} Per impedire che due SN identici si trovino in rete nello stesso momento, è stato introdotto un "periodo di silenzio" nel quale non possono essere inviati segmenti. %...dopo il ravvio pari al MSL
+\section{Connection Setup}
+Prima di verificare un percorso si deve verificare che ci sia tutto il necessario perché la trasmissione arrivi a compimento (che esistano le risorse necessarie, e così via \ldots). Quindi, prima che i datagrammi comincino a scorrere, i due \textit{end-hosts} e il router delegato aprono una \textit{connessione virtuale} dedicata. Inoltre, spesso sul livello direte vengono utilizzate delle funzioni importanti di terze parti, che definisco l'architettura di rete:
+\begin{itemize}
+	\item \textbf{ATM} (o \textit{Asynchronous Transfer Model});
+	\item \textbf{frame-relay};
+	\item \textbf{X.25}.
+\end{itemize}
+La differenza sostanziale tra il \textit{livello di rete} e il \textit{livello di trasporto} è che il primo mette in comunicazione due hosts (ed i vari router delegati, eventualmente), mentre il secondo due processi. \\
+Il livello di rete può garantire diversi gruppi di garanzie:
+\begin{itemize}
+	\item Sul singolo datagramma:
+	\begin{itemize}
+		\item garanzia di consegna;
+		\item garanzia di consegna entro un massimo di 40ms di ritardo.
+	\end{itemize}
+	\item Sull'intero flusso di datagrammi:
+	\begin{itemize}
+		\item consegna in ordine;
+		\item garanzia di non superare la banda di flusso;
+		\item garanzia di applicazione di restrizioni imposte nel corso della trasmissione.
+	\end{itemize}
+\end{itemize}
+Internet (inteso come architettura di rete) non fornisce alcuna garanzia. \\
+La rete a datagrammi però fornisce un servizio \textit{connectionless}, la cui alternativa è quella di utilizzare un approccio a \textit{circuito virtuale} utilizzato - per esempio - nell'architettura \textit{ATM} (determinando in una fase di setup il percorso da seguire - tabelle di routing - e mantenendo le informazioni di stato, che permettono di allocare risorse utili alla trasmissione).
 
-\subsection{Il problema dei due eserciti}
-Il problema del controllo nella trasmissione dati è facilmente spiegabile con il seguente esempio.
-Prendiamo in considerazione tre armate, due appartenenti alla fazione \textit{verde} ed una appartenente alla fazione \textit{rosso}. Le due armate verdi sono singolarmente più deboli di quella rossa, ma l'armata rossa è globalmente più debole. Le armate verdi devono quindi attaccare quella rossa nello stesso momento per vincere la battaglia. La prima soluzione che può venire in mente per fare in modo che le armate verdi si accordino per attaccare è che una invii un messaggio con l'orario di attacco e l'altra ne invii uno per confermare la ricezione.\\
-I messaggeri che li portano possono però essere catturati, quindi il messaggio può non arrivare correttamente a destinazione. Per assicurarsi che ogni messaggio sia correttamente ricevuto bisognerebbe quindi inviare un messaggio di conferma ad ogni ricezione, ma ciò porterebbe ad un loop in cui ogni armata continua ad inviare messaggeri per confermare la ricezione del messaggio dell'altra.
-Per ovviare a questo problema, si adotta la seguente soluzione:
-\begin{lstlisting}
-g1 to g2: "attacco alle 6."
-g2 to g1: "conferma ricezione messaggio."
-g1 to g2: "conferma ricevuta, fine trasmissione."
-g2 to g1: "conferma fine trasmissione."
-\end{lstlisting}
-Introducendo una comunicazione di fine trasmissione, il ricevente non deve fare altro che inviare un'ultima conferma per porre fine alla trasmissione.\\
-Ciò si traduce in TCP con una flag denominata \textit{FIN} che stabilisce il termine della connessione; poichè la connessione è doppia, FIN dev'essere inviato (e confermato) da entrambi i lati.
+\paragraph{VC (Virtual Circuit)}
+Il sistema a \textit{VC} fa utilizzo di una tabelle di instradamento, che mette associazione ogni VC entrante - tramite un \textit{ID} univoco identificativo - ad un altro \textit{VC} uscente. \\
+L'approccio a \textit{VC} viene utilizzato nelle architetture \textit{ATM}, \textit{frame-relay} e \textit{X.25}, ma non nell'architettura di internet attuale. \hfill \\
 
-\begin{lstlisting}
-a to b: connection request
-b to a: connection ack
-a to b: ack, data
-b to a: data ack
------------------------
-a to b: data
-b to a: data ack
-a to b: data
-b to a: data ack
-...
------------------------
-a to b: fin
-b to a: ack fin
-b to a: fin
-a to b: ack
-\end{lstlisting}
+Nel caso di un approccio di tipo datagram - usato in internet -, non ho una fase di setup - e quindi nessun'informazione di stato -, e ogni pacchetto contiene tutte le informazioni  e le coordinate necessarie per la consegna. \\
+La forwarding table cerca di compattare il maggior numero di informazioni nel minor spazio possibile, raggruppando gli IP per intervalli, e associando questi gruppi ad un dato link di uscita. Più concretamente, viene calcolato un \textit{longest address prefix} (e quindi cominciando con una dato prefisso binario - dove la sequenza binaria corrisponde all'IP): tutti gli IP che cominciando con lo stesso prefisso, vengono instradati verso lo stesso link.
 
+\paragraph{Esempio.}
+Ho una sequenza: \textit{11001000 00010111 00010110 10100001}. Leggendo questa sequenza bit per bit, controllo il più lungo prefisso che ha in comune con uno degli instradamenti descritti nella tabella di instradamento, dirottandolo verso il link associato a questo. \hfill \\
 
-\subsection{3 Way Handshake in TCP}
+Quindi, dal router, vengono eseguiti degli algoritmi/protocolli di routing (\textit{RIP}, \textit{OSPF}, \textit{BHP}), per collegare il link d'entrata con quello d'uscita.
+
+\section{Funzioni di un router}
+\subsection{Input ports}
+Viene gestita un buffer che contiene una coda dei pacchetti da instradare. In questa fase si utilizza (o si stabilisce) una tabella degli instradamenti, che mettono in comunicazione link di ingresso e di uscita tramite degli appositi switch.
+\subsection{Switching fabrics}
+Vari tipi di switch:
 \begin{enumerate}
-	\item Il client invia un segmento TCP SYN al server e specifica ISN senza invio di dati.
-	\item Il server riceve SYN e risponde con SYNACK; alloca il buffer e specifica ISN.
-	\item Il client riceve SYNACK; alloca buffer e variabili, risponde con ACK che potrebbe contenere dati.
-	\item Per chiudere la connessione uno dei due estremi invia un messaggio con flag $ FIN=1 $; il ricevente conferma e manda a sua volta un messaggio con $ FIN=1 $ e attende l'ultima conferma.
+	\item Switching a memoria: prima generazione. 
+	\item Switching a bus: ho \textit{n} linee di ingresso e \textit{n} linee di uscita, messe in collegamento tramite un bus condiviso. La pecca è che la velocità è limitata dall'architettura del bus. Inoltre, si può prelevare un datagramma alla volta, solamente per intero.
+	\item Switching a rete di interconnessione (\textit{crossbar}): ho \textit{n} linee di ingresso e \textit{n} linee di uscita, interconnesse tra loro. In questo modo posso raggiungere tramite qualsiasi linea di ingresso, una qualsiasi linea di uscita. In questo caso i datagrammi possono essere prelevati divendoli a celle di lunghezza prefissata, dando all'architettura più elasticità.
+\end{enumerate}
+\subsection{Output ports}
+Viene gestito un buffer dei datagrammi, in modo tale da gestire anche il caso in cui il tasso di trasmissione e ricezione dei datagrammi sia maggiore rispetto a quello di elaborazione dei datagrammi ricevuti.
+\paragraph{HOL (Head-of-the-Line) blocking}
+Blocco della coda dei pacchetti su un link d'ingresso, causato da un pacchetto non può essere ancora consegnato al suo link uscita, perché occupato a sua volta nell'elaborazione di altro pacchetto già inviato.
+
+\section{Datagramma IP (IPv4)}
+Grandezza minima header IP: 20byte. Campi:
+\begin{enumerate}
+	\item \textit{ver}: versione IP (IPv4 o IPv6);
+	\item \textit{header length}: lunghezza dell'header in byte;
+	\item \textit{type of service}: tipo dei dati, di datagramma inviato, base della gestione di servizi diversi attraverso la stessa struttura di datagrammi;
+	\item \textit{time to live}: massimo numero di link che possono essere attraversati dal datagramma in questione;
+	\item \textit{upper layer}: simile al numero di porta. Specifica a chi va consegnato a destinazione il datagramma, che sia un protocollo TCP o UDP o un altro tipo di protocollo arbitrario;
+	\item \textit{16-bit indentifier, flgs, fragment offset}: parametri utilizzati per la frammentazione e la ricomposizione del datagramma una volta arrivato a destinazione;
+	\item \textit{options}: campo opzionale, utile per tracciare, ottenere informazioni riguardo la rotta e/o la trasmissione generale del datagramma;
+	\item \textit{32bit source IP}: IP sorgente;
+	\item \textit{32bit destination IP}: IP destinatario;
+	\item \textit{data}: dati trasportati.
 \end{enumerate}
 
-\subsection{Connection states: client}
-0: closed\\
-1: syn\_sent		(ricevo \textit{synack}; invio \textit{ack})\\
-2: established\\
-	;\\
-2: established		(invio \textit{fin})\\
-3: fin\_wait\_1		(ricevo \textit{ack})\\
-4: fin\_wait\_2		(ricevo \textit{fin}, invio \textit{ack})\\
-5: close wait\\
+\subsection{IP Fragmentation / Riassembly}
+I link di rete hanno l'MTU (la \textit{max transfer size}). Spesso occorre - per questa ragione - comprimere la grandezza di un datagramma, perché questo possa attraversare tutti i link. Per questa ragione di parla della fragmentation e del riassembly. Attraverso questi parametri viene indicato come è stato frammentato il datagramma (e in quanti sotto-datagrammi) e come poter riassemblarlo una volta giunto a destinazione. Ciascun sotto datagramma ha in comune il parametro identificativo di 16bit e tutti, ad esclusione dell'ultimo pacchetto derivato dalla frammentazione, hanno il parametro \textit{fragflag} settato ad \textit{1}.
 
-\subsection{Connection states: server}
-0: closed\\
-1: listen			(ricevo \textit{syn}, invio \textit{synack})\\
-2: syn\_rcvd\\
-3: established\\
-4: close\_wait\\
-5: last\_ack\\
+\section{Indirizzo IP}
+Ogni indirizzo IP viene ad essere associato ad una porta di rete. Infatti, il router, avendo più porte di rete, ha un diverso indirizzo IP per ciascuna. \\
+L'indirizzo IP è una sequenza a 32bit, che viene divisa in 4 sequenze da 8 bit, ciascuna corrispondente al valore decimale delle 4 componenti dell'indirizzo IP comunemente utilizzato: \textit{1.1.1.1} : \textit{00000001 00000001 00000001 0000001}.
 
-\section{Principi di controllo della congestione}
-Nelle reti a pacchetto, i pacchetti attraversano una grande quantità di dispositivi diversi, come ad esempio router, switch e bridge. Questi dispositivi, e i collegamenti che li interconnettono, hanno capacità di elaborazione e di trasmissione finite che possono portare, in molti casi, a situazioni di congestione: i nodi suddetti potrebbero cioè non essere in grado di smistare tutto il traffico offerto in ingresso da varie connessioni tra utenti causando perdita di pacchetti e/o eccessivi ritardi di coda.\\
-Il controllo della congestione permette dunque di migliorare le prestazioni della rete evitando perdite di pacchetti e limitando il ritardo a causa delle ritrasmissioni dei pacchetti persi.
-%Cause/costi di congestione, scenario 1:
-%	Due senders, due receivers. Un router, buffer infiniti, no retransmission.
-%	copiare schemi
-
-Sono due i principali approcci implementati ai fini del controllo della congestione; il primo end-to-end, il secondo network-assisted.
-
-\paragraph{End-End Congestion Control.}
-Questo meccanismo di controllo non prevede feedback esplicito dalla rete; la congestione è dedotta dagli end-systems che si occupano direttamente di osservare la perdita e il ritardo dei pacchetti.
-\paragraph{Network-Assisted Congestion Control.} I routers forniscono feedback agli end-systems tramite un singolo bit indicante il tipo di congestione %credo
-(SNA, DECbit, TCP/IP ECN, ATM); in alternativa tentano di prevenire la congestione specificando una quantità massima di dati che è possibile inviare.\\
-
-\paragraph{TCP congestion control: additive increase, multiplicative decrease.}
-L'approccio di TCP prevede che il mittente aumenti il tasso di trasmissione (\textit{window size}) fino al verificarsi di una perdita dati.\\
-Quando la trasmissione è normale, l' incremento è additivo: viene aumentata la dimensione della "finestra" di 1 MSS ogni RTT.
-Al verificarsi di una perdita la dimensione della finestra è dimezzata.
-
-
-\paragraph{TCP Slow Start.}
-All'avvio della connessione, inizialmente il \textbf{cwnd} è impostato a 1 MSS. 
-TCP raddoppia il cwnd ogni RTT, incrementandolo per ogni ACK.
-%
-%TCP: detecting, reacting to loss.
-%	loss indicated by timeout.
-%		cwnd settato a 1 MSS
-%		window then grows exponentially (as in slow start) to threshold, then linearly.
-%	loss indicated by 3 duplicated ACKs: TCP RENO
-%		duplicate ACKs indicate network capable of delivering some segments
-%		cwnd is cut in half window then grows linearly
-%	TCP Tahoe always sets cwnd to 1 (timeout or 3 dup acks)
+\subsection{Subnet}
+La subnet è la sottorete che mette in comunicazione tutti gli indirizzi IP con \textit{subnet part} (sequenza\textit{high order bits}) in comune.
+\paragraph{CIDR (Classless InterDomain Routing)}
+Approccio di rappresentazione di subnet tramite la rappresentazione dei bit della \textit{subnet part}, alla quale viene aggiunta la \textit{host part} settata a zero. Infine si aggiunge un parametro che indica la capienza totale della subnet: \textit{192.168.1.0/24} (subnet \textit{192.168.1}, che può contenere un massimo di 255 \textit{host part} diverse, e quindi 255 indirizzi IP univoci). \hfill \\
+\paragraph{DHCP (Dynamic Host Configuration Protocol)}
+Protocollo di configurazione e associazione automatica dell'indirizzo IP ad un dato host in connessione ad una data subnet.
+Sostanzialmente l'host è capace in questo modo di ricevere dal server di rete un indirizzo valido dinamicamente, così da potersi unire alla rete.
+Il DHCP può fornire anche il \textit{first-hop router} (\textit{gateway} della subnet) e il DNS server. \\
+Le richieste DCHP sono incapsulate in \textit{UDP}. \\
+Questo permette il riutilizzo di indirizzi (che vengono tenuti occupati limitatamente al tempo entro il quale sono effettivamente connessi).

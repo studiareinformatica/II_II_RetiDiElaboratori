@@ -156,3 +156,110 @@ La \textit{finestra} e il \textit{buffer} sono configurati nell'\textit{handshak
 \end{itemize}
 Ad ogni trasmissione, viene specificato anche il valore \textit{WIN} sulla base dello spazio rimanente disponibile sul \textit{buffer} del ricevitore. \\
 Potrebbe però accadere che il segmento di notifica da parte del ricevitore che lo spazio sul \textit{buffer} è tornato disponibile vada perduta. Per questa ragione, il \textit{sender} continua \textit{sempre} ad inviare pacchetti - piccoli, se il \textit{buffer} è stato segnalato come saturo -, a distanza di timeout crescenti nel tempo (possono raggiungere massimo 60s), così da rimanere in contatto con il ricevitore e poter sapere se il \textit{buffer} contiene nuovamente spazio a sufficienza per ricevere dati utili.
+
+\section{Handshakes}
+Prima di scambiare dati, il ricevente e il destinatario compiono una "stretta di mano" (\textit{handshake}):
+questo si traduce nello stabilire che entrambi sono a conoscenza del fatto che l'altro vuole connettersi e che entrambi sono d'accordo sui parametri di connessione.\\
+Un handshake semplice prevede che il client mandi una richiesta di connessione, riceva una risposta positiva dal server e successivamente possa iniziare ad inviare dati.\\
+Il problema è che i dati possono essere intercettati, ritardati, duplicati o addirittura perduti. Prendendo in considerazione l'invio di dati importanti, questo potrebbe portare a conseguenze disastrose.
+Per questo motivo, al momento della richiesta si inseriscono un segmento di \textit{SYN} e una 'proposta' nel sequence number ($ seq = x $). Quando il destinatario riceve la richiesta, invia un segmento di SYNACK per comunicare di aver ricevuto la richiesta ($ seq = y; ack = x+1 $). Al momento della ricezione del segmento di SYNACK, il client stesso invia un segmento che contiene l'ACK della ricezione e i dati da inviare ($ seq = x+1; ack = y+1 $)
+
+\paragraph{Initial Sequence Number.}
+Per motivi di sicurezza, i sequence numbers dovrebbero cambiare nel tempo. \\
+RFC 793 suggerisce di generare sequence numbers iniziali (\textit{ISN}) semplici come un counter da 32 bit incrementati ogni $ 4 \mu s $ e trasmessi ogni volta che la flag SYN è attiva. \\
+Notare che sia il mittente sia il destinatario trasmettono il \textit{loro} ISN. %(cfr full duplex)
+A partire dall'ISN, i byte di dati sono numerati da $ ISN+1 $ in modo da permettere il \textit{synack}.
+
+\paragraph{Forbidden Region.} Per impedire che due SN identici si trovino in rete nello stesso momento, è stato introdotto un "periodo di silenzio" nel quale non possono essere inviati segmenti. %...dopo il ravvio pari al MSL
+
+\subsection{Il problema dei due eserciti}
+Il problema del controllo nella trasmissione dati è facilmente spiegabile con il seguente esempio.
+Prendiamo in considerazione tre armate, due appartenenti alla fazione \textit{verde} ed una appartenente alla fazione \textit{rosso}. Le due armate verdi sono singolarmente più deboli di quella rossa, ma l'armata rossa è globalmente più debole. Le armate verdi devono quindi attaccare quella rossa nello stesso momento per vincere la battaglia. La prima soluzione che può venire in mente per fare in modo che le armate verdi si accordino per attaccare è che una invii un messaggio con l'orario di attacco e l'altra ne invii uno per confermare la ricezione.\\
+I messaggeri che li portano possono però essere catturati, quindi il messaggio può non arrivare correttamente a destinazione. Per assicurarsi che ogni messaggio sia correttamente ricevuto bisognerebbe quindi inviare un messaggio di conferma ad ogni ricezione, ma ciò porterebbe ad un loop in cui ogni armata continua ad inviare messaggeri per confermare la ricezione del messaggio dell'altra.
+Per ovviare a questo problema, si adotta la seguente soluzione:
+\begin{lstlisting}
+g1 to g2: "attacco alle 6."
+g2 to g1: "conferma ricezione messaggio."
+g1 to g2: "conferma ricevuta, fine trasmissione."
+g2 to g1: "conferma fine trasmissione."
+\end{lstlisting}
+Introducendo una comunicazione di fine trasmissione, il ricevente non deve fare altro che inviare un'ultima conferma per porre fine alla trasmissione.\\
+Ciò si traduce in TCP con una flag denominata \textit{FIN} che stabilisce il termine della connessione; poichè la connessione è doppia, FIN dev'essere inviato (e confermato) da entrambi i lati.
+
+\begin{lstlisting}
+a to b: connection request
+b to a: connection ack
+a to b: ack, data
+b to a: data ack
+-----------------------
+a to b: data
+b to a: data ack
+a to b: data
+b to a: data ack
+...
+-----------------------
+a to b: fin
+b to a: ack fin
+b to a: fin
+a to b: ack
+\end{lstlisting}
+
+
+\subsection{3 Way Handshake in TCP}
+\begin{enumerate}
+	\item Il client invia un segmento TCP SYN al server e specifica ISN senza invio di dati.
+	\item Il server riceve SYN e risponde con SYNACK; alloca il buffer e specifica ISN.
+	\item Il client riceve SYNACK; alloca buffer e variabili, risponde con ACK che potrebbe contenere dati.
+	\item Per chiudere la connessione uno dei due estremi invia un messaggio con flag $ FIN=1 $; il ricevente conferma e manda a sua volta un messaggio con $ FIN=1 $ e attende l'ultima conferma.
+\end{enumerate}
+
+\subsection{Connection states: client}
+0: closed\\
+1: syn\_sent		(ricevo \textit{synack}; invio \textit{ack})\\
+2: established\\
+;\\
+2: established		(invio \textit{fin})\\
+3: fin\_wait\_1		(ricevo \textit{ack})\\
+4: fin\_wait\_2		(ricevo \textit{fin}, invio \textit{ack})\\
+5: close wait\\
+
+\subsection{Connection states: server}
+0: closed\\
+1: listen			(ricevo \textit{syn}, invio \textit{synack})\\
+2: syn\_rcvd\\
+3: established\\
+4: close\_wait\\
+5: last\_ack\\
+
+\section{Principi di controllo della congestione}
+Nelle reti a pacchetto, i pacchetti attraversano una grande quantità di dispositivi diversi, come ad esempio router, switch e bridge. Questi dispositivi, e i collegamenti che li interconnettono, hanno capacità di elaborazione e di trasmissione finite che possono portare, in molti casi, a situazioni di congestione: i nodi suddetti potrebbero cioè non essere in grado di smistare tutto il traffico offerto in ingresso da varie connessioni tra utenti causando perdita di pacchetti e/o eccessivi ritardi di coda.\\
+Il controllo della congestione permette dunque di migliorare le prestazioni della rete evitando perdite di pacchetti e limitando il ritardo a causa delle ritrasmissioni dei pacchetti persi.
+%Cause/costi di congestione, scenario 1:
+%	Due senders, due receivers. Un router, buffer infiniti, no retransmission.
+%	copiare schemi
+
+Sono due i principali approcci implementati ai fini del controllo della congestione; il primo end-to-end, il secondo network-assisted.
+
+\paragraph{End-End Congestion Control.}
+Questo meccanismo di controllo non prevede feedback esplicito dalla rete; la congestione è dedotta dagli end-systems che si occupano direttamente di osservare la perdita e il ritardo dei pacchetti.
+\paragraph{Network-Assisted Congestion Control.} I routers forniscono feedback agli end-systems tramite un singolo bit indicante il tipo di congestione %credo
+(SNA, DECbit, TCP/IP ECN, ATM); in alternativa tentano di prevenire la congestione specificando una quantità massima di dati che è possibile inviare.\\
+
+\paragraph{TCP congestion control: additive increase, multiplicative decrease.}
+L'approccio di TCP prevede che il mittente aumenti il tasso di trasmissione (\textit{window size}) fino al verificarsi di una perdita dati.\\
+Quando la trasmissione è normale, l' incremento è additivo: viene aumentata la dimensione della "finestra" di 1 MSS ogni RTT.
+Al verificarsi di una perdita la dimensione della finestra è dimezzata.
+
+
+\paragraph{TCP Slow Start.}
+All'avvio della connessione, inizialmente il \textbf{cwnd} è impostato a 1 MSS. 
+TCP raddoppia il cwnd ogni RTT, incrementandolo per ogni ACK.
+%
+%TCP: detecting, reacting to loss.
+%	loss indicated by timeout.
+%		cwnd settato a 1 MSS
+%		window then grows exponentially (as in slow start) to threshold, then linearly.
+%	loss indicated by 3 duplicated ACKs: TCP RENO
+%		duplicate ACKs indicate network capable of delivering some segments
+%		cwnd is cut in half window then grows linearly
+%	TCP Tahoe always sets cwnd to 1 (timeout or 3 dup acks)

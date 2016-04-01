@@ -1,0 +1,54 @@
+\section{Informazioni generali}
+La sicurezza informatica si fonda su diversi concetti:
+\begin{itemize}
+	\item \textbf{confidenzialità}: soltanto \textit{sender} e \textit{receiver} possono \textit{capire} il contenuto di un messaggio;
+	\item \textbf{autenticazione}: soltanto \textit{sender} e \textit{receiver} possono confermare l'identità di ciascuno;
+	\item \textbf{integrità di messaggio}: \textit{sender} e \textit{receiver} devono essere sicuri che il messaggio sia integro;
+	\item \textbf{accesso e disponibilità}: i servizi devono essere accessibili e disponibili agli utenti.
+\end{itemize}
+
+\paragraph{Personaggi noti}
+\textit{Bob} e \textit{Alice} vogliono comunicare in maniera sicura; \textit{Eve} è l'intruso, che vuole ottenere - senza permesso - le informazioni tra i due precedenti comunicanti, tramite \textit{eavesrop} (intercettazione), \textit{iniettazione} dei messaggi nella rete, \textit{personificazione} (pretendendo di essere qualcun altro); \textit{hijacking} (sostituendo uno dei capi della trasmissione con sé stesso), provocazione di \textit{denial of service} (prevenendo il servizio dall'essere usato dagli utenti, attraverso l'\textit{overload} delle risorse, per esempio).
+\newpage
+
+\section{Crittografia}
+Il messaggio in chiaro si dice \textit{plain-text}; una volta crittografato, invece, \textit{cipher-text}. \\
+Avendo soltanto il \textit{cipher-text} posso:
+\begin{enumerate}
+	\item fare \textit{brute-force}: tentare utilizzando tutte le chiavi in mio possesso per \textit{decriptare} il messaggio;
+	\item utilizzare un'analisi statistica per risalire attraverso calcoli probabilistici a sequenze di caratteri noti (nel caso in cui si utilizzino metodi di cifrature \textit{monoalfabetici}).
+\end{enumerate}
+
+\subsection{Crittografia a chiave simmetrica}
+Due o più persone condividono la stessa chiave (simmetrica), utilizzata come pattern ci cifratura a sostituzione mono alfabetica. Come si accordano, però, Bob e Alice? Occorre un sistema di scambio di chiavi attraverso un canale sicuro (anche fisico, per esempio).
+\subsubsection{Schema di cifratura di Cesare}
+Sistema di cifratura basato su uno spostamento/slittamento di \textit{n} lettere sulla sequenza dell'alfabeto. In questo caso, la chiave è proprio \textit{n}.
+
+\subsubsection{DES: Data Encryption Standard}
+Standard di criptazione, che utilizza chiavi lunghe \textit{56bit}, di cui si usano \textit{48bit}. Il messaggio viene spezzato in frammenti da 64bit, e passa per l'algoritmo blocco per blocco, tramite sistemi di permutazione. E' stato necessario nemmeno un giorno per \textit{bucarlo}. \\
+Per questa ragione hanno sviluppato il \textit{3DES}, algoritmo di criptazione che prevede 3 passaggi: una \textit{encryption} iniziale utilizzando una chiave iniziale, una \textit{decription}, utilizzando una seconda chiave, e una \textit{encryption} finale, tramite la chiave iniziale.
+
+\subsubsection{AES: Advanced Encryption Standard}
+Standard molto più attuale. Utilizza un sistema di criptazione simmetrica che nel 2001 ha rimpiazzato \textit{DES}. Processa dati in blocchi da \textit{128bit}, con chiavi da \textit{128}/\textit{192}/\textit{256 bit}, per cui si dice abbia sicurezza di un ordine di $2^{128}$. \\
+Mentre occorreva 1s per decriptare lo standard \textit{DES}, occorrono 149 trilioni di anni per farlo con \textit{AES}.
+\newpage
+
+\subsection{Modus operandi}
+Il \textit{modus operandi} di un algoritmo di cifratura è il modo con cui vengono scambiati i blocchi, e prende il nome di \textit{ECB} (o \textit{Elecronic CodeBook}).
+Altro metodo è quello del \textit{CBC} (o \textit{Cipher Block Chaining}), dove l'output del blocco precedente è l'input del blocco successivo.
+
+\subsection{Crittrogafia a chiave pubblica}
+Utilizza un approccio totalmente differente: il \textit{sender} e il \textit{receiver} hanno rispettivamente due chiavi: una privata e una pubblica. Non condividono la loro chiave privata, ma solo la pubblica, quindi la chiave di decriptazione privata è nota solo al \textit{receiver}. \\
+Sostanzialmente, quando Alice vuole inviare un messaggio a Bob, lo cripta con la chiave pubblica di Bob, il quale - quando riceverà il messaggio criptato - lo decripterà con la propria chiave privata, e/o viceversa. \\
+Tra gli algoritmi di crittografia a chiave pubblica più importanti troviamo l'\textit{RSA} (dai suoi creatori: \textit{Rivest}, \textit{Shamir} e \textit{Adelson}), che si basa sul fatto che bit può essere univocamente rappresentabile da un numero. Per creare un paio di chiavi \textit{RSA} occorre:
+\begin{itemize}
+	\item scegliere due numeri \textit{p} e \textit{q} (utilizzando, ad esempio, 1024 bit per ciascuno);
+	\item si calcola $n=p\times q$ e $z=(p-1)\times (q-1)$;
+	\item si sceglie una $e < n$ che non ha nulla in comune con \textit{z} (per cui si dicono \textit{relativamente primi});
+	\item si sceglie una \textit{d} in modo tale che $(e\times d)-1$ sia divisibile per \textit{z}.
+\end{itemize}
+Infine:
+\begin{center}
+	Criptazione: $c = m^e$ $mod$ $n$ \\
+	Decriptazione: $m = c^d$ $mod$ $n$
+\end{center}

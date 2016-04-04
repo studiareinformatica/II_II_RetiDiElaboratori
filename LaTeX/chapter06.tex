@@ -55,20 +55,30 @@ Infine:
 
 \section{Autenticazione}
 \subsection{Firme digitali}
-Tecniche di crittografia analoghe alle firme scritte a mano, così che se Bob firma digitalmente un documento, Alice è in grado di verificare Bob - e solamente Bob - l'abbia firmato.
-E' l'unico meccanismo basato su chiave pubblica ad avere la caratteristica di \textit{non ripudio}: ogni firma applicata in precedenza - dopo l'eventuale \textit{ripudio} - mantiene validità e garanzia. \\
-Sostanzialmente, il messaggio di Bob viene crittato utilizzando la sua chiave privata e mandato ad Alice: quest'ultima, alla ricezione, decritta il messaggio utilizzando la chiave pubblica di Bob:
-\begin{center}
-	$K_{B}^+ $ = chiave pubblica e $K_{B}^- $ = chiave privata \\
-	$K_{B}^+(K_{B}^-(msg)) = msg $
-\end{center}
+Una firma digitale rappresenta un insieme di dati in forma elettronica, allegati oppure connessi tramite associazione logica ad altri dati elettronici, utilizzati come metodo di identificazione informatica.
+
+Si propone di soddisfare le seguenti esigenze:
+\begin{itemize}
+	\item \textbf{autenticazione:} il destinatario può verificare l'identità del mittente.
+	\item \textbf{integrità:} il destinatario non può creare o modificare un documento firmato da qualcun altro.
+	\item \textbf{non ripudio:} il mittente non può disconoscere un documento da lui firmato. La firma digitale è l'unico meccanismo basato su crittografia a chiave pubblica ad avere questa caratteristica.	
+\end{itemize}
+
+Un tipico schema di firma elettronica basato sulla tecnologia della chiave pubblica consiste di tre algoritmi:
+\begin{enumerate}
+	\item Un algoritmo che genera una coppia di chiavi $ (PK, SK) $, dove \textit{PK} è la chiave pubblica di verifica della firma e \textit{SK} è la chiave privata utilizzata per firmare il documento.
+	\item Un algoritmo di firma che prende in input un messaggio \textit{m} e una chiave privata \textit{SK}, calcola il codice hash del messaggio e, crittografandolo con \textit{SK}, produce una firma $ \sigma $.
+	\item un algoritmo di verifica che prende in input la tripla $(m, PK, \sigma)$ e accetta o rifiuta la firma.
+\end{enumerate}
+La firma digitale è l'unico caso in cui l'uso delle chiavi è invertito: la chiave pubblica serve a decrittare la firma e trovare poi il \textit{digest} iniziale attraverso l'hash, mentre la chiave privata serve a crittografare una stringa anzichè aprirla.
+
 \subsection{Message digests}
-Utilizzati per dare una sorta di \textit{impronta digitale} di un'entità. Partendo da un insieme enorme di combinazioni applicabili su ogni tipo di file digitale, la funzione di \textit{hash} fa corrispondere un'entità ad una ed una sola (o quasi) sequenza di caratteri. In questo modo è possibile determinare una firma univoca per provare l'integrità di ogni file, potendo garantire che questa sia tale soltanto per quel file. \\
-La comodità di questo sistema è data dal fatto che ogni \textit{hash} è dato da una stringa di lunghezza fissa e che la procedura inversa non è allo stesso modo facilmente fattibile.
+Per dare una sorta di \textit{impronta digitale} di un'entità vengono utilizzati i cosiddetti \textbf{message digests}: partendo da un insieme enorme di combinazioni applicabili su ogni tipo di file digitale, una funzione di \textit{hashing} fa corrispondere un'entità a (quasi) una ed una sola sequenza di caratteri. In questo modo è possibile determinare una firma univoca per provare l'integrità di ogni file, potendo garantire che questa sia tale soltanto per quel file. La lunghezza dei valori di hash varia a seconda degli algoritmi utilizzati; il valore più comunemente adottato è di 128 bit, che offre una buona affidabilità in uno spazio relativamente ridotto\footnote{Va registrata la possibilità d'uso di hash di dimensione maggiore (SHA, ad esempio, può anche fornire stringhe di 224, 256, 384 e 512 bit) e minore (anche se fortemente sconsigliato).}. La sicurezza di questo sistema è data dal fatto che ogni \textit{hash} è dato da una stringa di lunghezza fissa indipendentemente dalla lunghezza del messaggio.\\
+La firma digitale pul essere definita come \textit{digest} di un documento crittografato con chiave privata.
+
 
 \subsubsection{Checksum}
-Il \textit{checksum} fa una sorta di \textit{hash} come è stato appena introdotto: produce una stringa da 16 bit. Il problema in questo caso riguarda il fatto che è molto più semplice trovare file diversi che abbiano lo stesso \textit{checksum}. \\ \\
-
+La \textit{checksum} fa una sorta di \textit{hash} come è stato appena introdotto: produce una stringa da 16 bit. Il problema in questo caso riguarda il fatto che è molto più semplice trovare file diversi che abbiano lo stesso \textit{checksum}.\\\\
 A questo punto possiamo arrivare alla combinazione ottimale: Bob manda un pacchetto di informazioni contenente:
 \begin{itemize}
 	\item messaggio puro;
@@ -100,8 +110,31 @@ In alternativa:
 \end{enumerate}
 Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segreta generata randomicamente da Alice con la sua chiave privata e - ancora - decritterà il messaggio in definitiva utilizzando la chiave-output della decrittazione della chiave segreta generata randomicamente da Alice. Bob, per verificare l'autenticità del messaggio, fa l'hash del messaggio e lo confronta con l'output della decrittazione tramite chiave pubblica di Alice dell'hash crittato precedentemente da Alice con la sua chiave privata. Se questi corrispondono, allora il messaggio risulta autentico.
 
-\section{SSL (Secure Socket Layer)}
-% appunti marco
+\section{Secure Socket Layer}
+Con l'apertura della Rete a fini pubblici, le problematiche di prevenzione di danni, perdite e attacchi via via sempre più importanti portarono alla nascita di strati aggiuntivi con lo specifico compito di assicurarsi la delle comunicazioni.
+Le prime implementazioni di SSL erano limitate a una cifratura a chiave simmetrica di soli 40 bit\footnote{Tale limitazione fu dovuta da restrizioni imposte dal governo statunitense sull'esportazione di tecnologie crittografiche. Fu esplicitamente imposta per rendere la cifratura abbastanza debole da poter essere forzata dalle autorità giudiziarie che volessero decifrare il traffico, ma sufficientemente resistente ad attacchi esterni poichè facente affidamento alle minori disponibilità di risorse tecnologiche e finanziarie dell'epoca.}; fu succesivamente aggiornato a TLS (\textit{Transport Layer Security}), con chiavi da 128+ bit.\\\\
+Il protocollo TLS consente alle applicazioni client/server di comunicare attraverso una rete in modo tale da prevenire il \textit{tampering}(manomissione), la falsificazione e l'intecettazione dei dati.\\
+Nell'utilizzo tipico del browser di un end-user, l'autenticazione è \textit{unilaterale}: è il solo server ad autenticarsi presso il client. Il browser valida il certificato del server controllando che la firma digitale dei certificati sia valida e riconosciuta da una \textbf{certificate authority}\footnote{} conosciuta utilizzando una cifratura a chiave pubblica. Dopo questa autenticazione, il browser indica una connessione sicura.\\
+Quest'autenticazione, però, non è sufficiente per garantire che il sito con cui ci si è collegati sia quello richiesto. Per esserne sicuri è necessario analizzare il contenuto del certificato rilasciato e controllarne la catena di certificazione. I siti che intendono ingannare l'utente non possono utilizzare un certificato del sito che vogliono impersonare, perchè non hanno la possibilità di cifrare in modo valido il certificato, 
+che include l'indirizzo, in modo tale che risulti valido alla destinazione.\\
+Il protocollo TLS permette anche un'autenticazione \textit{bilaterale}, tipicamente utilizzata in applicazioni aziendali, in cui entrambe le parti si autenticano in modo sicuro scambiandosi i relativi certificati. Questa autenticazione (definita \textit\textit{Mutual authentication}), richiede che anche il client possieda un proprio certificato digitale.\\
+
+\subsection{Principi di funzionamento}
+Il funzionamento del protocollo TLS può essere suddiviso in tre fasi principali:
+\begin{enumerate}
+	\item Negoziazione dell'algoritmo da utilizzare;
+	\item Scambio delle chiavi e autenticazione;
+	\item Cifratura simmetrica e autenticazione dei messaggi.
+\end{enumerate}
+Nella prima fase, il client e il server negoziano il protocollo di cifratura che sarà utilizzato nella comunicazione sicura, il protocollo per lo scambio delle chiavi, il MAC (\textit{message authentication code}) e l'algoritmo di autenticazione. L'algoritmo per lo scambio delle chiavi e quello per l'autenticazione normalmente sono a chiave pubblica; l'integrità dei messaggi è garantita da un algoritmo di hash che utilizza funzioni pseudorandom non standard.
+
+\paragraph{Protocolli.} All'interno di una sessione vengono tipicamente utilizzati i seguenti protocolli:
+\begin{itemize}
+	\item RSA, Diffie-Hellman, ECDH, SRP, PSK per lo scambio di chiavi;
+	\item RSA, DSA, ECDSA per l'autenticazione;
+	\item RC4, DES, 3DES, AES, IDEA o Camellia (anche RC2 nei vecchi SSL) per la cifratura simmetrica;
+	\item HMAC-MD5, HMAC-SHA (TLS); MD5, SHA (SSL) come funzioni di hash per le funzioni crittografiche d'integrità. 
+\end{itemize}
 
 \paragraph{ARP}
 Una richiesta \textit{ARP} consiste in una richiesta di risoluzione inversa: invece di chiedere la risoluzione di un nome host, richiediamo la risoluzione inversa, ovvero quella che associa univocamente un IP ad un nome host. Il protocollo \textit{ARP} lavora a livello \textit{datalink} della pila \textit{TCP/IP}, quindi utilizzando come nomi identificativi gli indirizzi \textit{MAC}. Per la richiesta viene richiamato il gateway dell'IP richiesto, il quale fa una richiesta in \textit{broadcast} nella subnet per cercare il dato IP. \\

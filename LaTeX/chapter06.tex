@@ -52,3 +52,57 @@ Infine:
 	Criptazione: $c = m^e$ $mod$ $n$ \\
 	Decriptazione: $m = c^d$ $mod$ $n$
 \end{center}
+
+\section{Autenticazione}
+\subsection{Firme digitali}
+Tecniche di crittografia analoghe alle firme scritte a mano, così che se Bob firma digitalmente un documento, Alice è in grado di verificare Bob - e solamente Bob - l'abbia firmato.
+E' l'unico meccanismo basato su chiave pubblica ad avere la caratteristica di \textit{non ripudio}: ogni firma applicata in precedenza - dopo l'eventuale \textit{ripudio} - mantiene validità e garanzia. \\
+Sostanzialmente, il messaggio di Bob viene crittato utilizzando la sua chiave privata e mandato ad Alice: quest'ultima, alla ricezione, decritta il messaggio utilizzando la chiave pubblica di Bob:
+\begin{center}
+	$K_{B}^+ $ = chiave pubblica e $K_{B}^- $ = chiave privata \\
+	$K_{B}^+(K_{B}^-(msg)) = msg $
+\end{center}
+\subsection{Message digests}
+Utilizzati per dare una sorta di \textit{impronta digitale} di un'entità. Partendo da un insieme enorme di combinazioni applicabili su ogni tipo di file digitale, la funzione di \textit{hash} fa corrispondere un'entità ad una ed una sola (o quasi) sequenza di caratteri. In questo modo è possibile determinare una firma univoca per provare l'integrità di ogni file, potendo garantire che questa sia tale soltanto per quel file. \\
+La comodità di questo sistema è data dal fatto che ogni \textit{hash} è dato da una stringa di lunghezza fissa e che la procedura inversa non è allo stesso modo facilmente fattibile.
+
+\subsubsection{Checksum}
+Il \textit{checksum} fa una sorta di \textit{hash} come è stato appena introdotto: produce una stringa da 16 bit. Il problema in questo caso riguarda il fatto che è molto più semplice trovare file diversi che abbiano lo stesso \textit{checksum}. \\ \\
+
+A questo punto possiamo arrivare alla combinazione ottimale: Bob manda un pacchetto di informazioni contenente:
+\begin{itemize}
+	\item messaggio puro;
+	\item hash del messaggio, crittato con la chiave privata dello stesso Bob.
+\end{itemize}
+A questo punto, Alice, per verificare l'autenticità del messaggio, fa l'hash del messaggio e lo confronta con l'output della decrittazione tramite chiave pubblica di Bob dell'hash crittato precedentemente da Bob con la sua chiave privata. Se questi corrispondono, allora il messaggio risulta autentico.
+
+Attualmente esistono diversi tipi di hash, in base al livello di sicurezza: leggermente datato è l'\textit{MD5} (da 128 bit, crittato in 4 passi), più aggiornato è invece lo \textit{SHA-1} (da 160 bit, ancora più sicuro è invece lo \textit{SHA-2}).
+
+\subsection{CA (Certification Authority)}
+La \textit{CA} rappresenta l'autorità che assegna un \textit{certificato digitale} (comprensivo dei dati di Bob con la sua firma digitale) ad una specifica entità E appartenente a Bob sulla base della chiave pubblica di E, in modo tale che sia garantita l'identità di E presso la \textit{CA}. Sostanzialmente, le informazioni del certificato digitale vengono prodotte dalla \textit{CA}, crittate con la chiave pubblica di Bob e poi con la chiave privata della \textit{CA}.
+\newpage
+
+\subsection{Sicurezza e-mail}
+Alice vuole mandare una email confidenziale a Bob:
+\begin{enumerate}
+	\item genera una chiave privata simmetrica randomica, $K_{s}$;
+	\item critta il messaggio con questa chiave $K_{s}$;
+	\item critta l'output con la chiave pubblica di Bob;
+	\item invia l'output e la chiave generata randomicamente a Bob, crittata ancora con la chiave pubblica di Bob.
+\end{enumerate}
+Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segreta generata randomicamente da Alice con la sua chiave privata e - ancora - decritterà il messaggio in definitiva utilizzando la chiave-output della decrittazione della chiave segreta generata randomicamente da Alice. \\
+In alternativa:
+\begin{enumerate}
+	\item Alice fa un \textit{hash} del messaggio;
+	\item impacchetta il messaggio in chiaro e la firma digitale (come già visto con i message digests);
+	\item il pacchetto viene crittato con una chiave privata simmetrica randomica, $K_{s}$;
+	\item viene mandato il pacchetto e la chiave generata randomicamente a Bob, crittata ancora con la chiave pubblica di Bob.
+\end{enumerate}
+Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segreta generata randomicamente da Alice con la sua chiave privata e - ancora - decritterà il messaggio in definitiva utilizzando la chiave-output della decrittazione della chiave segreta generata randomicamente da Alice. Bob, per verificare l'autenticità del messaggio, fa l'hash del messaggio e lo confronta con l'output della decrittazione tramite chiave pubblica di Alice dell'hash crittato precedentemente da Alice con la sua chiave privata. Se questi corrispondono, allora il messaggio risulta autentico.
+
+\section{SSL (Secure Socket Layer)}
+% appunti marco
+
+\paragraph{ARP}
+Una richiesta \textit{ARP} consiste in una richiesta di risoluzione inversa: invece di chiedere la risoluzione di un nome host, richiediamo la risoluzione inversa, ovvero quella che associa univocamente un IP ad un nome host. Il protocollo \textit{ARP} lavora a livello \textit{datalink} della pila \textit{TCP/IP}, quindi utilizzando come nomi identificativi gli indirizzi \textit{MAC}. Per la richiesta viene richiamato il gateway dell'IP richiesto, il quale fa una richiesta in \textit{broadcast} nella subnet per cercare il dato IP. \\
+In un attacco \textit{arp-spoofing} (o \textit{arp-poisoning}), l'attaccante fa un attacco \textit{man-in-the-middle}, \textit{spacciandosi} per l'IP richiesto.

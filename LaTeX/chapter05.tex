@@ -128,7 +128,7 @@ Tali messaggi risiedono nei datagrammi IP e sono composti da tipo, codice e i pr
 	\end{tabular}
 \end{center}
 
-\paragraph{Traceroute e ICMP.}
+\paragraph{Traceroute e ICMP}
 Il mittente invia una serie di segmenti UDP a destinazione, il primo con TTL = 1, il secondo con TTL = 2 e così via.
 Quando l'\textit{n}-esimo set di datagrammi arriva all'\textit{n}-esimo router, il router scarta i datagrami e invia i messaggi ICMP del mittente. Una volta arrivati, il mittente registra gli RTT.\\
 Per terminare il processo, quando tutti i segmenti UDP arrivano a destinazione, il destinatario restituisce un ICMP di tipo 3, codice 3: \textit{port unreachable}. A questo punto, il mittente interrompe l'invio.
@@ -150,23 +150,27 @@ Altri cambiamenti rispetto a IPv4 includono:
 	\item le \textbf{opzioni} sono consentite, ma al di fuori dall'header, e indicate dal campo \textit{next header};
 	\item \textbf{ICMPv6}, una nuova versione di ICMP, include tipi di messaggi aggiuntivi (come \textit{"Packet Too Big"}), e funzioni di gestione multicast di gruppo.
 \end{itemize}
-\paragraph{Transizione da IPv4 a IPv6.}
+
+\paragraph{Transizione da IPv4 a IPv6}
 Non tutti i routers possono essere aggiornati contemporaneamente. Perchè il network possa operare contemporaneamente con router IPv4 e IPv6, è introdotto il \textbf{tunneling}: i datagrammi IPv6 sono trasportati come \textit{payload} nei datagrammi IPv4 per i router che li richiedono.
 %controllare slide + cercare appunti: schemi tunneling, "interplay between routing,forwarding", "graph abstraction".
 \section{Algoritmi di routing}
 La scelta dell'algoritmo di routing più adatto varia in base a due domande fondamentali:
+
 \paragraph{1. Informazione globale o decentralizzata?}
 \begin{itemize}
 	\item Globale: tutti i router hanno completi "topology, link cost info"%?
 	. Per questa scelta è consigliato l'utilizzo di algoritmi \textit{link state}.
 	\item Decentralizzata: i router conoscono i vicini fisicamente connessi, "link costs to neighbors"; è previsto un processo iterativo di computazione per lo scambio di informazioni con i vicini. Per questa scelta è consigliato l'utilizzo di algoritmi \textit{distance vector}.	
 \end{itemize}
+
 \paragraph{2. Statico o dinamico?}
 \begin{itemize}
 	\item Statico: il router cambia lentamente nel tempo.
 	\item Dinamico: il router cambia più rapidamente e periodicamente in risposta a cambiamenti di "link costs".
 \end{itemize}
 
+\section{Tabella degli instradamenti}
 \subsection{Algoritmo di Dijkstra}
 L'algoritmo di Dijkstra è un algoritmo routing \textit{link state} che prevede che i costi di linking siano conosciuti da tutti i nodi. Ciò è ottenuto grazie al \textit{link state broadcast}, grazie a cui tutti i nodi avranno le stesse informazioni.\\
 Questo algoritmo calcola i percorsi di costo minimo da un nodo a tutti gli altri, producendo una \textit{forwarding table} per quel nodo. È iterativo: dopo \textit{k} iterazioni fornisce il percorso di costo minore per k destinazioni.
@@ -201,22 +205,108 @@ Questo algoritmo calcola i percorsi di costo minimo da un nodo a tutti gli altri
 \end{algorithm}
 
 \paragraph{Correttezza}
+
 \subparagraph{Tesi:} L'algoritmo di Dijkstra è corretto se eseguito su un grafo pesato diretto $ G = (N,E) $ con pesi non negativi, sorgente u, funzione peso c, allora alla terminazione $ D(v) = \delta(u,v) $ per ogni nodo \textit{v} in \textit{N}, dove $ \delta(u,v) $ è la lunghezza del cammino di peso minimo tra \textit{u} e \textit{v}.
+
 \subparagraph{Dimostrazione:}
-$ D(v) $ nonè più aggiornato nel momento in cui v è inserito in N'. Dovremo quindi mostrare che $ D(v) = \delta(u,v) \forall v$.\\
-Ragioniamo per assurdo: sia x il primo nodo (nell'ordine di inserimento in N') per cui vale $ D(v) \neq \delta(u,v) $ al momento in cui x è inserito nell'insieme N'.\\
-Ne consegue che $ x \neq u $, essendo il nodo sorgente u inserito nella fase di inizializzazione e valendo $ D(u) = \delta(u,v) = 0 $. Deve inoltre esistere un percorso di costo non infinito da u a x, dato che altrimenti il valore a cui D(x) è inizializzato (cioè $ \infty $) sarebbe uguale a delta(u,v). Esiste quindi un percorso di costo minimo $ p=u \ldots v \to y \ldots x  $, dove y è il primo nodo sul percorso di costo minimo \textit{non} in N' (quindi i nodi u \ldots v sono \textit{tutti} in '). Il percorso p può quindi essere diviso in due percorsi: $ p_{1} $, che va da u a y, e $ p_{2} $, che va da y a x.\\
-Da notare che il percorso $ p_{1} $ è anch'esso il percorso di costo minimo che unisce u a y: se non lo fosse, e ci fosse un percorso $ p_{3} $ che unisce u a y di costo minore del costo di $ p_{1} $, allora la concatenazione di $ p_{2} $ e $ p_{2} $ sarebbe un percorso p' da u a x di costo minore di p, ma ciò sarebbe assurdo a causa dell'assunto iniziale secondo cui p è un percorso minimo.\\
-Quando x è inserito in N', $ D(y) = \delta(u,y) $.\\
-Infatti, in quel momento v è stato già inserito in N' e dopo il suo inserimento y ha ricalcolato $ D(y) = D(v)+c)(v,y) = \delta(u,v)+c(v,y) $, dato che per ipotesi x è il primo nodo per cui all'inserimento in N' la stima dei costi non corrisponde al percorso di costo minimo $ \delta(u,y) $.\\
-Dato che y precede x sul percorso minimo ed i pesi sugli archi sono non negativi, vale che:\\
+$ D(v) $ nonè più aggiornato nel momento in cui v è inserito in N'. Dovremo quindi mostrare che $ D(v) = \delta(u,v) \forall v$. \\
+Ragioniamo per assurdo: sia x il primo nodo (nell'ordine di inserimento in N') per cui vale $ D(v) \neq \delta(u,v) $ al momento in cui x è inserito nell'insieme N'. \\
+Ne consegue che $ x \neq u $, essendo il nodo sorgente u inserito nella fase di inizializzazione e valendo $ D(u) = \delta(u,v) = 0 $. Deve inoltre esistere un percorso di costo non infinito da u a x, dato che altrimenti il valore a cui D(x) è inizializzato (cioè $ \infty $) sarebbe uguale a delta(u,v). Esiste quindi un percorso di costo minimo $ p=u \ldots v \to y \ldots x  $, dove y è il primo nodo sul percorso di costo minimo \textit{non} in N' (quindi i nodi u \ldots v sono \textit{tutti} in '). Il percorso p può quindi essere diviso in due percorsi: $ p_{1} $, che va da u a y, e $ p_{2} $, che va da y a x. \\
+Da notare che il percorso $ p_{1} $ è anch'esso il percorso di costo minimo che unisce u a y: se non lo fosse, e ci fosse un percorso $ p_{3} $ che unisce u a y di costo minore del costo di $ p_{1} $, allora la concatenazione di $ p_{2} $ e $ p_{2} $ sarebbe un percorso p' da u a x di costo minore di p, ma ciò sarebbe assurdo a causa dell'assunto iniziale secondo cui p è un percorso minimo. \\
+Quando x è inserito in N', $ D(y) = \delta(u,y) $. \\
+Infatti, in quel momento v è stato già inserito in N' e dopo il suo inserimento y ha ricalcolato $ D(y) = D(v)+c)(v,y) = \delta(u,v)+c(v,y) $, dato che per ipotesi x è il primo nodo per cui all'inserimento in N' la stima dei costi non corrisponde al percorso di costo minimo $ \delta(u,y) $. \\
+Dato che y precede x sul percorso minimo ed i pesi sugli archi sono non negativi, vale che: \\
 $ \delta(u,x)\geq\delta(u,y)=D(y) $\\
-e quindi anche\\
-$ D(x) \geq \delta(u,x) \geq \delta(u,y)=D(y) $.\\\\
-D'altro canto, dato che x viene inserito in N' prima di y, vale che:\\
-$ \delta(u,x) \leq D(x) \leq D(y) = \delta(u,y) $;\\
-quindi\\
-$ \delta(u,x)=D(x)=D(y)=\delta(u,y) $,\\
-cosa che porlta alla contraddizione.\\\\
+e quindi anche \\
+$ D(x) \geq \delta(u,x) \geq \delta(u,y)=D(y) $. \\\\
+
+D'altro canto, dato che x viene inserito in N' prima di y, vale che: \\
+$ \delta(u,x) \leq D(x) \leq D(y) = \delta(u,y) $; \\
+quindi \\
+$ \delta(u,x)=D(x)=D(y)=\delta(u,y) $, \\
+cosa che porlta alla contraddizione. \\\\
+
 \subparagraph{Discussione}
 La complessità dell'algoritmo per \textit{n} nodi, contando che ogni iterazione necessita di controllare tutti i nodi \textit{w} non in N, è $ \frac{n(n+1)}{2} \approx O(n^2) $. Il costo della più efficiente implementazione possibile è $ O(nlogn) $.
+
+\subsection{DistanceVector}
+Uno degli algoritmi alternativi a quello di \textit{Dijsktra}, è noto come algoritmo di \textit{Bellman-Ford}. Questo dice: essendo $d_{x}(y)$ definito come il percorso di costo minimo da \textit{x} a \textit{y}, allora $d_{x}(y) = min\{c(x,v), d_{v}(y)\}$, dove il \textit{min} indica il minimo preso per ciascun vicino comune tra il \textit{v} e quello \textit{x}, \textit{c(x,v)} è il costo per arrivare dal nodo \textit{x} a quello \textit{v} e $d_{v}(y)$ è il costo dal nodo \textit{v} a quello \textit{y}. In quasto caso il raggiungimento con percorso minimo di un nodo è il successivo hop nel percorso minore, usato nella tabella degli instradamenti. \\
+Altro modo di rappresentare questa equazione è:
+\begin{center}
+	$d_{x}(y)^{h+1} = min\{d_{x}(y)^h, min\{c(x,v) + d_{v}(y)^h\}\}$
+\end{center}
+Quindi: devo andare da \textit{x} a \textit{y}, passando al più per \textit{h} o esattamente \textit{h+1} uscite. \\
+La potenza dell'equazione di \textit{Bellman-Ford} è che non è richiesta sincronizzazione tra i vari nodi all'interno di una rete. \\
+Genericamente, ogni nodo tiene un \textit{distance vector} che memorizza tutti i costi del nodo verso i suoi vicini. Ogni nodo invia il suo \textit{distance vector} ai vicini, che quando lo ricevono aggiornano il proprio utilizzando l'equazione di \textit{Bellman-Ford}, per ogni nodo. Sotto condizioni naturali, la stima della distanza a costo minimo calcolata con questo sistema converge in quella realmente tale. \\
+Dunque: questo sistema è \textit{iterativo}, \textit{asincrono} e \textit{distribuito}. Non esiste né un inizio né una fine dell'algoritmo, perché per ogni cambiamento minimo nel \textit{distance vector} di un nodo, questo viene propagato e notificato ad ogni suo vicino. \\
+Il punto di debolezza di questo sistema è il \textit{count to infinity}, cioè la lentezza nel ricalcolare le stime migliori al cambio di anche un solo costo: per ogni minimo cambiamento - come l'eventuale scomparsa di un collegamento -, sono necessarie altre nuove \textit{n} iterazioni prima di ritrovarci in una situazione stabile ed ottimale.
+
+\paragraph{Poisoned reverse}
+Se il nodo \textit{z} decide di voler passare per \textit{y} per arrivare ad \textit{x}, \textit{z} comunica a \textit{y} che la distanza che separa \textit{z} da \textit{x} è pari ad infinito, così da permettere l'instradamento per \textit{y}. Questo però non permette totalmente di risolvere i problemi di \textit{count-to-infinity}.
+
+\subsubsection{Costi e conclusioni}
+Una volta calcolate le tabelle dei cammini minimi, popolo la tabella degli instradamenti, che sappiamo avere:
+\begin{itemize}
+	\item Complessità dei messaggi:
+	\begin{itemize}
+		\item \textit{LinkState}: dati \textit{n} nodi ed \textit{E} links, ho un numero di messaggi inviati pari a $O(n\times E)$;
+		\item \textit{DistanceVector}: variabile, in quanto - per ciascun nodo - avvengono scambi e interazioni con i suoi vicini.
+	\end{itemize}
+	\item Robustezza:
+	\begin{itemize}
+		\item \textit{LinkState}: dati \textit{n} nodi, ho una velocità di $O(n^2)$; potrebbe portare oscillazioni;
+		\item \textit{DistanceVector}: variabile; potrebbe portare a loop o al problema di \textit{count-to-infinity}.
+	\end{itemize}
+\end{itemize} \hfill \\
+Tutte queste soluzioni di instradamento vengono utilizzate in un solo \textit{AS}.
+
+\section{Autonomous System (AS)}
+Sistema di aggregazione di router in diverse regioni, governato da un entità - il \textit{gateway router} - tramite un protocollo di instradamento \textit{intra-as} (variabile in base all'\textit{AS} preso in considerazione).
+Esistono poi i protocolli \textit{inter-as}, che si occupano di mettere in connessione differenti \textit{AS} tramite \textit{router di frontiera}. \\
+\begin{itemize}
+	\item L'\textit{intra-as} avrà la gestione degli instradamenti interni all'\textit{AS}, per avere informazioni sul percorso minimo per raggiungere un nodo \textit{interno} all'\textit{AS}: si appoggia sulla necessità di presenza di criteri per rendere la gestione degli indirizzamenti il più organizzata possibile, spesso anche a scapito della performance;
+	\item L'\textit{inter-as} avrà la gestione degli instradamenti esterni all'\textit{AS}, per ottenere informazioni sui percorsi utilizzati per mettere in comunicazione router appartenenti ad \textit{AS} differneti: si appoggia sulla necessità di performance.
+\end{itemize}
+
+\paragraph{Esempio}
+Mi trovo in un \textit{AS}, l'\textit{AS1}. Ricevo un datagramma destinato ad un nodo esterno all'\textit{AS1}. Devo inviarlo al gateway, ma quale? L'\textit{AS1} deve poter apprendere quali sono le destinazioni raggiungibili tramite ciascun suo \textit{AS} vicino, e inoltre deve dare le sue informazioni delle destinazioni raggiungibili tramite l'\textit{AS1} agli stessi, cosi da risultare raggiungibile per ricevere eventuali risposte indietro. \\
+Tramite \textit{inter-as} impara che una subnet \textit{x} è raggiungibile tramite \textit{AS3}, per esempio, uscendo col \textit{gateway router} \textit{1c}: viene impiegato l'\textit{inter-as} per propagare le informazioni di raggiungibilità e calcolare il percorso migliore. \\
+Ma se invece potessi apprendesse di poter raggiungere la destinazione sia tramite \textit{AS3} che tramite \textit{AS2}? Il router \textit{1d} deve determinare quale dei due sia migliore da adoperare: questa scelta spetta comunque all'\textit{inter-as}. Molto spesso si usa scegliere il più vicino (metodo \textit{hot potato routing}).
+
+\subsection{Protocolli di instradamento intra-as}
+Protocolli noti anche come \textit{Interior Gateway Protocols} (\textit{IGP}). Tra i più famosi:
+\begin{itemize}
+	\item \textit{RIP}, o \textit{Routing Information Protocol};
+	\item \textit{OSPF}, o \textit{Open Shortest Path First};
+	\item \textit{IGRP}, o \textit{Interior Gateway Routing Protocol}.
+\end{itemize}
+
+\paragraph{RIP}
+Protocollo distribuito da \textit{BSD-Unix} nel 1982, che utilizza un approccio di tipo \textit{distance vector}. \\
+Per calcolare il costo di raggiungibilità, conta il numero di \textit{subnet} (numero di hop, il cui massimo imposto è 15, cosi da avere un metodo rapido per stabilire se una rotta è convenzionalmente ritenuta infinita o meno) da attraversare per arrivare a destinazione. Ad ogni di 30 secondi, viene inviato un \textit{advertisement} (un semplice messaggio) sui costi attuali relativi a ciascun nodo: in questo tipo di messaggio posso comunicare al massimo 25 \textit{subnet}.
+Qualora non si ricevesse nemmeno un \textit{advertisement} di un dato nodo entro 180 secondi, quel nodo verrebbe definitivamente dichiarato dai vicini come morto: le rotte verrebbero invalidate. \\
+Le tabelle di \textit{RIP} vengono gestite a livello applicativo, e gli advertisement sono inviati tramite protocollo \textit{UDP}.
+
+\paragraph{OSPF}
+Approccio completamente \textit{open}, molto più recente rispetto al \textit{RIP}, ma di tipo \textit{link state}: è necessaria una fase di inizializzazione in cui ogni nodo deve comunicare in \textit{broadcast} a tutti i nodi le sue informazioni. \\
+Per comunicare le informazioni - tramite advertisement - occorre autenticarsi. \\
+Dà la possibilità di individuare più di un percorso ottimale e di conservarlo per essere utilizzato per trasmettere dati, permettendo la gestione del \textit{load balancing}: tramite questa funzionalità, supporta non solo l'\textit{unicast} (la trasmissione biunivoca sorgente-destinatario), ma anche il \textit{multicast} (permette di trasmettere da un'unica sorgente ad un gruppo di destinazione). \\
+Non è \textit{flat}, ma gerarchico, così da ovviare a problemi derivanti dalla grandezza di un'eventuale struttura: si divide in \textit{n}, ciascuna gestita da un \textit{router di bordo}, che - oltre a catalogare informazioni di instradamento e raggiungibilità relative a quell'area - si trova in un'area speciale, detta \textit{area di backbone}, che mette in comunicazione tutti i \textit{router di bordo} con il \textit{router di backbone}. 
+
+\subsection{Protocolli di instradamento inter-as}
+Senza ombra di dubbio, il protocollo \textit{de facto} \textit{inter-as} più famoso e utilizzato è il \textit{BGP} (o \textit{Border Gateway Protocol}).
+
+\paragraph{BGP}
+Protocollo che non abbraccia propriamente né l'approccio \textit{link state}, né quello \textit{distance vector}. Definisce il suo approccio come \textit{path vector}, in quanto usa dichiarare unicamente l'insieme di vettori che mettono in comunicazione diversi \textit{AS}. \\
+Utilizza due componenti:
+\begin{itemize}
+	\item \textit{eBGP}: per comunicare ai diversi \textit{AS} la raggiungibilità di destinazioni possibili tramite il mio \textit{AS};
+	\item \textit{iBGP}: per propagare la raggiungibilità a tutti i router interni all'\textit{AS};
+\end{itemize}
+Due router \textit{BGP} (due \textit{peers}), per scambiarsi messaggi \textit{BGP} (atti alla scoperta dei percorsi possibili per raggiungere diversi prefissi di rete), richiedono l'apertura di una conessione \textit{TCP}, una sessione dedicata. \\
+Inoltre, con \textit{BGP}, quando un \textit{AS} comunica la raggiungibilità di un dato prefisso di rete, prende l'impegno di poter gestire il traffico derivato dalla richiesta di connessioni vesro quella destinazione. \\
+Infine, utilizza due attributi fondamentali:
+\begin{itemize}
+	\item \textit{AS-PATH}: contiene gli \textit{AS} attraverso cui è passato l'advertisement del prefisso di rete;
+	\item \textit{NEXT-HOP}: indica il router interno specifico sull'\textit{AS} di \textit{next-hop} (vicino, adiacente).
+\end{itemize}

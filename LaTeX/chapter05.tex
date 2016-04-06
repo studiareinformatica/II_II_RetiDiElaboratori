@@ -1,11 +1,10 @@
-\section{Introduzione}
 Il livello di rete di occupa dell'effettivo trasporto delle informazioni dal sender al receiver, incapsulandole in datagrammi - lato sender - e consegnandoli al livello di trasporto - lato receiver.
 Per la consegna, esamina il pacchetto, analizzando l'header e tutte le informazioni in esso contenute (principalmente l'IP), e determinandone l'instradamento più consono.
 
 \paragraph{Forwarding}
-Dirotta i pacchetti dall'input del router all'output dello stesso, associando un dato valore dell'header ad un link locale. \hfill \\
+Dirotta i pacchetti dall'input del router all'output dello stesso, associando un dato valore dell'header ad un link locale. \\\\
 \paragraph{Routing}
-Determina la rotta che collegherà la sorgente al destinatario, utilizzando appositi algoritmi di routing. \hfill \\
+Determina la rotta che collegherà la sorgente al destinatario, utilizzando appositi algoritmi di routing.\\\\
 
 \section{Connection Setup}
 Prima di verificare un percorso si deve verificare che ci sia tutto il necessario perché la trasmissione arrivi a compimento (che esistano le risorse necessarie, e così via \ldots). Quindi, prima che i datagrammi comincino a scorrere, i due \textit{end-hosts} e il router delegato aprono una \textit{connessione virtuale} dedicata. Inoltre, spesso sul livello direte vengono utilizzate delle funzioni importanti di terze parti, che definisco l'architettura di rete:
@@ -91,3 +90,133 @@ Sostanzialmente l'host è capace in questo modo di ricevere dal server di rete u
 Il DHCP può fornire anche il \textit{first-hop router} (\textit{gateway} della subnet) e il DNS server. \\
 Le richieste DCHP sono incapsulate in \textit{UDP}. \\
 Questo permette il riutilizzo di indirizzi (che vengono tenuti occupati limitatamente al tempo entro il quale sono effettivamente connessi).
+
+\section{ICMP}
+Per comunicare informazioni a livello di rete, hosts e routers utilizzano l'\textit{Internet Control Message Protocol}. Tali informazioni includono report di errori (host irraggiungibile, network, porte, protocolli) e richieste/risposte echo (usate da ping).\\
+Tali messaggi risiedono nei datagrammi IP e sono composti da tipo, codice e i primi 8 byte del datagramma IP che ha causato l'errore.
+\begin{center}
+	\begin{tabular}{|c|c|p{5cm}|}
+		\hline
+		Type & Code & Description\\
+		\hline
+		0 & 0 & echo reply (ping)\\
+		\hline
+		3 & 0 & dest. network unreachable\\
+		\hline
+		3 & 1 & dest. host unreachable\\
+		\hline
+		3 & 2 & dest. protocol unreachable\\ 
+		\hline
+		3 & 3 & dest. port unreachable\\
+		\hline
+		3 & 6 & dest. network unknown\\
+		\hline
+		3 & 7 & dest. host unknown\\
+		\hline
+		4 & 0 & source quench (congestion control - not used)\\
+		\hline
+		8 & 0 & echo request (ping)\\
+		\hline
+		9 & 0 & route advertisement\\
+		\hline
+		10& 0 & router discovery\\
+		\hline
+		11& 0 & TTL expired\\
+		\hline
+		12& 0 & bad IP header\\
+		\hline
+	\end{tabular}
+\end{center}
+
+\paragraph{Traceroute e ICMP.}
+Il mittente invia una serie di segmenti UDP a destinazione, il primo con TTL = 1, il secondo con TTL = 2 e così via.
+Quando l'\textit{n}-esimo set di datagrammi arriva all'\textit{n}-esimo router, il router scarta i datagrami e invia i messaggi ICMP del mittente. Una volta arrivati, il mittente registra gli RTT.\\
+Per terminare il processo, quando tutti i segmenti UDP arrivano a destinazione, il destinatario restituisce un ICMP di tipo 3, codice 3: \textit{port unreachable}. A questo punto, il mittente interrompe l'invio.
+\section{IPv6}
+Il motivo iniziale dell'utilizzo di questa versione di IP è il fatto che lo spazio di un indirizzo da 32 bit impiega poco tempo per essere completamente allocato. \\
+% Additional motivation: no time for translating! 
+% - header format helps speed processing/forwarding
+% - header changes to facilitate QoS
+Il formato dei datagrammi IPv6 prevede un header a dimensione fissa di 40 byte e impedisce la frammentazione.
+\begin{itemize}
+	\item \textbf{pri}: indica la priorità tra datagrammi nel flusso
+	\item \textbf{flow label}: indica datagrammi nello stesso "flusso"
+	\item \textbf{next header}: indica il protocollo del livello più alto per i dati%?
+\end{itemize}
+%includere immagine
+Altri cambiamenti rispetto a IPv4 includono:
+\begin{itemize}
+	\item la \textbf{checksum} è rimossa interamente per ridurre il tempo di processamento ad ogni hop;
+	\item le \textbf{opzioni} sono consentite, ma al di fuori dall'header, e indicate dal campo \textit{next header};
+	\item \textbf{ICMPv6}, una nuova versione di ICMP, include tipi di messaggi aggiuntivi (come \textit{"Packet Too Big"}), e funzioni di gestione multicast di gruppo.
+\end{itemize}
+\paragraph{Transizione da IPv4 a IPv6.}
+Non tutti i routers possono essere aggiornati contemporaneamente. Perchè il network possa operare contemporaneamente con router IPv4 e IPv6, è introdotto il \textbf{tunneling}: i datagrammi IPv6 sono trasportati come \textit{payload} nei datagrammi IPv4 per i router che li richiedono.
+%controllare slide + cercare appunti: schemi tunneling, "interplay between routing,forwarding", "graph abstraction".
+\section{Algoritmi di routing}
+La scelta dell'algoritmo di routing più adatto varia in base a due domande fondamentali:
+\paragraph{1. Informazione globale o decentralizzata?}
+\begin{itemize}
+	\item Globale: tutti i router hanno completi "topology, link cost info"%?
+	. Per questa scelta è consigliato l'utilizzo di algoritmi \textit{link state}.
+	\item Decentralizzata: i router conoscono i vicini fisicamente connessi, "link costs to neighbors"; è previsto un processo iterativo di computazione per lo scambio di informazioni con i vicini. Per questa scelta è consigliato l'utilizzo di algoritmi \textit{distance vector}.	
+\end{itemize}
+\paragraph{2. Statico o dinamico?}
+\begin{itemize}
+	\item Statico: il router cambia lentamente nel tempo.
+	\item Dinamico: il router cambia più rapidamente e periodicamente in risposta a cambiamenti di "link costs".
+\end{itemize}
+
+\subsection{Algoritmo di Dijkstra}
+L'algoritmo di Dijkstra è un algoritmo routing \textit{link state} che prevede che i costi di linking siano conosciuti da tutti i nodi. Ciò è ottenuto grazie al \textit{link state broadcast}, grazie a cui tutti i nodi avranno le stesse informazioni.\\
+Questo algoritmo calcola i percorsi di costo minimo da un nodo a tutti gli altri, producendo una \textit{forwarding table} per quel nodo. È iterativo: dopo \textit{k} iterazioni fornisce il percorso di costo minore per k destinazioni.
+\paragraph{Notazione}
+\begin{itemize}
+	\item $ c(x,y) $: costo di link dal nodo x al nodo y; corrisponde a $ \infty $ se non sono vicini diretti.
+	\item  $ D(v) $: valore corrente del costo di percorso dal nodo di partenza al nodo di destinazione \textit{v}.
+	\item  $ p(v) $: nodo predecessore nel percorso dal nodo di partenza al nodo \textit{v}.
+	\item  $ N' $: set di nodi il cui minore costo di percorso è conosciuto.
+\end{itemize}
+
+\begin{algorithm}
+	\caption{Algoritmo di Dijsktra}\label{alg:dijsktra}
+	\begin{algorithmic}
+		\Function{Dijsktra}{}
+		\State $ N' = {u} $
+		\For {v $ \in $ net }
+		\If {v.isAdjacent(u)}
+		\State $ D(v) = c(u,v) $
+		\Else $ D(v) = \infty $
+		\EndIf
+		\EndFor
+		\While {$ N'.isFull() $} \Comment{Finchè N' non contiene tutti i nodi}
+		\State $ find (w : (!N'.contains(v)) \and (D(v).isMinimum())) $
+		\State $ N' \gets w $
+		\State $ D(v) = min(D(v),D(w)+c(w,v)) $
+		\Comment{Il nuovo costo per v è uguale al vecchio costo
+			o uguale al costo del percorso minimo per w più il costo da w a v}
+		\EndWhile
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Correttezza}
+\subparagraph{Tesi:} L'algoritmo di Dijkstra è corretto se eseguito su un grafo pesato diretto $ G = (N,E) $ con pesi non negativi, sorgente u, funzione peso c, allora alla terminazione $ D(v) = \delta(u,v) $ per ogni nodo \textit{v} in \textit{N}, dove $ \delta(u,v) $ è la lunghezza del cammino di peso minimo tra \textit{u} e \textit{v}.
+\subparagraph{Dimostrazione:}
+$ D(v) $ nonè più aggiornato nel momento in cui v è inserito in N'. Dovremo quindi mostrare che $ D(v) = \delta(u,v) \forall v$.\\
+Ragioniamo per assurdo: sia x il primo nodo (nell'ordine di inserimento in N') per cui vale $ D(v) \neq \delta(u,v) $ al momento in cui x è inserito nell'insieme N'.\\
+Ne consegue che $ x \neq u $, essendo il nodo sorgente u inserito nella fase di inizializzazione e valendo $ D(u) = \delta(u,v) = 0 $. Deve inoltre esistere un percorso di costo non infinito da u a x, dato che altrimenti il valore a cui D(x) è inizializzato (cioè $ \infty $) sarebbe uguale a delta(u,v). Esiste quindi un percorso di costo minimo $ p=u \ldots v \to y \ldots x  $, dove y è il primo nodo sul percorso di costo minimo \textit{non} in N' (quindi i nodi u \ldots v sono \textit{tutti} in '). Il percorso p può quindi essere diviso in due percorsi: $ p_{1} $, che va da u a y, e $ p_{2} $, che va da y a x.\\
+Da notare che il percorso $ p_{1} $ è anch'esso il percorso di costo minimo che unisce u a y: se non lo fosse, e ci fosse un percorso $ p_{3} $ che unisce u a y di costo minore del costo di $ p_{1} $, allora la concatenazione di $ p_{2} $ e $ p_{2} $ sarebbe un percorso p' da u a x di costo minore di p, ma ciò sarebbe assurdo a causa dell'assunto iniziale secondo cui p è un percorso minimo.\\
+Quando x è inserito in N', $ D(y) = \delta(u,y) $.\\
+Infatti, in quel momento v è stato già inserito in N' e dopo il suo inserimento y ha ricalcolato $ D(y) = D(v)+c)(v,y) = \delta(u,v)+c(v,y) $, dato che per ipotesi x è il primo nodo per cui all'inserimento in N' la stima dei costi non corrisponde al percorso di costo minimo $ \delta(u,y) $.\\
+Dato che y precede x sul percorso minimo ed i pesi sugli archi sono non negativi, vale che:\\
+$ \delta(u,x)\geq\delta(u,y)=D(y) $\\
+e quindi anche\\
+$ D(x) \geq \delta(u,x) \geq \delta(u,y)=D(y) $.\\\\
+D'altro canto, dato che x viene inserito in N' prima di y, vale che:\\
+$ \delta(u,x) \leq D(x) \leq D(y) = \delta(u,y) $;\\
+quindi\\
+$ \delta(u,x)=D(x)=D(y)=\delta(u,y) $,\\
+cosa che porlta alla contraddizione.\\\\
+\subparagraph{Discussione}
+La complessità dell'algoritmo per \textit{n} nodi, contando che ogni iterazione necessita di controllare tutti i nodi \textit{w} non in N, è $ \frac{n(n+1)}{2} \approx O(n^2) $. Il costo della più efficiente implementazione possibile è $ O(nlogn) $.

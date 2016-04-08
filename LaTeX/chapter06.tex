@@ -139,3 +139,72 @@ Nella prima fase, il client e il server negoziano il protocollo di cifratura che
 \paragraph{ARP}
 Una richiesta \textit{ARP} consiste in una richiesta di risoluzione inversa: invece di chiedere la risoluzione di un nome host, richiediamo la risoluzione inversa, ovvero quella che associa univocamente un IP ad un nome host. Il protocollo \textit{ARP} lavora a livello \textit{datalink} della pila \textit{TCP/IP}, quindi utilizzando come nomi identificativi gli indirizzi \textit{MAC}. Per la richiesta viene richiamato il gateway dell'IP richiesto, il quale fa una richiesta in \textit{broadcast} nella subnet per cercare il dato IP. \\
 In un attacco \textit{arp-spoofing} (o \textit{arp-poisoning}), l'attaccante fa un attacco \textit{man-in-the-middle}, \textit{spacciandosi} per l'IP richiesto.
+
+\section{IPsec}
+Simile al protocollo \textit{TLS} (che lavora sopra al livello di trasporto, per cui inutile in caso di attacci su livelli inferiori rispetto a quest'ultimo), che lavora a livello di rete. L'obiettivo è cifrare il \textit{payload} (un segmento \textit{TCP}/U\textit{DP}, un messaggio \textit{ICMP}/\textit{OSPF}, \ldots): per motivi di sicurezza spesso si usano reti private, motivo per cui diventa necessaria una \textit{VPN} (o \textit{Virtual Private Network}), per mettere in comunicazione reti private attraverso internet, mantenendo tutto quello che passa per internet cifrato e separato logicamente dal traffico comune. Le \textit{VPN} quindi stabiliscono reti private virtuali, per racchiudere \textit{n} non fisicamente - e al contempo privatamente - collegate. \\
+\textit{IPsec} fornisce i seguenti servizi:
+\begin{itemize}
+	\item integrità dei dati;
+	\item autenticazione;
+	\item prevenzione ad attacchi di tipo \textit{replay}\footnote{Nell'ambito della sicurezza informatica il replay-attack è una forma di attacco di rete che consiste nell'impossessarsi di una credenziale di autenticazione comunicata da un host ad un altro, e riproporla successivamente simulando l'identità dell'emittente. In genere l'azione viene compiuta da un attaccante che s'interpone tra i due lati comunicanti.};
+	\item confidenzialità.
+\end{itemize}
+Può lavorare - in base alla decisione presa dall'amministratore dell'infrastruttura - con due protocolli:
+\begin{itemize}
+	\item \textit{AH} (\textit{Authentication Header}): fornisce garanzie su integrità e autenticazione;
+	\item \textit{ESP} (\textit{Encapsulation Security Protocol}): fornisce garanzie su integrità autenticazione e confidenzialità.
+\end{itemize}
+e due modalità:
+\begin{itemize}
+	\item Modalità \textit{transport}: il processo di rendere sicuri i pacchetti è fatto direttamente dagli host delle reti;
+	\item Modalità \textit{tunneling}: il processo è gestito unicamente dagli \textit{edge router}.
+\end{itemize}
+Attualmente la combinazione migliore e più diffusa è la \textit{ESP}-\textit{tunneling}. \\ \\
+
+Per ciascun host che entri in comunicazione con un altro della seconda (o \textit{n}-esima) rete appartenente alla \textit{VPN}, viene stabilita una \textit{Security Association} (\textit{SA}) un canale di comunicazione privato a questi due, che contiene:
+\begin{itemize}
+	\item identificativo (da 32 bit);
+	\item interfaccia \textit{SA} di origine (\textit{edge router} di origine);
+	\item interfaccia \textit{SA} di destinazione (\textit{edge router} di destinazione);
+	\item tipo di cifratura usata (e.g. \textit{3DES} con \textit{CBC});
+	\item chiave di cifratura;
+	\item tipo di algoritmo di integrità (e.g. \textit{HMAC} con \textit{MD5});
+	\item chiave di autenticazione.
+\end{itemize}
+Tutte le \textit{SA} sono memorizzate in un database, chiamato \textit{Security Association Database} (\textit{SAD}). \\ \\
+
+Nella modalità di \textit{tunneling} con \textit{ESP}, viene gestito un datagramma, composto da diversi passaggi: partendo dal messaggio originario in chiaro, seguito dal \textit{padding} del messaggio (necessario a saturare lo spazio in bit dedicato al messaggio), viene cifrato, e poi viene aggiunto in testa l'header \textit{ESP}. Su tutta questa sequenza viene applicato un primo protocollo di autenticazione, che prende il nome di \textit{enchilada}. A questa ultima sequenza viene aggiunto, infine, l'IP di destinazione e applicato il protocollo di autenticazione relativo a tutto il datagramma. \\
+Il \textit{Security Policy Database} (\textit{SPD}) gestisce invece un insieme di regole generali che stabiliscono che reagire a tutti i datagrammi uscenti dalla rete: come/se elaborarli. \\
+Per la generazione delle \textit{SA} automatica arriva in aiuto il protocollo \textit{IKE} (o \textit{Internet Key Exchange}), sfruttabile tramite \textit{PKI} e/o \textit{PSK}:
+\begin{enumerate}
+	\item \textit{IKE} stabilisce una \textit{SA} bidirezionale;
+	\item \textit{ISAKMP} viene utilizzato per negoziare la tupla di connessioni speculari delle \textit{SA}.
+\end{enumerate}
+
+\section{Sicurezza nelle reti Wireless}
+\subsection{WEP}
+Primo protocollo noto sulla sicurezza wireless è il \textit{WEP} (\textit{Wired Equivalent Protocol}), nato nel tentativo di raggiungere la sicurezza come nelle reti via capo, ottenendo:
+\begin{itemize}
+	\item confidenzialità;
+	\item autorizzazione dell'end-host;
+	\item integrità.
+\end{itemize}
+Inoltre occorreva avere un protocollo non solo efficiente, ma che potesse allo stesso tempo cifrare ogni pacchetto trasmesso indipendentemente l'uno dall'altro (anche se uno dei precedenti fosse andato perso, a differenza del \textit{Cipher Block Chaining}, \textit{CBC}, in cui l'output della cifratura del pacchetto precedente era preso come input per quella del successivo). Usava un \textit{cifrario a flusso}: cioè una funzione che prendesse in input una chiave - costante - e un \textit{initialization vector}, che potesse dare uno stream di chiavi utile per cifrare (facendo lo \textit{XOR} tra stream e messaggio da cifrare), ma soprattutto per decifrare (facendo lo \textit{XOR} tra stream e messaggio cifrato). \\
+Tra i problemi principali troviamo che il campo relativo all'\textit{initialization vector} è troppo piccolo per evitare che si ripeti dopo un quantitativo di tempo ridotto. Questo rende il \textit{WEP} quasi totalmente insicuro, perdendo integrità e confidenzialità.
+
+\subsection{802.11i}
+Protocollo molto più sicuro rispetto al \textit{WEP}, che mette a disposizione numerosi tipi di cifratura (e.g. \textit{WPA}, \textit{WPA2}) e utilizza un server separato per l'autenticazione, rispetto a quello utilizzato per l'accesso. Mentre \textit{WPA2} è molto sicuro, è stata introdotta una funziona che potrebbe facilmente \textit{disarcionarlo}: \textit{WPS}. \\
+\textit{WPS} è un protocollo per facilitare la connessione per l'estensione del segnale: che sostanzialmente permette la decifratura per parti, così da dare un eventuale OK, se è stata decifrata correttamente la prima parte. Negli ultimi anni si è pensato di mettere un numero di tentativi massimi, al termine dei quali viene sganciato il richiedente. \\
+\textit{802.11i} ha 4 fasi di operazione che sostanzialmente permettono di generare \textit{n} per \textit{n} client connessi: questa funzione prende il nome di \textit{EAP} (\textit{Extensible Authentication Protocol}).
+\newpage
+
+\section{Firewall}
+I firewall si occupano di gestire delle policy volte all'autorizzazione di utilizzo di determinati servizi, attraverso la generazione di regole che lavorano su a livello di porte e servizi per \textit{TCP}, di tipologia di messaggio \textit{ICMP} e di bit \textit{TCP} \textit{SYN} e \textit{ACK}. \\
+Un firewall può implementare uno \textit{stateless packet-filter}, cioè basato unicamente su indirizzo e porta, o anche \textit{stateful packet-filter}, che non solo ammette le possibilità della versione \textit{staless}, ma anche quella di monitorare e gestire lo stato delle connessioni \textit{TCP} già aperte e in corso.
+
+\subsection{IDS}
+Gli \textit{Intrusion Detectiom System} può fare un molteplice attività:
+\begin{itemize}
+	\item ispezione dei pacchetti: controlla il contenuto di ciascun pacchetto transitato, istruito con le \textit{signature} prelevate da database di \textit{virus}, o attacchi noti;
+	\item esaminare la correlazione tra diversi pacchetti, per evitare si possa fare uno scan delle porte, un mapping della rete o un attacco \textit{DoS}.
+\end{itemize}

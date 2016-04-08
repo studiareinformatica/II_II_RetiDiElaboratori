@@ -13,7 +13,7 @@ Prima di introdurre il concetto di \textit{HTTP} occorre spiegare il paradigma \
     \item \textit{Client}: processo client (come un browser, quando richiede una \textit{URL} - \textit{Uniform Resource Locator}) che può fare richieste ed interpretare le risposte;
     \item \textit{Server}: processo server, che fornisce le risposte.
 \end{itemize}
-Il \textit{client} viene attivato solo quando server, mentre invece il \textit{server} è sempre in ascolto.
+Il \textit{client} viene attivato solo quando necessario, mentre invece il \textit{server} è sempre in ascolto.
 Un \textit{IP} identifica univocamente un host nella rete (in realtà una scheda di rete).
 Attraverso l'indirizzo \textit{IP} si può raggiungere l'host ma non il processo cui occorre effettivamente consegnare il messaggio. Per questo, vengono utilizzate porte differenti. \\
 Il binomio \textit{IP-porta} permette a due processi su due host diversi di comunicare. \\
@@ -76,7 +76,7 @@ Set-Cookie: SSID=Ap4P...GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-20021
 \end{lstlisting}
 
 \section{Domain Name System}
-Il \textbf{DNS} identifica sia il\textit{database distribuito}, che contiene l'associazione tra nome e IP, sia il protocollo applicativo per l'effettiva risoluzione \textit{nome-IP} (o \textit{IP-nome}). \\
+Il \textbf{DNS} identifica sia il \textit{database distribuito}, che contiene l'associazione tra nome e IP, sia il protocollo applicativo per l'effettiva risoluzione \textit{nome-IP} (o \textit{IP-nome}). \\
 I suoi principali servizi sono:
 \begin{itemize}
 	\item traduzione tra \textit{hostname} e \textit{IP};
@@ -84,7 +84,7 @@ I suoi principali servizi sono:
 	\item gestione di aliasing dei mail server;
 	\item distribuzione del carico, o \textit{load balancing} (per evitare di sovraccaricare il server, tramite l'associazione di più IP ad un unico nome).
 \end{itemize}
-È strutturato come database distribuito per i seguenti domini:
+È strutturato come database distribuito per le seguenti ragioni:
 \begin{itemize}
 	\item possibilità di isolamento di eventuali problemi;
 	\item gestione del traffico;
@@ -180,7 +180,7 @@ Ciascun protocollo gestisce funzioni diverse:
         \item closure.
     \end{enumerate}
     Avviene tutto tramite comandi formati da un ID e un messaggio (codificati in 7 bit). Mentre HTTP è un protocollo \textit{pull} (che richiede risorse), SMTP è un protocollo \textit{push} (che le invia).
-    \item \textbf{POP} (in TCP, sulla porta 993, RFC 1939) (\textit{Post Office Protocol}): molto vecchio. Segue unicamente due fasi: l'autenticazione e la transazione (per il download delle email.
+    \item \textbf{POP} (in TCP, sulla porta 993, RFC 1939) (\textit{Post Office Protocol}): molto vecchio. Segue unicamente due fasi: l'autenticazione e la transazione (per il download delle email).
     \item \textbf{IMAP} (in TCP, sulla porta 143, RFC 3501) (\textit{Internet Mail Access Protocol}): mantiene ben organizzate tutte le emails sul server, fornendone  un'interazione molto più completa.
 \end{itemize}
 
@@ -201,7 +201,7 @@ Sono composte delle seguenti componenti:
 Le CDN sfruttano un meccanismo di redirezione di due tipi:
 \begin{itemize}
     \item \textbf{DNS Redirect}: a livello DNS, tramite l'associazione del record \textit{A} del dato dominio su un IP della CDN;
-    \item \textbf{HTTP Redirect}: viene utilizzata un'URL apposita in cui specificato viene specificata sia la CDN, sia il dominio di riferimento.
+    \item \textbf{HTTP Redirect}: viene utilizzata un'URL apposita in cui specificata sia la \textit{redirezione} alla CDN, con il dominio di riferimento.
 \end{itemize}
 
 \section{P2P}

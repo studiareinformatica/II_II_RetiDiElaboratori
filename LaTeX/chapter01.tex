@@ -37,37 +37,28 @@ Centinaia di milioni di dispositivi (\textbf{hosts} o endsystems) che ospitano \
 I protocolli definiscono come avvengono i colloqui tra dispositivi attraverso specifici set di regole.
 
 \subsection{TCP}
-Il \textit{Transmission Control Protocol} è un protocollo di rete che si occupa di controllo di rendere affidabile la comunicazione dati in rete tra mittente e destinatario.
+Il \textit{Transmission Control Protocol} è un protocollo di rete che si occupa di rendere affidabile la trasmissione dati in rete tra mittente e destinatario.
 In particolare, questo protocollo fornisce:
     \begin{itemize}
-        \item trasferimento dati ordinato e affidabile
-        \begin{itemize}
-            \item permette riconoscimento e ritrasmissione di eventuali perdite di dati
-        \end{itemize}
-        \item controllo del flusso
-        \begin{itemize}
-            \item il mittente non sovraccaricherà il ricevente
-        \end{itemize}
-        \item controllo della congestione
-        \begin{itemize}
-            \item il mittente rallenterà la velocità di invio quando la rete è congestionata
-        \end{itemize}
+        \item trasferimento dati ordinato e affidabile: permette riconoscimento e ritrasmissione di eventuali perdite di dati
+        \item controllo del flusso: il mittente non sovraccaricherà il ricevente
+        \item controllo della congestione: il mittente rallenterà la velocità di invio quando la rete è congestionata
     \end{itemize}
 
     \subsubsection{Handshake}
-    Si definisce \textit{handshake}(lett. \textit{stretta di mano}) il processo attraverso il quale due calcolatori stabiliscono le regole comuni, ovvero la velocità, i protocolli di compressione, di criptazione, di controllo degli errori etc.
+    Si definisce \textit{handshake} (lett. \textit{stretta di mano}) il processo attraverso il quale due calcolatori stabiliscono le regole comuni, ovvero la velocità, i protocolli di compressione, di criptazione, di controllo degli errori etc.
     
     Prima di iniziare la connessione vera e propria tra due macchine si crea questo tipo di connessione che consiste nella trasmissione dei pacchetti per regolare i parametri di connessione.
 
-\subsection{UDP} (\textit{User Datagram Protocol}
-A differenza del protocollo TCP non esegue alcun tipo di \textit{handshake} o controllo: questoè utile (o necessario) per alcuni tipi di applicativi che fanno loro componente fondamentale la rapidità d trasmissione di dati, come i servizi di streaming o voip, per i quali diventa di fondamentale importanza la rapidità di ricezione dei pacchetti, piuttosto che la loro qualità.
+\subsection{UDP}
+Lo \textit{User Datagram Protocol}, a differenza del protocollo TCP non esegue alcun tipo di \textit{handshake} o controllo: questo è utile (o necessario) per alcuni tipi di applicativi che fanno loro componente fondamentale la rapidità di trasmissione di dati, come i servizi di streaming o voip, per i quali diventa di fondamentale importanza la rapidità di ricezione dei pacchetti, piuttosto che la loro qualità.
 
 \section{Trasmissione Dati}
 \begin{itemize}
     \item \textbf{Commutazione di Circuito}: si stabilisce un circuito (percorso) tra mittente e destinatario, soltanto dopo aver appurato che le risorse necessarie per effettuare l'effettiva trasmissione dei dati siano disponibili.
     Qualora ci fossero diversi utenti, la suddivisione delle risorse potrebbe avvenire attraverso due modalità:
     \begin{itemize}
-        \item \textbf{FDM}: \textit{Frequence Division Multiplexing}, che consiste nel suddividere le risorse in canali, uno per utente. In questo modo ogni utente avrà 1/x risorse a disposizione, dove x è il numero di utenti che utilizza la rete;
+        \item \textbf{FDM}: \textit{Frequence Division Multiplexing}, che consiste nel suddividere le risorse in canali, uno per utente. In questo modo ogni utente avrà 1/x delle risorse totali a propria disposizione, dove x è il numero di utenti che utilizza la rete;
         \item \textbf{TDM}: \textit{Time Division Multiplexing}, che consiste nel suddividere le risorse in base al tempo. Ogni utente utilizza la totalità delle risorse disponibili per un determinato lasso di tempo, a conclusione del quale l'utilizzo delle risorse passa all'utente successivo fino a ricominciare il ciclo con il primo utente.
     \end{itemize}
     \textbf{ESEMPIO}. Vogliamo ricavarci il tempo necessario per trasmettere 640.000 bit da un host A ad un host B, sapendo che la rete ha una banda di 1,536Mbps.
@@ -78,9 +69,10 @@ A differenza del protocollo TCP non esegue alcun tipo di \textit{handshake} o co
     \begin{equation}
         3*7,5/1,5 = 3*5 = 15s
     \end{equation}
+    \newpage
     
     \item \textbf{Commutazione di Pacchetto}: ogni informazione da trasmettere viene suddivisa in \textit{n} pacchetti. Ogni host condivide in questo caso le stesse risorse di rete, ogni pacchetto utilizza tutta la banda disponibile e le risorse vengono adoperate soltanto quando necessario.
-    Solitamente le code di pacchetti sono gestite in ordine di arrivo.
+    Solitamente le code di pacchetti sono gestite in ordine di arrivo. \\ \\
     \textbf{ESEMPIO}. Trasmettiamo 7,5Mbit con una banda massima di 1,5Mbps.
     \begin{enumerate}
         \item Dividiamo l'informazione da trasmettere in 5000 pacchetti da 1500 bit;
@@ -114,7 +106,7 @@ Ogni dispositivo può essere connesso ad internet tramite diverse \textit{reti d
 \end{itemize}
 Elementi essenziali della rete di accesso sono la banda (bit/s), l'affidabilità (bit error rates) e se è dedicata o condivisa.
 \paragraph{Punti di accesso mobili}
-Un altro elemento fondamentale è il punto di accesso alla rete: essa dev'essere in grado di riconoscere che si sta degradando il segnale e individuare un altro punto di accesso al quale ci stiamo avvicinando, così da evitare un'eventuale degradazione della qualit della rete quando si è in movimento.
+Un altro elemento fondamentale è il punto di accesso alla rete: essa dev'essere in grado di riconoscere che si sta degradando il segnale e individuare un altro punto di accesso al quale ci stiamo avvicinando, così da evitare un'eventuale degradazione della qualità della rete quando si è in movimento.
 
 \section{Trasmissione attraverso link fisici}
 Ciò che viene trasmesso è una sequenza di bit che codifica il contenuto.
@@ -141,15 +133,14 @@ Utilizzata in Ethernet. Essenzialmente viene associato un valore ad ogni transiz
 
 \section{Tecnologie di accesso}
 \subsection{Dial-up modem}
-Velocità trasmissiva: ~56Kbps
-Utilizza la stessa infrastruttura telefonica: non \textit{always-on}, impossibile poter usufruire della linea per internet e telefonia allo stesso tempo.
-Il modem reindirizza le richieste al \textit{central office}, che - qualora si cerchi di navigare in internet - converte la richiesta e la reindirizza al \textit{ISP} (\textit{Internet Service Provider}).
+Velocità trasmissiva: 56Kbps (ca.). Utilizza la stessa infrastruttura telefonica: non \textit{always-on}, impossibile poter usufruire della linea per internet e telefonia allo stesso tempo.
+Il modem reindirizza le richieste al \textit{central office}, che - qualora si cerchi di navigare in internet - converte la richiesta e la reindirizza all'\textit{ISP} (\textit{Internet Service Provider}).
 
 \subsection{Digital Subscriber Line}
 Anch'essa utilizza un'infrastruttura telefonica esistente. Spesso chiamata anche A-DSL (la \textit{A} indica l'\textit{asimmetria} tra la velocità di trasmissione modem-\textit{central office} e \textit{central office}-modem).
 Essendo la frequenza del segnale vocale sempre in un intervallo tra 0 e 4KHz, il segnale può essere campionato fino a 8M volt/s ed essere successivamente ricostruito; in quella frequenza il segnale è trasmesso \textit{solo} attraverso via telefonica. Tutte le trasmissioni fuori da quell'intervallo vengono quindi campionate come richieste per internet.
 Le risorse del canale sono divise attraverso \textit{FDM} (\textit{Frequency Division Multiplexing}).\\
-Velocità: fino a 1Mbps up (tipicamente < 256Kbps), fino a 8Mbps (tipicamente < 1Mbps) down. La grande differenza di velocità trasmissiva è causata da un paradigma client/server che dà la precedenza al download dei dati piuttosto che alla loro trasmissione.
+Velocità: fino a 1Mbps up (tipicamente $<$ 256Kbps) e a 8Mbps down (tipicamente $<$ 1Mbps) down. La grande differenza di velocità trasmissiva è causata da un paradigma client/server che dà la precedenza al download dei dati piuttosto che alla loro trasmissione.
 \\
 Tecnologie di tipo DSL sono progettate per raggiungere distanze non molto elevate (fino a 4/5 km).
 \paragraph{ADSL loop extender} 
@@ -157,14 +148,14 @@ Dispositivo posizionato tra il cliente e il central office dalla compagnia telef
 
 \subsection{HFC (in \textit{USA})}
 Velocità: fino a 20Mbps down, 2Mbps up.
-Utilizza - invece dell'infrastruttura telefonica, quella della TV via cavo.
+Utilizza - invece dell'infrastruttura telefonica - quella della TV via cavo.
 Sostanzialmente il \textit{central office}, in questo caso il \textit{cable headend}, gestisce degli anelli di fibra, composti da moltissimi nodi che li collegano ad ogni abitazione. A questo punto, la connessione passa per uno splitter (che utilizza l'\textit{FDM}), che la indirizza alla TV o al dispositivo che richiede la connessione internet. 
 
 \subsection{Fibra ottica}
-Collegamenti ottici dal \textit{central office} all'abitazione. Raggiunge distanza lunghissime praticamente senza alcuna distorsione del segnale.
+Collegamenti ottici dal \textit{central office} all'abitazione. Raggiunge distanze lunghissime praticamente senza alcuna distorsione del segnale.
 Due tipologie di accesso:
 \begin{itemize}
-	\item \textit{Passive Optical Network} (\textit{PON}): un'unica fibra \& uno splitter ottico che smista le informazioni verso diverse abitazioni. Comporta costi decisamente bassi, a scompenso però della qualità:
+	\item \textit{Passive Optical Network} (\textit{PON}): un'unica fibra e uno splitter ottico che smista le informazioni verso diverse abitazioni. Comporta costi decisamente bassi, a scompenso però della qualità:
 	\begin{itemize}
 		\item Si possono spesso verificare \textit{collisioni}, evitate attraverso il \textit{TDM}
 		\item Essendo una linea condivisa si presenta la necessità di dover criptare i messaggi
@@ -217,6 +208,7 @@ Internet ha una struttura gerarchica, composta da moltissimi \textit{ISP} (\text
 La prima categoria è composta dai \textit{Tier-1} (Verizon, Sprint, AT\&T, e così via \ldots). Questi sono interconnessi - per maggiore copertura - tramite dei \textit{POP} (\textit{Point of presence}).
 Poi ci sono i \textit{Tier-2}, anche loro interconnessi tra loro e con i \textit{Tier-1}.
 La gerarchia continua seguendo questo schema, fino a raggiungere gli \textit{ISP} regionali/pronvinciali e, infine, le reti residenziali.
+\newpage
 
 \section{Loss \& Delay}
 Esistono diversi tipi di ritardi:

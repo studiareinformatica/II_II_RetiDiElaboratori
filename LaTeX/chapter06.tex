@@ -114,7 +114,7 @@ Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segret
 Con l'apertura della Rete a fini pubblici, le problematiche di prevenzione di danni, perdite e attacchi via via sempre più importanti portarono alla nascita di strati aggiuntivi con lo specifico compito di assicurarsi la delle comunicazioni.
 Le prime implementazioni di SSL erano limitate a una cifratura a chiave simmetrica di soli 40 bit\footnote{Tale limitazione fu dovuta da restrizioni imposte dal governo statunitense sull'esportazione di tecnologie crittografiche. Fu esplicitamente imposta per rendere la cifratura abbastanza debole da poter essere forzata dalle autorità giudiziarie che volessero decifrare il traffico, ma sufficientemente resistente ad attacchi esterni poichè facente affidamento alle minori disponibilità di risorse tecnologiche e finanziarie dell'epoca.}; fu succesivamente aggiornato a TLS (\textit{Transport Layer Security}), con chiavi da 128+ bit.\\\\
 Il protocollo TLS consente alle applicazioni client/server di comunicare attraverso una rete in modo tale da prevenire il \textit{tampering}(manomissione), la falsificazione e l'intecettazione dei dati.\\
-Nell'utilizzo tipico del browser di un end-user, l'autenticazione è \textit{unilaterale}: è il solo server ad autenticarsi presso il client. Il browser valida il certificato del server controllando che la firma digitale dei certificati sia valida e riconosciuta da una \textbf{certificate authority}\footnote{} conosciuta utilizzando una cifratura a chiave pubblica. Dopo questa autenticazione, il browser indica una connessione sicura.\\
+Nell'utilizzo tipico del browser di un end-user, l'autenticazione è \textit{unilaterale}: è il solo server ad autenticarsi presso il client. Il browser valida il certificato del server controllando che la firma digitale dei certificati sia valida e riconosciuta da una \textit{certification authority} conosciuta utilizzando una cifratura a chiave pubblica. Dopo questa autenticazione, il browser indica una connessione sicura.\\
 Quest'autenticazione, però, non è sufficiente per garantire che il sito con cui ci si è collegati sia quello richiesto. Per esserne sicuri è necessario analizzare il contenuto del certificato rilasciato e controllarne la catena di certificazione. I siti che intendono ingannare l'utente non possono utilizzare un certificato del sito che vogliono impersonare, perchè non hanno la possibilità di cifrare in modo valido il certificato, 
 che include l'indirizzo, in modo tale che risulti valido alla destinazione.\\
 Il protocollo TLS permette anche un'autenticazione \textit{bilaterale}, tipicamente utilizzata in applicazioni aziendali, in cui entrambe le parti si autenticano in modo sicuro scambiandosi i relativi certificati. Questa autenticazione (definita \textit\textit{Mutual authentication}), richiede che anche il client possieda un proprio certificato digitale.\\
@@ -152,7 +152,7 @@ Simile al protocollo \textit{TLS} (che lavora sopra al livello di trasporto, per
 Può lavorare - in base alla decisione presa dall'amministratore dell'infrastruttura - con due protocolli:
 \begin{itemize}
 	\item \textit{AH} (\textit{Authentication Header}): fornisce garanzie su integrità e autenticazione;
-	\item \textit{ESP} (\textit{Encapsulation Security Protocol}): fornisce garanzie su integrità autenticazione e confidenzialità.
+	\item \textit{ESP} (\textit{Encapsulation Security Protocol}): fornisce garanzie su integrità, autenticazione e confidenzialità.
 \end{itemize}
 e due modalità:
 \begin{itemize}

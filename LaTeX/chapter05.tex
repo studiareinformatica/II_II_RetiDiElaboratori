@@ -1,8 +1,8 @@
-Il livello di rete di occupa dell'effettivo trasporto delle informazioni dal sender al receiver, incapsulandole in datagrammi - lato sender - e consegnandoli al livello di trasporto - lato receiver.
+Il livello di rete si occupa dell'effettivo trasporto delle informazioni dal sender al receiver, incapsulandole in datagrammi - lato sender - e consegnandoli al livello di trasporto - lato receiver.
 Per la consegna, esamina il pacchetto, analizzando l'header e tutte le informazioni in esso contenute (principalmente l'IP), e determinandone l'instradamento più consono.
 
 \paragraph{Forwarding}
-Dirotta i pacchetti dall'input del router all'output dello stesso, associando un dato valore dell'header ad un link locale. \\\\
+Dirotta i pacchetti dall'input del router all'output dello stesso, associando un dato valore dell'header ad un link locale.
 \paragraph{Routing}
 Determina la rotta che collegherà la sorgente al destinatario, utilizzando appositi algoritmi di routing.\\\\
 
@@ -45,7 +45,7 @@ Quindi, dal router, vengono eseguiti degli algoritmi/protocolli di routing (\tex
 
 \section{Funzioni di un router}
 \subsection{Input ports}
-Viene gestita un buffer che contiene una coda dei pacchetti da instradare. In questa fase si utilizza (o si stabilisce) una tabella degli instradamenti, che mettono in comunicazione link di ingresso e di uscita tramite degli appositi switch.
+Viene gestito un buffer che contiene una coda dei pacchetti da instradare. In questa fase si utilizza (o si stabilisce) una tabella degli instradamenti, che mettono in comunicazione link di ingresso e di uscita tramite degli appositi switch.
 \subsection{Switching fabrics}
 Vari tipi di switch:
 \begin{enumerate}
@@ -81,7 +81,7 @@ Ogni indirizzo IP viene ad essere associato ad una porta di rete. Infatti, il ro
 L'indirizzo IP è una sequenza a 32bit, che viene divisa in 4 sequenze da 8 bit, ciascuna corrispondente al valore decimale delle 4 componenti dell'indirizzo IP comunemente utilizzato: \textit{1.1.1.1} : \textit{00000001 00000001 00000001 0000001}.
 
 \subsection{Subnet}
-La subnet è la sottorete che mette in comunicazione tutti gli indirizzi IP con \textit{subnet part} (sequenza\textit{high order bits}) in comune.
+La subnet è la sottorete che mette in comunicazione tutti gli indirizzi IP con \textit{subnet part} (sequenza \textit{high order bits}) in comune.
 \paragraph{CIDR (Classless InterDomain Routing)}
 Approccio di rappresentazione di subnet tramite la rappresentazione dei bit della \textit{subnet part}, alla quale viene aggiunta la \textit{host part} settata a zero. Infine si aggiunge un parametro che indica la capienza totale della subnet: \textit{192.168.1.0/24} (subnet \textit{192.168.1}, che può contenere un massimo di 255 \textit{host part} diverse, e quindi 255 indirizzi IP univoci). \hfill \\
 \paragraph{DHCP (Dynamic Host Configuration Protocol)}
@@ -291,7 +291,7 @@ Le tabelle di \textit{RIP} vengono gestite a livello applicativo, e gli advertis
 Approccio completamente \textit{open}, molto più recente rispetto al \textit{RIP}, ma di tipo \textit{link state}: è necessaria una fase di inizializzazione in cui ogni nodo deve comunicare in \textit{broadcast} a tutti i nodi le sue informazioni. \\
 Per comunicare le informazioni - tramite advertisement - occorre autenticarsi. \\
 Dà la possibilità di individuare più di un percorso ottimale e di conservarlo per essere utilizzato per trasmettere dati, permettendo la gestione del \textit{load balancing}: tramite questa funzionalità, supporta non solo l'\textit{unicast} (la trasmissione biunivoca sorgente-destinatario), ma anche il \textit{multicast} (permette di trasmettere da un'unica sorgente ad un gruppo di destinazione). \\
-Non è \textit{flat}, ma gerarchico, così da ovviare a problemi derivanti dalla grandezza di un'eventuale struttura: si divide in \textit{n}, ciascuna gestita da un \textit{router di bordo}, che - oltre a catalogare informazioni di instradamento e raggiungibilità relative a quell'area - si trova in un'area speciale, detta \textit{area di backbone}, che mette in comunicazione tutti i \textit{router di bordo} con il \textit{router di backbone}. 
+Non è \textit{flat}, ma gerarchico, così da ovviare a problemi derivanti dalla grandezza di un'eventuale struttura: si divide in \textit{n} aree, ciascuna gestita da un \textit{router di bordo}, che - oltre a catalogare informazioni di instradamento e raggiungibilità relative a quell'area - si trova in un'area speciale, detta \textit{area di backbone}, che mette in comunicazione tutti i \textit{router di bordo} con il \textit{router di backbone}. 
 
 \subsection{Protocolli di instradamento inter-as}
 Senza ombra di dubbio, il protocollo \textit{de facto} \textit{inter-as} più famoso e utilizzato è il \textit{BGP} (o \textit{Border Gateway Protocol}).

@@ -119,7 +119,7 @@ Ciò che viene trasmesso è una sequenza di bit che codifica il contenuto.
 	\end{itemize}
 \end{itemize}
 
-Le informazioni trasmesse tramite onde radio subisce un'\textit{attenuazione} durante la propagazione dell'informazione, e quindi una \textit{distorsione}.
+Le informazioni trasmesse tramite onde radio subiscono un'\textit{attenuazione} durante la propagazione dell'informazione, e quindi una \textit{distorsione}.
 Ciò non avviene in maniera uniforme; bisogna anche mettere in conto eventuali interferenze elettromagnetiche (spesso introdotte dalle stesse apparecchiature utilizzate per la connessione). Il risultato è che la sequenza ricevuta potrebbe non essere corretta. Questo introduce la definizione di \textit{bit error rate}, ovvero la frequenza con cui si verifica un errore nella trasmissione delle informazioni. Minore è il suo valore, migliore e più stabile è la rete.
 In questo caso, occorre che il dispositivo sia \textit{error-aware}, così da essere autonomo nell'individuare la presenza di errori e tentare di correggerli (possibile fino a un certo numero di bit, altrimenti viene scartato il pacchetto e richiesto indietro).
 
@@ -174,10 +174,10 @@ Uno switch - con ingressi ethernet, appunto - viene frapposto tra router/modem e
 In questo caso, le informazioni sono modulate opportunamente, per raggiungere le frequenze delle onde radio supportate dal ricetrasmettitore radio.
 Ne esistono due tipi:
 \begin{enumerate}
-	\item \textit{Wireless LAN} (o \textit{WiFi}) 802.11b/g: raggiunge una velocità comresa tra gli 11Mbps e i 54Mbps.
-	\item \textit{Wide-area Wireless Access}: mezzo radio adibito condiviso che raggiunge una velocità compresa tra 1Mbps (\textit{EVDO}/\textit{HSDPA}) e diverse decine di Mbps (\textit{LTS}).
+	\item \textit{Wireless LAN} (o \textit{WiFi}) 802.11b/g: raggiunge una velocità compresa tra gli 11Mbps e i 54Mbps;
+	\item \textit{Wide-area Wireless Access}: mezzo radio condiviso che raggiunge una velocità compresa tra 1Mbps (\textit{EVDO}/\textit{HSDPA}) e diverse decine di Mbps (\textit{LTS}).
 \end{enumerate}
-Essendo la rete condivisa, neccessità di essere criptata. Non utilizza né \textit{FDM} né \textit{TDP}, ma un sistema di gestione proprietario e specifico.
+Essendo la rete condivisa, neccessita di essere criptata. Non utilizza né \textit{FDM} né \textit{TDP}, ma un sistema di gestione proprietario e specifico.
 
 \section{Reti Mobili}
 \begin{center}
@@ -203,7 +203,7 @@ Essendo la rete condivisa, neccessità di essere criptata. Non utilizza né \tex
 	\item \textit{Reti mobili}: diverse centinaia di Mbps
 \end{enumerate}
 
-\section{Internet Structure: network of networks}
+\section{Internet Structure: rete di reti}
 Internet ha una struttura gerarchica, composta da moltissimi \textit{ISP} (\textit{Internet Service Provider}).
 La prima categoria è composta dai \textit{Tier-1} (Verizon, Sprint, AT\&T, e così via \ldots). Questi sono interconnessi - per maggiore copertura - tramite dei \textit{POP} (\textit{Point of presence}).
 Poi ci sono i \textit{Tier-2}, anche loro interconnessi tra loro e con i \textit{Tier-1}.
@@ -233,7 +233,7 @@ Esistono diversi tipi di ritardi:
 	\begin{itemize}
 		\item d = lunghezza fisica del link
 		\item s = tempo di propagazione in media
-		\item \textit{Ritardo di propagazione} = d/s
+		\item \textit{Ritardo di propagazione} = $\frac{d}{s}$
 	\end{itemize}
 	\item \textbf{Nodal delay} = Processing delay + Queue delay + Transmission delay + Propagation delay
 \end{itemize}

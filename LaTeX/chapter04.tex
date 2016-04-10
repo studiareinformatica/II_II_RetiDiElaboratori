@@ -49,7 +49,7 @@ Il caso riguardante \textit{RDT 1.0} è contestualizzato in una situazione perfe
 In questo caso, il canale di trasmissione effettiva può confondere i bit nel pacchetto. Da qui la necessità di introdurre dei messaggi di risposta alla ricezione di un pacchetto:
 \begin{itemize}
     \item \textbf{ACK} (\textit{ACKnowledgment}, o \textit{conferma di ricezione}): utilizzato per confermare che il pacchetto è stato ricevuto ed è integro;
-    \item \textbf{NAK} (\textit{Negative AcKnowledgment}, o \textit{conferma negativa}): il pacchetto contiene errori. Il mittente reinvia il pacchetto quando riceve indietro questo tipo di messaggio: motivo per cui si tratta di un protocollo \textit{ARQ} (\textit{Automatic Repeat reQuest}, o \textit{Richiesta Automatica di Ripetizione}.
+    \item \textbf{NAK} (\textit{Negative AcKnowledgment}, o \textit{conferma negativa}): il pacchetto contiene errori. Il mittente reinvia il pacchetto quando riceve indietro questo tipo di messaggio: motivo per cui si tratta di un protocollo \textit{ARQ} (\textit{Automatic Repeat reQuest}, o \textit{Richiesta Automatica di Ripetizione}).
 \end{itemize}
 \begin{center}
     \includegraphics[width=.7\textwidth]{res/fsm-rdt-20.jpg} \hfill
@@ -93,15 +93,15 @@ $ U = \frac{\frac{L}{R}}{RTT + \frac{L}{R}} = \frac{0,0008}{30,0008} = 0,00027 $
 \end{center}
 \newpage
 
-\subsection{Protocolli a Ritrasmissione Automatica (o \textit{a finetra})}
-A differenza dei precedenti, viene trasmessa sempre una sequenza di pacchetti. A man mano che si ricevono gli ACK, vengono aggiunti nuovi pacchtti in coda.
+\subsection{Protocolli a Ritrasmissione Automatica (o \textit{a finestra})}
+A differenza dei precedenti, viene trasmessa sempre una sequenza di pacchetti. A man mano che si ricevono gli ACK, vengono aggiunti nuovi pacchetti in coda.
 In questo caso: $ U = \frac{\frac{3L}{R}}{RTT + \frac{L}{R}} $ \\
 \paragraph{Go-back-N.} Il mittente può avere fino a N pacchetti non riconosciuti nella pipeline. Il destinatario invia solo \textit{ACK cumulativi}, ovvero relativi ad un gruppo di pacchetti ricevuti. Il mittente utilizza un timer per legato al primo pacchetto inviato che ancora non ha ricevuto ACK: al suo raggiungimento, reinvia tutti i pacchetti a partire da quello per il quale ha impostato il timeout.
-\paragraph{Selective Repeat.} Il mittente può avere fino a N pacchetti. Il destinatario invia un \textit{ACK individuae}, relativo quindi ad ogni pacchetto. Il mittente utilizza invece un timer per ogni pacchetto di cui non ha ricevuto esito; quando raggiunge il timeout, ritrasmette solo quel dato pacchetto.
+\paragraph{Selective Repeat.} Il mittente può avere fino a N pacchetti. Il destinatario invia un \textit{ACK individuale}, relativo quindi ad ogni pacchetto. Il mittente utilizza invece un timer per ogni pacchetto di cui non ha ricevuto esito; quando raggiunge il timeout, ritrasmette solo quel dato pacchetto.
 
 \section{Ritrasmissione Automatica in TCP}
 TCP utilizza una versione ibrida dei protocolli \textit{Go-back-N} e \textit{Selective repeat}: invia un flusso di singoli bytes che formano - per mano del ricevente - un segmento, il cui \textit{sequence number} è quello del primo byte contenuto, e la cui lunghezza è determinata dal numero totale di bytes. Utilizza inoltre una variabile definita come \textit{MSS}, che indica la lunghezza massima di ciascun segmento. \\
-In una stessa connessione, il flusso di dati è bidirezionale, viene eseguito un \textit{handshake} per inizializzare i buffer e alcune variabili (come la \textit{MSS} stessa). La dimensione dei buffer varia nel tempo, sulla base delle informazioni raccolte dai controlli di flusso e congestione. \\
+In un'unica connessione, il flusso di dati è bidirezionale e, per istanziarla, viene eseguito un \textit{handshake} per inizializzare i buffer e alcune variabili (come la \textit{MSS} stessa). La dimensione dei buffer varia nel tempo, sulla base delle informazioni raccolte dai controlli di flusso e congestione. \\
 Ogni segmento è composto dai seguenti campi (ciascuno da 32bit):
 \begin{itemize}
 	\item Porta sorgente / destinazione;
@@ -127,7 +127,7 @@ Al ricevimento dell'\textit{ACK}, si controlla se è relativo ad un segmento di 
 \end{enumerate}
 
 \subsection{Variabilità del retransmission timeout}
-Ovviamente, il timeout deve essere necessariamente $/geq RTT$ (\textit{RoundTrip Time}). Inoltre:
+Ovviamente, il timeout deve essere necessariamente $< RTT$ (\textit{RoundTrip Time}). Inoltre:
 \begin{itemize}
     \item se troppo corto, avvengono ritrasmissioni inutili e non necessarie;
     \item se troppo lungo, i tempi di reazione diventano troppo lunghi se i segmenti sono andati perduti.
@@ -170,11 +170,11 @@ RFC 793 suggerisce di generare sequence numbers iniziali (\textit{ISN}) semplici
 Notare che sia il mittente sia il destinatario trasmettono il \textit{loro} ISN. %(cfr full duplex)
 A partire dall'ISN, i byte di dati sono numerati da $ ISN+1 $ in modo da permettere il \textit{synack}.
 
-\paragraph{Forbidden Region.} Per impedire che due SN identici si trovino in rete nello stesso momento, è stato introdotto un "periodo di silenzio" nel quale non possono essere inviati segmenti. %...dopo il ravvio pari al MSL
+\paragraph{Forbidden Region.} Per impedire che due ISN identici si trovino in rete nello stesso momento, è stato introdotto un "periodo di silenzio" nel quale non possono essere inviati segmenti. %...dopo il ravvio pari al MSL
 
 \subsection{Il problema dei due eserciti}
 Il problema del controllo nella trasmissione dati è facilmente spiegabile con il seguente esempio.
-Prendiamo in considerazione tre armate, due appartenenti alla fazione \textit{verde} ed una appartenente alla fazione \textit{rosso}. Le due armate verdi sono singolarmente più deboli di quella rossa, ma l'armata rossa è globalmente più debole. Le armate verdi devono quindi attaccare quella rossa nello stesso momento per vincere la battaglia. La prima soluzione che può venire in mente per fare in modo che le armate verdi si accordino per attaccare è che una invii un messaggio con l'orario di attacco e l'altra ne invii uno per confermare la ricezione.\\
+Prendiamo in considerazione tre armate, due appartenenti alla fazione \textit{verde} ed una appartenente alla fazione \textit{rossa}. Le due armate verdi sono singolarmente più deboli di quella rossa, ma l'armata rossa è globalmente più debole. Le armate verdi devono quindi attaccare quella rossa nello stesso momento per vincere la battaglia. La prima soluzione che può venire in mente per fare in modo che le armate verdi si accordino per attaccare è che una invii un messaggio con l'orario di attacco e l'altra ne invii uno per confermare la ricezione.\\
 I messaggeri che li portano possono però essere catturati, quindi il messaggio può non arrivare correttamente a destinazione. Per assicurarsi che ogni messaggio sia correttamente ricevuto bisognerebbe quindi inviare un messaggio di conferma ad ogni ricezione, ma ciò porterebbe ad un loop in cui ogni armata continua ad inviare messaggeri per confermare la ricezione del messaggio dell'altra.
 Per ovviare a questo problema, si adotta la seguente soluzione:
 \begin{lstlisting}
@@ -193,10 +193,10 @@ a to b: ack, data
 b to a: data ack
 -----------------------
 a to b: data
-b to a: data ack
-a to b: data
-b to a: data ack
-...
+b to a: data + ack
+a to b: data + ack
+b to a: data + ack
+[...]
 -----------------------
 a to b: fin
 b to a: ack fin
@@ -212,13 +212,14 @@ a to b: ack
 	\item Il client riceve SYNACK; alloca buffer e variabili, risponde con ACK che potrebbe contenere dati.
 	\item Per chiudere la connessione uno dei due estremi invia un messaggio con flag $ FIN=1 $; il ricevente conferma e manda a sua volta un messaggio con $ FIN=1 $ e attende l'ultima conferma.
 \end{enumerate}
+\newpage
 
 \subsection{Connection states: client}
 0: closed\\
 1: syn\_sent		(ricevo \textit{synack}; invio \textit{ack})\\
-2: established\\
-;\\
-2: established		(invio \textit{fin})\\
+2.1: established;\\
+$...$\\
+2.\textit{n}: established		(invio \textit{fin})\\
 3: fin\_wait\_1		(ricevo \textit{ack})\\
 4: fin\_wait\_2		(ricevo \textit{fin}, invio \textit{ack})\\
 5: close wait\\
@@ -254,12 +255,3 @@ Al verificarsi di una perdita la dimensione della finestra è dimezzata.
 \paragraph{TCP Slow Start.}
 All'avvio della connessione, inizialmente il \textbf{cwnd} è impostato a 1 MSS. 
 TCP raddoppia il cwnd ogni RTT, incrementandolo per ogni ACK.
-%
-%TCP: detecting, reacting to loss.
-%	loss indicated by timeout.
-%		cwnd settato a 1 MSS
-%		window then grows exponentially (as in slow start) to threshold, then linearly.
-%	loss indicated by 3 duplicated ACKs: TCP RENO
-%		duplicate ACKs indicate network capable of delivering some segments
-%		cwnd is cut in half window then grows linearly
-%	TCP Tahoe always sets cwnd to 1 (timeout or 3 dup acks)

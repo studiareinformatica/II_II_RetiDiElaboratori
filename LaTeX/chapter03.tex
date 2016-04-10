@@ -39,7 +39,7 @@ Esistono poi quattro tipi di header:
     \item \textit{response} header
     \item \textit{entity} header
 \end{enumerate}
-Un caso specifico da sottolineare è quello dell'\textit{if-modified-since}, che fa parte dei \textit{request} headers: il client specifica una data e richiede al server la risorsa solo se questa è stata modificata dopo quella data. \\
+Un campo specifico da sottolineare è quello dell'\textit{if-modified-since}, che fa parte dei \textit{request} headers: il client specifica una data e richiede al server la risorsa solo se questa è stata modificata dopo quella data. \\
 Tra il client e il server ci sono degli intermediari chiamati \textit{proxy-servers}, che mantengono risorse in cache e forniscono le risorse al posto del server interessato. Sostanzialmente, sono delle macchine che lavorano a livello applicativo, con grandi quantità di memoria; leggono le richieste dei client e se possono servire la richiesta lo fanno al posto del server. Chiaramente, sono in costante aggiornamento così da evitare problemi di consistenza. \\
 Esistono diversi tipi di \textit{proxy}:
 \begin{itemize}
@@ -124,7 +124,6 @@ Per questa procedura si possono usare due tipi di approcci:
 
 \subsection{Cache}
 I DNS utilizzano un parametro in ogni loro record, che ne gestisce il tempo di aggiornamento per il flush del record stesso, in modo tale da rendere l'aggiornamento periodico ogni tot tempo, e mantenerlo - nel restante - in cache, aumentando le prestazioni di risoluzione dei domini.
-
 \newpage
 
 \subsection{Records}
@@ -353,7 +352,7 @@ Questo - a differenza del \textit{close()} - chiude uno dei due sensi di comunic
 Interfaccia network virtuale per gestire comunicazioni tra processi sullo stesso host. Bypassa l'hardware dell'interfaccia network locale e i livelli più bassi della pila TCP/IP
 
 \subsubsection{Socket Passivo / Attivo}
-Il socket di cui fino a questo punto si è parlato è il socket \textit{passivo}. Come accennato nelle procedure di implementazione di un socket in \textit{python}, si è parlato però dei socket \textit{attivi}. Questi si distinguono da quelli passivi per il fatto che sono effettivamente usati per la trasmissione dati. I primi sono creati da un processo, ma poi delegano a nuovi socket, con lo stesso \textit{address} (la tupla \textit{(indirizzo, porta)}), lo scambio effettivo dei dati. Un \textit{socket attivo} è definito univocamente dalla quadrupla \textit{(local\_ip, local\_port, remote\_ip, remote\_port)}.
+Il socket di cui fino a questo punto si è parlato è il socket \textit{passivo}. Come accennato nelle procedure di implementazione di un socket in \textit{python}. I \textit{socket attivi} si distinguono da quelli \textit{passivi} per il fatto che sono effettivamente usati per la trasmissione dati. I \textit{passivi} sono creati da un processo, ma poi delegano a nuovi socket, con lo stesso \textit{address} (la tupla \textit{(indirizzo, porta)}), lo scambio effettivo dei dati. Un \textit{socket attivo} è definito univocamente dalla quadrupla \textit{(local\_ip, local\_port, remote\_ip, remote\_port)}.
 
 \subsubsection{Porte}
 I numeri di porta - essendo in \textit{16bit} - vanno dalla porta 0 alla 65535:

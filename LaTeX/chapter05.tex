@@ -310,3 +310,18 @@ Infine, utilizza due attributi fondamentali:
 	\item \textit{AS-PATH}: contiene gli \textit{AS} attraverso cui è passato l'advertisement del prefisso di rete;
 	\item \textit{NEXT-HOP}: indica il router interno specifico sull'\textit{AS} di \textit{next-hop} (vicino, adiacente).
 \end{itemize}
+
+\subsection{Topologia logica inter-as}
+Esistono diversi metodi per diffondere in broadcast i nodi raggiungibili: lo \textit{spanning tree} è un metodo che, a partire da un nodo della rete, costruisce un albero, la cui radice è il nodo di partenza stesso. Esistono diversi algoritmi (\textit{Prim} o \textit{Kruskal}), utilizzati per cercare di ammortizzare il costo di costruzione dello stesso. \\
+Ogni nodo invia un messaggio di \textit{join} in \textit{unicast} al nodo centrale, che viene reindirizzato fino a che non raggiunge un nodo (già) appartiene allo \textit{spanning tree}. \\
+Molte applicazioni richiedono il trasferimento di pacchetti da uno o più mittenti ad un gruppo di destinatari (e.g., per il trasferimento di aggiornamenti, per lo streaming, per applicazioni con dati condivisi, per aggiornamento di dati, per giochi multiplayer, \ldots). L'indirizzo che rappresenta un gruppo multicast è un indirizzo IP multicast di classe D, dentro il quale si possono affiliare diversi utenti.
+
+\subsubsection{IGMP (Internet Group Management Protocol)}
+Utilizzato a livello di trasporto: i messaggi sono incapsulati in datagrammi IP, mandati con \textit{TTL} a 1 (perché si tratta di uno scambio tra endpoint e router di accesso delegato della gestione multicast). Sono composti da un tipo (da 8bit: \textit{query} (richiesta dal router), \textit{membership report} (risposta dagli host) o \textit{leave group}), un tempo di risposta, un \textit{checksum} e un \textit{group address}. I router eseguono un refresh ogni minuto per verificare che i propri host non siano interessati a eventuali cambiamenti del gruppo multicast a cui sono affiliati. \\
+Come calcolare le rotte di raggiungimento da una sorgente ad una destinazione? Come calcolare i percorsi migliori? Si può costruire - alla sorgente - un albero di copertura utilizzando il \textit{reverse path forwarding}, appoggiandosi a quanto noto al router per i percorsi minimi di unicast. In questo caso, occorre - per essere rimosso completamente dall'albero - un messaggio di \textit{pruning} al router delegato, per accertarmi di non essere più raggiunto per ogni richiesta dei membri multicast. \\
+L'altro approccio è il \textit{center-based tree}, indipendente dalla sorgente. Viene utilizzato un albero di consegna unico e comune per tutti: prendo un nodo di riferimento, \textit{centro} dell'albero. \\
+Nella pratica, vengono utilizzati entrambi gli approcci:
+\begin{itemize}
+	\item \textit{DVMRP} (o \textit{Distance Vector Multicast Routing Protocol}): utilizza un approccio \textit{flood and prune} e \textit{reverse path forwarding}. Ad ogni minuto, \textit{dimentica} gli endpoint esclusi, per cui risulta poco performante se sono pochi gli host inclusi nel gruppo multicast per le troppe richiestte di pruning;
+	\item \textit{PIM}: (o \textit{Protocol Indepenetent Multicast}): non dipende da nessun algoritmo di routing di unicast. Due metodi di distribuzione in multicast: \textit{dense} e \textit{sparse}.
+\end{itemize}

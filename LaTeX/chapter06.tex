@@ -1,216 +1,25 @@
-\section{Informazioni generali}
-La sicurezza informatica si fonda su diversi concetti:
+Come si trasmettono le informazioni da un router all'altro fino agli endpoint è opera del livello \textit{datalink}. \\
+Questo livello si appoggia sul concetto di \textit{trama}, un percorso seguito dal flusso, che inizia e finisce su due estremi. Offre diversi servizi:
 \begin{itemize}
-	\item \textbf{confidenzialità}: soltanto \textit{sender} e \textit{receiver} possono \textit{capire} il contenuto di un messaggio;
-	\item \textbf{autenticazione}: soltanto \textit{sender} e \textit{receiver} possono confermare l'identità di ciascuno;
-	\item \textbf{integrità di messaggio}: \textit{sender} e \textit{receiver} devono essere sicuri che il messaggio sia integro;
-	\item \textbf{accesso e disponibilità}: i servizi devono essere accessibili e disponibili agli utenti.
+	\item rilevamento e correzioni di errori;
+	\item condivisione di canali broadcast, offrendo accessi multipli;
+	\item servizio di gestione degli indirizzi di livello link;
+	\item trasnferimento dati affidabili, con controllo del flusso.
 \end{itemize}
+Il livello di rete è implementato sugli \textit{adaptor}, che comunicano l'uno con l'altro - stabilendo una trama per raggiungersi - e che devono rispettare gli standard appena esposti. \\
+Accetta soltanto degli stream di raw bit (flussi di sequenze di bit) e cerca di consegnarlo a destinazione: ciononostante la comunicazione non è necessariamente priva di errori. Per gestire un numero multiplo di flussi di informazioni, divide lo stream in un numero variabile di trama (\textit{framing}) e elabora il checksum per ogni trama (per ovviare a problemi di generazione e correzione errori). \\
+Lo split viene applicato ogni \textit{n} caratteri, e ciascun flusso è delimitato da dei caratteri speciali: \textit{DLE STX} (\textit{Data Link Escape Start of TeXt}) e DLE ETX (\textit{Data Link Escape End of TeXt}). Qualora dovesse essere inviata esattamente la stringa utilizzata come escape, viene aggiunto un \textit{DLE} per eliminare ambiguità. \\
+Possono essere poi utilizzati degli approcci meno generici, come il sistema \textit{Manchester}.
 
-\paragraph{Personaggi noti}
-\textit{Bob} e \textit{Alice} vogliono comunicare in maniera sicura; \textit{Eve} è l'intruso, che vuole ottenere - senza permesso - le informazioni tra i due precedenti comunicanti, tramite \textit{eavesrop} (intercettazione), \textit{iniettazione} dei messaggi nella rete, \textit{personificazione} (pretendendo di essere qualcun altro); \textit{hijacking} (sostituendo uno dei capi della trasmissione con sé stesso), provocazione di \textit{denial of service} (prevenendo il servizio dall'essere usato dagli utenti, attraverso l'\textit{overload} delle risorse, per esempio).
-\newpage
-
-\section{Crittografia}
-Il messaggio in chiaro si dice \textit{plain-text}; una volta crittografato, invece, \textit{cipher-text}. \\
-Avendo soltanto il \textit{cipher-text} posso:
+\section{Rilevamento di errori}
+Tra i dati trasmessi, vi sono due blocchi fondamentali:
 \begin{enumerate}
-	\item fare \textit{brute-force}: tentare utilizzando tutte le chiavi in mio possesso per \textit{decriptare} il messaggio;
-	\item utilizzare un'analisi statistica per risalire attraverso calcoli probabilistici a sequenze di caratteri noti (nel caso in cui si utilizzino metodi di cifrature \textit{monoalfabetici}).
+	\item \textit{EDC}: bit - ridondnati - di \textit{error detection and correction};
+	\item \textit{D}: dati protetti dal controllo di errori - eventualmente accompagnati da campi header.
 \end{enumerate}
+Ovviamente la rilevamento di errori non è affidabile al 100\%: si potrebbero raramente non rilevare alcuni errori, in maniera inversamente proporzionale alla dimensione alla dimensione dell'\textit{EDC} utilizzata. \\
+Nel rilevamento di errori, si utilizza il calcolo della distanza di \textit{Hamming}, attraverso cui è possibile determinare in quanti bit differiscano due parole di codice. Sostanzialmente, si esegue lo \textit{XOR} tra le parole e poi si conta il numero di 1 nel risultato: il numero di posizioni nelle quali le due parole di codice differiscono determina la loro distanza di \textit{Hamming}. Se due parole hanno distanza di \textit{Hamming} \textit{d}, ci vorranno \textit{d} operazioni sui singoli bit per tramutare una parola di codice nell'altra: per come sono utilizzati i bit di ridonanza, se la lunghezza delle parole di codice è $n=m+4$, sono possibili $2^m$ messaggi dati validi, ma non tutte le $2^n$ parole di codice. Dunque la distanza di \textit{Hamming} di un codice è la minima distanza di \textit{Hamming} tra le due parole di codice. Ancora, per rilevare \textit{d} errori occorre un codice con distanza di \textit{Hamming} $d+1$, mentre per correggerli serve un codice con distanza di \textit{Hamming} $2d+1$.
 
-\subsection{Crittografia a chiave simmetrica}
-Due o più persone condividono la stessa chiave (simmetrica), utilizzata come pattern ci cifratura a sostituzione mono alfabetica. Come si accordano, però, Bob e Alice? Occorre un sistema di scambio di chiavi attraverso un canale sicuro (anche fisico, per esempio).
-\subsubsection{Schema di cifratura di Cesare}
-Sistema di cifratura basato su uno spostamento/slittamento di \textit{n} lettere sulla sequenza dell'alfabeto. In questo caso, la chiave è proprio \textit{n}.
-
-\subsubsection{DES: Data Encryption Standard}
-Standard di criptazione, che utilizza chiavi lunghe \textit{56bit}, di cui si usano \textit{48bit}. Il messaggio viene spezzato in frammenti da 64bit, e passa per l'algoritmo blocco per blocco, tramite sistemi di permutazione. E' stato necessario nemmeno un giorno per \textit{bucarlo}. \\
-Per questa ragione hanno sviluppato il \textit{3DES}, algoritmo di criptazione che prevede 3 passaggi: una \textit{encryption} iniziale utilizzando una chiave iniziale, una \textit{decription}, utilizzando una seconda chiave, e una \textit{encryption} finale, tramite la chiave iniziale.
-
-\subsubsection{AES: Advanced Encryption Standard}
-Standard molto più attuale. Utilizza un sistema di criptazione simmetrica che nel 2001 ha rimpiazzato \textit{DES}. Processa dati in blocchi da \textit{128bit}, con chiavi da \textit{128}/\textit{192}/\textit{256 bit}, per cui si dice abbia sicurezza di un ordine di $2^{128}$. \\
-Mentre occorreva 1s per decriptare lo standard \textit{DES}, occorrono 149 trilioni di anni per farlo con \textit{AES}.
-\newpage
-
-\subsection{Modus operandi}
-Il \textit{modus operandi} di un algoritmo di cifratura è il modo con cui vengono scambiati i blocchi, e prende il nome di \textit{ECB} (o \textit{Elecronic CodeBook}).
-Altro metodo è quello del \textit{CBC} (o \textit{Cipher Block Chaining}), dove l'output del blocco precedente è l'input del blocco successivo.
-
-\subsection{Crittrogafia a chiave pubblica}
-Utilizza un approccio totalmente differente: il \textit{sender} e il \textit{receiver} hanno rispettivamente due chiavi: una privata e una pubblica. Non condividono la loro chiave privata, ma solo la pubblica, quindi la chiave di decriptazione privata è nota solo al \textit{receiver}. \\
-Sostanzialmente, quando Alice vuole inviare un messaggio a Bob, lo cripta con la chiave pubblica di Bob, il quale - quando riceverà il messaggio criptato - lo decripterà con la propria chiave privata, e/o viceversa. \\
-Tra gli algoritmi di crittografia a chiave pubblica più importanti troviamo l'\textit{RSA} (dai suoi creatori: \textit{Rivest}, \textit{Shamir} e \textit{Adelson}), che si basa sul fatto che bit può essere univocamente rappresentabile da un numero. Per creare un paio di chiavi \textit{RSA} occorre:
-\begin{itemize}
-	\item scegliere due numeri \textit{p} e \textit{q} (utilizzando, ad esempio, 1024 bit per ciascuno);
-	\item si calcola $n=p\times q$ e $z=(p-1)\times (q-1)$;
-	\item si sceglie una $e < n$ che non ha nulla in comune con \textit{z} (per cui si dicono \textit{relativamente primi});
-	\item si sceglie una \textit{d} in modo tale che $(e\times d)-1$ sia divisibile per \textit{z}.
-\end{itemize}
-Infine:
-\begin{center}
-	Criptazione: $c = m^e$ $mod$ $n$ \\
-	Decriptazione: $m = c^d$ $mod$ $n$
-\end{center}
-
-\section{Autenticazione}
-\subsection{Firme digitali}
-Una firma digitale rappresenta un insieme di dati in forma elettronica, allegati oppure connessi tramite associazione logica ad altri dati elettronici, utilizzati come metodo di identificazione informatica.
-
-Si propone di soddisfare le seguenti esigenze:
-\begin{itemize}
-	\item \textbf{autenticazione:} il destinatario può verificare l'identità del mittente.
-	\item \textbf{integrità:} il destinatario non può creare o modificare un documento firmato da qualcun altro.
-	\item \textbf{non ripudio:} il mittente non può disconoscere un documento da lui firmato. La firma digitale è l'unico meccanismo basato su crittografia a chiave pubblica ad avere questa caratteristica.	
-\end{itemize}
-
-Un tipico schema di firma elettronica basato sulla tecnologia della chiave pubblica consiste di tre algoritmi:
-\begin{enumerate}
-	\item Un algoritmo che genera una coppia di chiavi $ (PK, SK) $, dove \textit{PK} è la chiave pubblica di verifica della firma e \textit{SK} è la chiave privata utilizzata per firmare il documento.
-	\item Un algoritmo di firma che prende in input un messaggio \textit{m} e una chiave privata \textit{SK}, calcola il codice hash del messaggio e, crittografandolo con \textit{SK}, produce una firma $ \sigma $.
-	\item un algoritmo di verifica che prende in input la tripla $(m, PK, \sigma)$ e accetta o rifiuta la firma.
-\end{enumerate}
-La firma digitale è l'unico caso in cui l'uso delle chiavi è invertito: la chiave pubblica serve a decrittare la firma e trovare poi il \textit{digest} iniziale attraverso l'hash, mentre la chiave privata serve a crittografare una stringa anzichè aprirla.
-
-\subsection{Message digests}
-Per dare una sorta di \textit{impronta digitale} di un'entità vengono utilizzati i cosiddetti \textbf{message digests}: partendo da un insieme enorme di combinazioni applicabili su ogni tipo di file digitale, una funzione di \textit{hashing} fa corrispondere un'entità a (quasi) una ed una sola sequenza di caratteri. In questo modo è possibile determinare una firma univoca per provare l'integrità di ogni file, potendo garantire che questa sia tale soltanto per quel file. La lunghezza dei valori di hash varia a seconda degli algoritmi utilizzati; il valore più comunemente adottato è di 128 bit, che offre una buona affidabilità in uno spazio relativamente ridotto\footnote{Va registrata la possibilità d'uso di hash di dimensione maggiore (SHA, ad esempio, può anche fornire stringhe di 224, 256, 384 e 512 bit) e minore (anche se fortemente sconsigliato).}. La sicurezza di questo sistema è data dal fatto che ogni \textit{hash} è dato da una stringa di lunghezza fissa indipendentemente dalla lunghezza del messaggio.\\
-La firma digitale pul essere definita come \textit{digest} di un documento crittografato con chiave privata.
-
-
-\subsubsection{Checksum}
-La \textit{checksum} fa una sorta di \textit{hash} come è stato appena introdotto: produce una stringa da 16 bit. Il problema in questo caso riguarda il fatto che è molto più semplice trovare file diversi che abbiano lo stesso \textit{checksum}.\\\\
-A questo punto possiamo arrivare alla combinazione ottimale: Bob manda un pacchetto di informazioni contenente:
-\begin{itemize}
-	\item messaggio puro;
-	\item hash del messaggio, crittato con la chiave privata dello stesso Bob.
-\end{itemize}
-A questo punto, Alice, per verificare l'autenticità del messaggio, fa l'hash del messaggio e lo confronta con l'output della decrittazione tramite chiave pubblica di Bob dell'hash crittato precedentemente da Bob con la sua chiave privata. Se questi corrispondono, allora il messaggio risulta autentico.
-
-Attualmente esistono diversi tipi di hash, in base al livello di sicurezza: leggermente datato è l'\textit{MD5} (da 128 bit, crittato in 4 passi), più aggiornato è invece lo \textit{SHA-1} (da 160 bit, ancora più sicuro è invece lo \textit{SHA-2}).
-
-\subsection{CA (Certification Authority)}
-La \textit{CA} rappresenta l'autorità che assegna un \textit{certificato digitale} (comprensivo dei dati di Bob con la sua firma digitale) ad una specifica entità E appartenente a Bob sulla base della chiave pubblica di E, in modo tale che sia garantita l'identità di E presso la \textit{CA}. Sostanzialmente, le informazioni del certificato digitale vengono prodotte dalla \textit{CA}, crittate con la chiave pubblica di Bob e poi con la chiave privata della \textit{CA}.
-\newpage
-
-\subsection{Sicurezza e-mail}
-Alice vuole mandare una email confidenziale a Bob:
-\begin{enumerate}
-	\item genera una chiave privata simmetrica randomica, $K_{s}$;
-	\item critta il messaggio con questa chiave $K_{s}$;
-	\item critta l'output con la chiave pubblica di Bob;
-	\item invia l'output e la chiave generata randomicamente a Bob, crittata ancora con la chiave pubblica di Bob.
-\end{enumerate}
-Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segreta generata randomicamente da Alice con la sua chiave privata e - ancora - decritterà il messaggio in definitiva utilizzando la chiave-output della decrittazione della chiave segreta generata randomicamente da Alice. \\
-In alternativa:
-\begin{enumerate}
-	\item Alice fa un \textit{hash} del messaggio;
-	\item impacchetta il messaggio in chiaro e la firma digitale (come già visto con i message digests);
-	\item il pacchetto viene crittato con una chiave privata simmetrica randomica, $K_{s}$;
-	\item viene mandato il pacchetto e la chiave generata randomicamente a Bob, crittata ancora con la chiave pubblica di Bob.
-\end{enumerate}
-Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segreta generata randomicamente da Alice con la sua chiave privata e - ancora - decritterà il messaggio in definitiva utilizzando la chiave-output della decrittazione della chiave segreta generata randomicamente da Alice. Bob, per verificare l'autenticità del messaggio, fa l'hash del messaggio e lo confronta con l'output della decrittazione tramite chiave pubblica di Alice dell'hash crittato precedentemente da Alice con la sua chiave privata. Se questi corrispondono, allora il messaggio risulta autentico.
-
-\section{Secure Socket Layer}
-Con l'apertura della Rete a fini pubblici, le problematiche di prevenzione di danni, perdite e attacchi via via sempre più importanti portarono alla nascita di strati aggiuntivi con lo specifico compito di assicurarsi la delle comunicazioni.
-Le prime implementazioni di SSL erano limitate a una cifratura a chiave simmetrica di soli 40 bit\footnote{Tale limitazione fu dovuta da restrizioni imposte dal governo statunitense sull'esportazione di tecnologie crittografiche. Fu esplicitamente imposta per rendere la cifratura abbastanza debole da poter essere forzata dalle autorità giudiziarie che volessero decifrare il traffico, ma sufficientemente resistente ad attacchi esterni poichè facente affidamento alle minori disponibilità di risorse tecnologiche e finanziarie dell'epoca.}; fu succesivamente aggiornato a TLS (\textit{Transport Layer Security}), con chiavi da 128+ bit.\\\\
-Il protocollo TLS consente alle applicazioni client/server di comunicare attraverso una rete in modo tale da prevenire il \textit{tampering}(manomissione), la falsificazione e l'intecettazione dei dati.\\
-Nell'utilizzo tipico del browser di un end-user, l'autenticazione è \textit{unilaterale}: è il solo server ad autenticarsi presso il client. Il browser valida il certificato del server controllando che la firma digitale dei certificati sia valida e riconosciuta da una \textit{certification authority} conosciuta utilizzando una cifratura a chiave pubblica. Dopo questa autenticazione, il browser indica una connessione sicura.\\
-Quest'autenticazione, però, non è sufficiente per garantire che il sito con cui ci si è collegati sia quello richiesto. Per esserne sicuri è necessario analizzare il contenuto del certificato rilasciato e controllarne la catena di certificazione. I siti che intendono ingannare l'utente non possono utilizzare un certificato del sito che vogliono impersonare, perchè non hanno la possibilità di cifrare in modo valido il certificato, 
-che include l'indirizzo, in modo tale che risulti valido alla destinazione.\\
-Il protocollo TLS permette anche un'autenticazione \textit{bilaterale}, tipicamente utilizzata in applicazioni aziendali, in cui entrambe le parti si autenticano in modo sicuro scambiandosi i relativi certificati. Questa autenticazione (definita \textit\textit{Mutual authentication}), richiede che anche il client possieda un proprio certificato digitale.\\
-
-\subsection{Principi di funzionamento}
-Il funzionamento del protocollo TLS può essere suddiviso in tre fasi principali:
-\begin{enumerate}
-	\item Negoziazione dell'algoritmo da utilizzare;
-	\item Scambio delle chiavi e autenticazione;
-	\item Cifratura simmetrica e autenticazione dei messaggi.
-\end{enumerate}
-Nella prima fase, il client e il server negoziano il protocollo di cifratura che sarà utilizzato nella comunicazione sicura, il protocollo per lo scambio delle chiavi, il MAC (\textit{message authentication code}) e l'algoritmo di autenticazione. L'algoritmo per lo scambio delle chiavi e quello per l'autenticazione normalmente sono a chiave pubblica; l'integrità dei messaggi è garantita da un algoritmo di hash che utilizza funzioni pseudorandom non standard.
-
-\paragraph{Protocolli.} All'interno di una sessione vengono tipicamente utilizzati i seguenti protocolli:
-\begin{itemize}
-	\item RSA, Diffie-Hellman, ECDH, SRP, PSK per lo scambio di chiavi;
-	\item RSA, DSA, ECDSA per l'autenticazione;
-	\item RC4, DES, 3DES, AES, IDEA o Camellia (anche RC2 nei vecchi SSL) per la cifratura simmetrica;
-	\item HMAC-MD5, HMAC-SHA (TLS); MD5, SHA (SSL) come funzioni di hash per le funzioni crittografiche d'integrità. 
-\end{itemize}
-
-\paragraph{ARP}
-Una richiesta \textit{ARP} consiste in una richiesta di risoluzione inversa: invece di chiedere la risoluzione di un nome host, richiediamo la risoluzione inversa, ovvero quella che associa univocamente un IP ad un nome host. Il protocollo \textit{ARP} lavora a livello \textit{datalink} della pila \textit{TCP/IP}, quindi utilizzando come nomi identificativi gli indirizzi \textit{MAC}. Per la richiesta viene richiamato il gateway dell'IP richiesto, il quale fa una richiesta in \textit{broadcast} nella subnet per cercare il dato IP. \\
-In un attacco \textit{arp-spoofing} (o \textit{arp-poisoning}), l'attaccante fa un attacco \textit{man-in-the-middle}, \textit{spacciandosi} per l'IP richiesto.
-
-\section{IPsec}
-Simile al protocollo \textit{TLS} (che lavora sopra al livello di trasporto, per cui inutile in caso di attacci su livelli inferiori rispetto a quest'ultimo), che lavora a livello di rete. L'obiettivo è cifrare il \textit{payload} (un segmento \textit{TCP}/U\textit{DP}, un messaggio \textit{ICMP}/\textit{OSPF}, \ldots): per motivi di sicurezza spesso si usano reti private, motivo per cui diventa necessaria una \textit{VPN} (o \textit{Virtual Private Network}), per mettere in comunicazione reti private attraverso internet, mantenendo tutto quello che passa per internet cifrato e separato logicamente dal traffico comune. Le \textit{VPN} quindi stabiliscono reti private virtuali, per racchiudere \textit{n} non fisicamente - e al contempo privatamente - collegate. \\
-\textit{IPsec} fornisce i seguenti servizi:
-\begin{itemize}
-	\item integrità dei dati;
-	\item autenticazione;
-	\item prevenzione ad attacchi di tipo \textit{replay}\footnote{Nell'ambito della sicurezza informatica il replay-attack è una forma di attacco di rete che consiste nell'impossessarsi di una credenziale di autenticazione comunicata da un host ad un altro, e riproporla successivamente simulando l'identità dell'emittente. In genere l'azione viene compiuta da un attaccante che s'interpone tra i due lati comunicanti.};
-	\item confidenzialità.
-\end{itemize}
-Può lavorare - in base alla decisione presa dall'amministratore dell'infrastruttura - con due protocolli:
-\begin{itemize}
-	\item \textit{AH} (\textit{Authentication Header}): fornisce garanzie su integrità e autenticazione;
-	\item \textit{ESP} (\textit{Encapsulation Security Protocol}): fornisce garanzie su integrità, autenticazione e confidenzialità.
-\end{itemize}
-e due modalità:
-\begin{itemize}
-	\item Modalità \textit{transport}: il processo di rendere sicuri i pacchetti è fatto direttamente dagli host delle reti;
-	\item Modalità \textit{tunneling}: il processo è gestito unicamente dagli \textit{edge router}.
-\end{itemize}
-Attualmente la combinazione migliore e più diffusa è la \textit{ESP}-\textit{tunneling}. \\ \\
-
-Per ciascun host che entri in comunicazione con un altro della seconda (o \textit{n}-esima) rete appartenente alla \textit{VPN}, viene stabilita una \textit{Security Association} (\textit{SA}) un canale di comunicazione privato a questi due, che contiene:
-\begin{itemize}
-	\item identificativo (da 32 bit);
-	\item interfaccia \textit{SA} di origine (\textit{edge router} di origine);
-	\item interfaccia \textit{SA} di destinazione (\textit{edge router} di destinazione);
-	\item tipo di cifratura usata (e.g. \textit{3DES} con \textit{CBC});
-	\item chiave di cifratura;
-	\item tipo di algoritmo di integrità (e.g. \textit{HMAC} con \textit{MD5});
-	\item chiave di autenticazione.
-\end{itemize}
-Tutte le \textit{SA} sono memorizzate in un database, chiamato \textit{Security Association Database} (\textit{SAD}). \\ \\
-
-Nella modalità di \textit{tunneling} con \textit{ESP}, viene gestito un datagramma, composto da diversi passaggi: partendo dal messaggio originario in chiaro, seguito dal \textit{padding} del messaggio (necessario a saturare lo spazio in bit dedicato al messaggio), viene cifrato, e poi viene aggiunto in testa l'header \textit{ESP}. Su tutta questa sequenza viene applicato un primo protocollo di autenticazione, che prende il nome di \textit{enchilada}. A questa ultima sequenza viene aggiunto, infine, l'IP di destinazione e applicato il protocollo di autenticazione relativo a tutto il datagramma. \\
-Il \textit{Security Policy Database} (\textit{SPD}) gestisce invece un insieme di regole generali che stabiliscono che reagire a tutti i datagrammi uscenti dalla rete: come/se elaborarli. \\
-Per la generazione delle \textit{SA} automatica arriva in aiuto il protocollo \textit{IKE} (o \textit{Internet Key Exchange}), sfruttabile tramite \textit{PKI} e/o \textit{PSK}:
-\begin{enumerate}
-	\item \textit{IKE} stabilisce una \textit{SA} bidirezionale;
-	\item \textit{ISAKMP} viene utilizzato per negoziare la tupla di connessioni speculari delle \textit{SA}.
-\end{enumerate}
-
-\section{Sicurezza nelle reti Wireless}
-\subsection{WEP}
-Primo protocollo noto sulla sicurezza wireless è il \textit{WEP} (\textit{Wired Equivalent Protocol}), nato nel tentativo di raggiungere la sicurezza come nelle reti via capo, ottenendo:
-\begin{itemize}
-	\item confidenzialità;
-	\item autorizzazione dell'end-host;
-	\item integrità.
-\end{itemize}
-Inoltre occorreva avere un protocollo non solo efficiente, ma che potesse allo stesso tempo cifrare ogni pacchetto trasmesso indipendentemente l'uno dall'altro (anche se uno dei precedenti fosse andato perso, a differenza del \textit{Cipher Block Chaining}, \textit{CBC}, in cui l'output della cifratura del pacchetto precedente era preso come input per quella del successivo). Usava un \textit{cifrario a flusso}: cioè una funzione che prendesse in input una chiave - costante - e un \textit{initialization vector}, che potesse dare uno stream di chiavi utile per cifrare (facendo lo \textit{XOR} tra stream e messaggio da cifrare), ma soprattutto per decifrare (facendo lo \textit{XOR} tra stream e messaggio cifrato). \\
-Tra i problemi principali troviamo che il campo relativo all'\textit{initialization vector} è troppo piccolo per evitare che si ripeti dopo un quantitativo di tempo ridotto. Questo rende il \textit{WEP} quasi totalmente insicuro, perdendo integrità e confidenzialità.
-
-\subsection{802.11i}
-Protocollo molto più sicuro rispetto al \textit{WEP}, che mette a disposizione numerosi tipi di cifratura (e.g. \textit{WPA}, \textit{WPA2}) e utilizza un server separato per l'autenticazione, rispetto a quello utilizzato per l'accesso. Mentre \textit{WPA2} è molto sicuro, è stata introdotta una funziona che potrebbe facilmente \textit{disarcionarlo}: \textit{WPS}. \\
-\textit{WPS} è un protocollo per facilitare la connessione per l'estensione del segnale: che sostanzialmente permette la decifratura per parti, così da dare un eventuale OK, se è stata decifrata correttamente la prima parte. Negli ultimi anni si è pensato di mettere un numero di tentativi massimi, al termine dei quali viene sganciato il richiedente. \\
-\textit{802.11i} ha 4 fasi di operazione che sostanzialmente permettono di generare \textit{n} per \textit{n} client connessi: questa funzione prende il nome di \textit{EAP} (\textit{Extensible Authentication Protocol}).
-\newpage
-
-\section{Firewall}
-I firewall si occupano di gestire delle policy volte all'autorizzazione di utilizzo di determinati servizi, attraverso la generazione di regole che lavorano su a livello di porte e servizi per \textit{TCP}, di tipologia di messaggio \textit{ICMP} e di bit \textit{TCP} \textit{SYN} e \textit{ACK}. \\
-Un firewall può implementare uno \textit{stateless packet-filter}, cioè basato unicamente su indirizzo e porta, o anche \textit{stateful packet-filter}, che non solo ammette le possibilità della versione \textit{staless}, ma anche quella di monitorare e gestire lo stato delle connessioni \textit{TCP} già aperte e in corso.
-
-\subsection{IDS}
-Gli \textit{Intrusion Detectiom System} può fare un molteplice attività:
-\begin{itemize}
-	\item ispezione dei pacchetti: controlla il contenuto di ciascun pacchetto transitato, istruito con le \textit{signature} prelevate da database di \textit{virus}, o attacchi noti;
-	\item esaminare la correlazione tra diversi pacchetti, per evitare si possa fare uno scan delle porte, un mapping della rete o un attacco \textit{DoS}.
-\end{itemize}
-
-\section{Tor}
-\textit{Tor} è un servizio di comunicazione anonimo distribuito che usa un livello indipendente di rete che permette alle persone di migliorare la loro privacy su Internet. Si usa \textit{tor} per mantenere i siti web liberi da meccanismi di \textit{tracking}. \\
-Essendo una rete, è formato da un numero decisamente elevato di host che funzionano da router - gli \textit{onion router} (o \textit{OR}), che dirigono il traffico - ma soprattutto da un \textit{onion proxy} (o \textit{OP}), installato sul client utilizzato per navigare sul \textit{deep web}. \\
-Tutte le informazioni che passano dal client ai vari nodi della rete vengono cifrate: l'unico \textit{hop} che rimane in chiaro è quello che lega l'ultimo nodo che lega il primo client al secondo da raggiungere: sostanziamente, Alice - che cerca di mandare un messaggio a Tor - invierà delle informazioni; queste informazioni passeranno per un numero $n$ di \textit{OR}, e ciascuno di essi applicherà una cifratura sul pacchetto ricevuto. Toccherà decifrare all'$n$esimo \textit{OR} - l'\textit{exit router} -, che consegnerà le informazioni a Bob. \\
-Il metodo di cifratura utilizzato da \textit{Tor} è \textit{TLS}.
+\subsection{CRC (Cyclic Redundancy Check)}
+Vengono visti i bit, \textit{D}, come un numero binario. Viene scelto un polinomio generatore di grado $r+1$ (una sequenza binaria in cui il primo elemento è sempre 1). L'obiettivo è trovare un numero \textit{r} di bits \textit{CRC} di ridondanza \textit{R}: viene calcolato così che $<D,R>$ (concatenazione) sia esattamente divisibile per \textit{G} (in modulo 2). Il ricevente conosce \textit{G}, e divide $<D^1,R^1>$ per \textit{G} e controlla che il resto di questa operazione sia proprio 0, il che gli garantisce che l'informazione non contenga errori. \\
+Questo approccio è molto utilizzato in internet.

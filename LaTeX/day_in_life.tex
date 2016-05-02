@@ -1,0 +1,22 @@
+Scenario: uno studente collega il laptop alla rete del campus e richiede/riceve www.google.com
+\begin{enumerate}
+	\item Tipicamente non ha nessuna configurazione: parte il protocollo DHCP; ricevi indirizzo IP, gateway, subnetmask, DNS. Il protocollo viaggia su UDP.\\
+	$ DHCP \rightarrow UDP \rightarrow IP \rightarrow Eth \rightarrow Phy $
+	
+	\item DHCP server: tipicamente sul primo router. Vede un frame in broadcast e sale tutta la pila protocollare.
+	Reincapsulato a sua volta e torna indietro fino all'utente; ora anche lo switch ha imparato dove inoltrare i pacchetti. La scheda di rete è configurata.
+	
+	\item Mandata richiesta per: "www.google.com". Serve il DNS.
+	Si riparte col DNS: crea un altro pacchetto udp, lo mette su un pacchetto ip, lo piazza su ethernet e lo mette su phy.
+	Mandare una query arp in broadcast perchè hai bisogno di sapere dov'è il router! questo risponde e dice "il mio indirizzo MAC è questo qua."
+	
+	\item il datagramma IP viene inviato al server DNS. Questo:
+		- ha nella sua cache l'indirizzo IP di google e lo invia
+		- non ha indirizzo ip di google. WTF?! Va sulla gerarchia di DNS fino al dns autoritativo e ritorna la risposta.
+	
+	\item Si parte col TCP.	A questo punto , inviate un syn al server per instaurare una connessione. SYNACK. Parte la richiesta HTTP. 3 way handshake inviato contestualmente ai dati.
+	Viaggia dentro la socket tcp, arriva a google, google la legge e risponde. 
+	
+	\item 404, not found.
+	Fine.
+\end{enumerate}

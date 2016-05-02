@@ -75,3 +75,58 @@ La struttura di una trama Ethernet è semplicissima:
 	\item \textit{crc}: campo per detecting di errori ad opera del ricevitore (se vengono trovati errori, il frame viene scartato).
 \end{itemize}
 Ethernet è \textit{connectionless}, \textit{unreliable} e utilizza l'algoritmo \textit{CSMA/CD}.
+\newpage
+\section{Switch}
+Uno \textit{switch} è un dispositivo di rete che si occupa di commutazione. Agisce sull'indirizzamento e sull'instradamento all'interno delle reti LAN mediante indirizo fisico, selezionando i frame ricevuti e dirigendoli verso il dispositivo corretto.\\
+Presenta le seguenti caratteristiche fondamentali:
+\begin{itemize}
+	\item permette trasmissioni multiple simultaneamente
+	\item consente buffer di pacchetti
+	\item gli host hanno connessioni dedicate dirette con lo switch
+	\item il protocollo ethernet è usato su \textit{ogni} link entrante, ma senza collisione (full duplex)
+\end{itemize}
+Internamente, uno switch è costituito da una o più schede munite di porte. Ad ogni porta può essere connesso un nodo, che può essere una stazione, un altro switch, un hub o un altro dispositivo di rete.
+Quando un nodo A cerca di comunicare con un nodo B il comportamento dello switch dipende dalla scheda a cui è collegato B:
+\begin{itemize}
+	\item se B è collegato a una porta sulla stessa scheda di A, la scheda stessa inoltra i frame in arrivo su tale porta;
+	\item se B è collegato a una scheda diversa da quella a cui è collegato A, la scheda invia i frame a un canale di trasmissione interno detto \textit{backplane}, caratterizzato da elevata velocità (tipicamente sull'ordine del Gbps), che provvede a consegnare il frame alla scheda giusta.
+\end{itemize}
+Per l'instradamento, gli switches contengono al loro interno una \textbf{switch table} che consente la memorizzazione di entries contenenti un MAC address e una porta. È importante notare come questo dispositivo non necessiti di nessuna configurazione; è dotato di un meccanismo di \textit{self-learning} per la creazione automatica delle entries.\\
+Quando il nodo A deve trasmettere, nel momento in cui il frame arriva allo switch, questo legge l'indirizzo di A e la porta su cui è arrivato il frame; memorizza sulla tabella le informazioni e registra un \textit{ttl}, fondamentale nel caso in cui il nodo abbia cambiato porta o non sia più disponibile per qualsiasi motivo (MAC = A, interface = 1, TTL = 60).\\
+Se il nodo B, a cui dev'essere inviato il frame, non è presente tra le entries della switching table, lo switch invia il frame in \textit{flagging} ai suoi nodi, e ricorsivamente se incontra altri switch: alla risposta di B, registrerà la entry mancante nella table. Nel caso in cui un qualsiasi nodo si colleghi ad un altro switch, poichè è essenziale che a livello di routing si sappia che ha cambiato subnet, sarà il nodo stesso ad inviare un pacchetto ARP (cfr. \textit{ARP table}) per aggiornare la tabella.\\
+\paragraph{Switches VS Routers}\hfil\\
+Pur essendo entrambi dispositivi \textit{store-and-forward}\footnote{Tecnica in base alla quale un'informazione (suddivisa in pacchetti), nel suo percorso tra le singole stazioni (o nodi) della rete, deve esere totalmente ricevuta prima di poter essere ritrasmessa nel collegamento in uscita.}, switches e routers presentano importanti differenze. Per prima cosa, i router sono dispositivi che agiscono a livello di rete, a differenza degli switches che agiscono a livello datalink.\\
+Va notato che, pur essendo gli switches dei dispositivi \textit{'plug-and-play'} (mentre i router devono essere configurati), il loro utilizzo causa un aumento di overhead proporzionale all'aumento delle dimensioni della rete: oltre al broadcast dovuto dall'utilizzo di ARP, gli switches stessi utilizzano il flagging come tecnica per ovviare all'assenza di entries sulle loro table; il risultato di una tempesta broadcast in una rete mal strutturata di medie dimensioni potrebbe essere disastroso sia per integrità e velocità di trasmissione che per la sicurezza e la privacy.\\\\
+Per evitare \textit{broadcast storm}, algoritmi di \textit{spanning tree} rendono gli switch in grado di 'staccare' i link che potrebbero creare problemi e redirezionano il traffico utilizzando un altro link posto appositamente nella rete per creare ridondanza nei collegamenti; tale link rimarrà attivo solo il tempo necessario alla riparazione del link danneggiato.
+\paragraph{VLAN}
+Per motivi di privacy e controllo dello scambio di dati, è stato introdotto un meccanismo che consente di "etichettare" le porte degli switches, raggruppandole in lan diverse, disconnesse l'una dall'altra: dopo la configurazione di queste "etichette", è necessario solo passare da una porta all'altra (o addirittura solo cambiare l'etichetta della porta) per passare da una lan all'altra.\\
+È inoltre possibile il forwarding tra VLANs:gli switches che lo supportano hanno una specie di piccolo router integrato che all'occasione può mettere in comunicazione le lan. Alla presenza di moltiplici switches con diversi insiemi di VLANs, vengono messe a disposizione le \textbf{trunk ports}: porte che non appartengono a nessuna vlan e servono unicamente per mettere in collegamento due switch. Ovviamente occorre che un pacchetto rechi su di sè informazioni sulla VLAN di appartenenza: per questo motivo gli switch allargano l'header di ogni frame passante per una trunk porte inseriscono le informazioni necessarie.\\
+\newpage
+\section{Point-to-Point Data Link Control}
+Garantisce:
+\begin{itemize}
+	\item \textit{packet framing}: prende i pacchetti a qualsiasi livello superiore e li inserisce in uno stream di bit.
+	\item \textit{bit transparency}
+	\item \textit{error detection}
+	\item \textit{connection liveness}: detect signal link failure to network layer
+	\item network layer address negotiation: endpoint can learn/configure each other's network address	
+\end{itemize}
+Non fornisce:
+\begin{itemize}
+	\item error connection
+	\item flow control
+	\item ordine trasmissione di pacchetti
+	\item supporto link multipoint (polling)
+\end{itemize}
+\paragraph{Data Frame} Composto da una flag di inizio, un indirizzo, un byte di controllo, il protocollo utilizzato, l'informazione, un altro check ed una flag di fine.\\
+Se si trasmette uno stream ad un'altra scheda potrebbe campionare bit in maniera sbagliata; è necessario sincronizzare trasmettitore e ricevitore continuamente durante la ricezione di bit. Per fare questo si ricorre al \textit{byte stuffing}.
+Ogni volta che nel pacchetto si trova una sequenza (fissa, preambolo) 01111110 mette un extra 01111110; il ricevente scarta il secondo byte e continua la ricezione.
+
+Il meccanismo di trasmissione è abbastanza semplice.
+\begin{itemize}
+	\item link establishment - configurazione, viene decisa la dimensione massima del frame, definita fase di autenticazione etc.
+	\item configurazione livello di rete
+	\item apertura: scambio di dati
+	\item terminating
+	\item dead
+\end{itemize}

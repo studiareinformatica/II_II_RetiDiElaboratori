@@ -1,0 +1,70 @@
+Per anni - nonostante già esistessero le reti mobili - si accedeva ad internet con dispositivi fissi cablati. Negli ultimi anni, invece, la situazione si è evoluta drasticamente, grazie all'arrivo degli smartphones: si è passati da un accesso cablato ad un accesso wireless/mobile ed è cambiato il tipo e l'intensità di traffico, molto più multimediale.
+Diventa quindi di rilevante importanza la questione della gestione dei consumi energetici. \\
+I dispositivi che accedono ad internet sono molto variegati: da desktop/laptop, a palmari, a smartphone, a dispositivi dell'\textit{internet delle cose}. Tutto risulta essere connesso ed interagire con internet. I punti di accesso ad internet diventano sempre più radio. \\
+Occorre quindi imparare a gestire questa tipologia di accesso, che si articola di due tipi:
+\begin{itemize}
+	\item wireless \textit{anywhere/anytime}: possibilità di accedere ad internet da mobile anche se in movimento;
+	\item wireless senza mobilità (rete universitaria): un link wireless (un \textit{access point}, o \textit{relay})che offre accesso wifi, collegato a sua volta - attraverso una parabola ad alta ricezione (come per esempio la tecnologia \textit{WiMAX})- ad un dispositivo radio centrale (la \textit{stazione base}).
+\end{itemize}
+
+\paragraph{Nomadic computing}
+Insieme delle circostanze riguardanti un endpoint che si connette - anche con accesso cablato - in reti differenti (eventualmente con IP diversi).
+
+\paragraph{Mobile computing}
+Insieme delle circostanze riguardanti endpoint non connessi in maniera cablata. \\
+
+Il link che connette i dispositivi alla \textit{stazione base} lavora a livello due della pila \textit{TCP/IP}, è utiizzato come \textit{backbone link} e garantisce accesso multiplo attraverso protocolli che ne coordinano l'accesso. \\
+Esistono moltissime alternative per le tecnologie di link wireless, che garantiscono copertura di aree più o meno vaste:
+\begin{itemize}
+	\item \textit{802.11n}: 10m - 30m;
+	\item \textit{802.11a,g}: 10m - 30m;
+	\item \textit{802.11a,g point-to-point}: 50m - 5km;
+	\item \textit{802.11b}: 10m - 30m;
+	\item \textit{802.15}: 10m - 25m;
+	\item \textit{802.16} (\textit{WiMAX}): 30m - 20km;
+	\item \textit{UMTS/WCDMA-HSPDA}, \textit{CDMA2000-1xEVDO}: 30m - 15km;
+	\item \textit{UMTS/WCDMA}, \textit{CDMA2000}: 50m - 15km;
+	\item \textit{IS95}, \textit{CDMA}, \textit{GSM}: 50m - 15km.
+\end{itemize}
+
+\paragraph{Reti infrastrutturali}
+Nelle reti infrastrutturali vi sono terminali mobili, un'infrastruttura e dei punti di accesso ad essa, garantendo tipicamente accesso ad internet.
+\begin{itemize}
+	\item Profondità a singolo hop: l'host si connette ad una \textit{stazione base} che si connette ad internet;
+	\item Profondità ad hop multipli: l'host può fare da \textit{relay} per altri nodi per permettergli di connettersi a loro volta ad internet.
+\end{itemize}
+
+\paragraph{Reti \textit{ad hoc} (non infrastrutturali)}
+Nelle reti \textit{ad hoc} non esiste \textit{stazione base} e i nodi possono soltanto trasmettere agli altri nodi nell'arco di coperatura del link wireless a cui sono connessi. Inoltre i nodi si organizzano in una network indipendente, in cui essere capaci di stabilire delle rotte funzionanti.
+\begin{itemize}
+	\item Profondità a singolo hop: non c'è né \textit{stazione base}, né connessione ad internet;
+	\item Profondità ad hop multipli: non c'è né \textit{stazione base}, né connessione ad internet, ma alcuni nodi potrebbero ugualmente funzionare da \textit{relay} per permettere accessi da alcuni nodi, ad altri. Si tratta di reti \textit{manet} e/o \textit{vanet}.
+\end{itemize}
+
+\section{Caratteristiche dei link Wireless}
+Le differenze sostanziali dai link cablati:
+\begin{itemize}
+	\item La densità di potenza del segnale trasmesso - propagandosi - decresce;
+	\item Può verificarsi interferenza causate da sorgenti non necessariamente coinvolte direttamente nella connessione (e.g., dispositivi a micro-onde, motori, \ldots);
+	\item Propagazione \textit{multipath}: il segnale radio in base alla diffrazione che ne varia il percorso, arriva in momenti diversi in punti diversi.
+\end{itemize}
+Tutte queste differenze rendono la comunicazione wireless molto più difficile da gestire rispetto alla comune rete cablata.
+
+\paragraph{SNR}
+Il \textit{signal-to-noise ratio} è il rapporto signale-rumore, che deve essere entro una certa soglia per poter garantire ricezione. Chiaramente può variare nel tempo. E' importante perché è collegato alla probabilità di errore. \\
+
+Il link wireless rappresenta un canale \textit{broadcast}: a creare nuovi problemi è la gestione della interazioni multiple tra un \textit{sender} ed un \textit{receiver} wireless. Il motivo per cui non è possibile utilizzare il protocollo \textit{CSMA/CD} è rappresentato dal problema dell'\textit{hidden terminal}: vi sono tre terminali \textit{A}, \textit{B} e \textit{C}, dove \textit{A} e \textit{B} possono comunicare senza problemi, così come \textit{B}, \textit{C}, ma non come \textit{A} e \textit{C}, perché esiste un impedimento fisico tra i due. Ancora può verificarsi il problema dell'attenuazione del segnale, dove \textit{B} si trova nel raggio trasmissivo di \textit{A} e \textit{C}, ma \textit{A} e \textit{C} non sono nel raggio trasmissivo l'uno dell'altro; anche se decidessero comunque di provare a trasmettersi, porterebbero ad una collisione su \textit{B}. \\
+Un'alternativa sviluppata è il Code Division Multiple Access (CDMA): viene utilizzato in diversi standard per canali di broadcast wireless. Ad ogni utente viene assegnato un codice univoco, tutti gli utenti condividono la stessa banda di frequenza e ad ogni utente viene assegnata una sequenza che lo autentichi (come il codice univoco): quando avviene la trasmissione, viene moltiplicato quanto da trasmettere con la sequenza, detta \textit{chipping code}. CDMA passa per tutta una serie di difficoltà, che permettono il sovrapporsi di trasmissioni, garantendo la capacità di decomporle autonomamente.
+
+\paragraph{IEEE 802.11}
+Diverse tecnologie (più è alto lo spettro della banda, più si è aperti ad attenuazioni), che però usano tutte il protocollo \textit{CSMA/CA} per l'accesso multiplo e tutte supportano sia una rete di tipo infrastrutturale che non:
+\begin{itemize}
+	\item 802.11b: spettro non licenziato tipicamente di 2.4-5GHz, raggiunge un massimo di 11Mbps e tutti gli host usano lo stesso chipping code;
+	\item 802.11a: spettro di 5-6GHz, con un tetto di 54Mbps;
+	\item 802.11g: spettro di 2.4-5GHz, con un tetto di 54Mbps;
+	\item 802.11n (con più trasmettenti): spettro di 2.4-5GHz, con un tetto di 200Mbps.
+\end{itemize}
+
+In una LAN wireless, il \textit{BSS} (\textit{Basic Service Set}) è una cella dell'infrastruttura, che contiene gli host wireless, l'access point (AP) e che supporta la modalità \textit{ad hoc}. \\
+Un'espansione del \textit{CSMA/CA} prevede che un comportamento diverso da parte del sender: se il canale è libero per il \textit{DIFS} (ovvero il \textit{Distributed InterFrame Spacing}), allora trasmetto l'intero frame, altrimenti aspetto per un intervallo casuale di temp, al termine del quale trasmetto soltanto se il canale è libero, altrimenti lo raddoppio. Una volta trasmesso il dato, il ricevitore risponde con un ACK dopo un \textit{SIFS} (sempre minore del \textit{DIFS}, per garantire che altri non confondano questo tempo come canale libero). \\
+Per evitare le collisioni invece, il sender prima trasmette un piccolo pacchetto chiamato \textit{RTS} (\textit{request-to-send}): se questo non cattura collisioni, allora apro la trasmissione effettiva. In risposta all'\textit{RTS}, vi è il \textit{CTS}.

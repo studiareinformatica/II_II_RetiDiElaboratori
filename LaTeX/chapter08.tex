@@ -1,10 +1,10 @@
-Per anni - nonostante già esistessero le reti mobili - si accedeva ad internet con dispositivi fissi cablati. Negli ultimi anni, invece, la situazione si è evoluta drasticamente, grazie all'arrivo degli smartphones: si è passati da un accesso cablato ad un accesso wireless/mobile ed è cambiato il tipo e l'intensità di traffico, molto più multimediale.
+Per anni - nonostante già esistessero le reti mobili - si è usato accedere ad internet con dispositivi fissi cablati. Negli ultimi anni, invece, la situazione si è evoluta drasticamente, grazie all'arrivo degli smartphones: si è passati da un accesso cablato ad un accesso wireless/mobile ed è cambiato il tipo e l'intensità di traffico, molto più multimediale.
 Diventa quindi di rilevante importanza la questione della gestione dei consumi energetici. \\
 I dispositivi che accedono ad internet sono molto variegati: da desktop/laptop, a palmari, a smartphone, a dispositivi dell'\textit{internet delle cose}. Tutto risulta essere connesso ed interagire con internet. I punti di accesso ad internet diventano sempre più radio. \\
 Occorre quindi imparare a gestire questa tipologia di accesso, che si articola di due tipi:
 \begin{itemize}
 	\item wireless \textit{anywhere/anytime}: possibilità di accedere ad internet da mobile anche se in movimento;
-	\item wireless senza mobilità (rete universitaria): un link wireless (un \textit{access point}, o \textit{relay})che offre accesso wifi, collegato a sua volta - attraverso una parabola ad alta ricezione (come per esempio la tecnologia \textit{WiMAX})- ad un dispositivo radio centrale (la \textit{stazione base}).
+	\item wireless senza mobilità (rete universitaria): un link wireless (un \textit{access point}, o \textit{relay}) che offre accesso wifi, collegato a sua volta - attraverso una parabola ad alta ricezione (come per esempio la tecnologia \textit{WiMAX}) - ad un dispositivo radio centrale (la \textit{stazione base}).
 \end{itemize}
 
 \paragraph{Nomadic computing}
@@ -13,7 +13,7 @@ Insieme delle circostanze riguardanti un endpoint che si connette - anche con ac
 \paragraph{Mobile computing}
 Insieme delle circostanze riguardanti endpoint non connessi in maniera cablata. \\
 
-Il link che connette i dispositivi alla \textit{stazione base} lavora a livello due della pila \textit{TCP/IP}, è utiizzato come \textit{backbone link} e garantisce accesso multiplo attraverso protocolli che ne coordinano l'accesso. \\
+Il link che connette i dispositivi alla \textit{stazione base} lavora a livello due della pila \textit{TCP/IP}, è utilizzato come \textit{backbone link} e garantisce accesso multiplo attraverso protocolli che ne coordinano l'accesso. \\
 Esistono moltissime alternative per le tecnologie di link wireless, che garantiscono copertura di aree più o meno vaste:
 \begin{itemize}
 	\item \textit{802.11n}: 10m - 30m;
@@ -45,13 +45,13 @@ Nelle reti \textit{ad hoc} non esiste \textit{stazione base} e i nodi possono so
 Le differenze sostanziali dai link cablati:
 \begin{itemize}
 	\item La densità di potenza del segnale trasmesso - propagandosi - decresce;
-	\item Può verificarsi interferenza causate da sorgenti non necessariamente coinvolte direttamente nella connessione (e.g., dispositivi a micro-onde, motori, \ldots);
+	\item Possono verificarsi interferenze causate da sorgenti non necessariamente coinvolte direttamente nella connessione (e.g., dispositivi a micro-onde, motori, \ldots);
 	\item Propagazione \textit{multipath}: il segnale radio in base alla diffrazione che ne varia il percorso, arriva in momenti diversi in punti diversi.
 \end{itemize}
 Tutte queste differenze rendono la comunicazione wireless molto più difficile da gestire rispetto alla comune rete cablata.
 
 \paragraph{SNR}
-Il \textit{signal-to-noise ratio} è il rapporto signale-rumore, che deve essere entro una certa soglia per poter garantire ricezione. Chiaramente può variare nel tempo. E' importante perché è collegato alla probabilità di errore. \\
+Il \textit{signal-to-noise ratio} è il rapporto segnale-rumore, che deve essere entro una certa soglia per poter garantire ricezione. Chiaramente può variare nel tempo. E' importante perché è collegato alla probabilità di errore. \\
 
 Il link wireless rappresenta un canale \textit{broadcast}: a creare nuovi problemi è la gestione della interazioni multiple tra un \textit{sender} ed un \textit{receiver} wireless. Il motivo per cui non è possibile utilizzare il protocollo \textit{CSMA/CD} è rappresentato dal problema dell'\textit{hidden terminal}: vi sono tre terminali \textit{A}, \textit{B} e \textit{C}, dove \textit{A} e \textit{B} possono comunicare senza problemi, così come \textit{B}, \textit{C}, ma non come \textit{A} e \textit{C}, perché esiste un impedimento fisico tra i due. Ancora può verificarsi il problema dell'attenuazione del segnale, dove \textit{B} si trova nel raggio trasmissivo di \textit{A} e \textit{C}, ma \textit{A} e \textit{C} non sono nel raggio trasmissivo l'uno dell'altro; anche se decidessero comunque di provare a trasmettersi, porterebbero ad una collisione su \textit{B}. \\
 Un'alternativa sviluppata è il Code Division Multiple Access (CDMA): viene utilizzato in diversi standard per canali di broadcast wireless. Ad ogni utente viene assegnato un codice univoco, tutti gli utenti condividono la stessa banda di frequenza e ad ogni utente viene assegnata una sequenza che lo autentichi (come il codice univoco): quando avviene la trasmissione, viene moltiplicato quanto da trasmettere con la sequenza, detta \textit{chipping code}. CDMA passa per tutta una serie di difficoltà, che permettono il sovrapporsi di trasmissioni, garantendo la capacità di decomporle autonomamente.
@@ -66,8 +66,8 @@ Diverse tecnologie (più è alto lo spettro della banda, più si è aperti ad at
 \end{itemize}
 
 In una LAN wireless, il \textit{BSS} (\textit{Basic Service Set}) è una cella dell'infrastruttura, che contiene gli host wireless, l'access point (AP) e che supporta la modalità \textit{ad hoc}. \\
-Un'espansione del \textit{CSMA/CA} prevede che un comportamento diverso da parte del sender: se il canale è libero per il \textit{DIFS} (ovvero il \textit{Distributed InterFrame Spacing}), allora trasmetto l'intero frame, altrimenti aspetto per un intervallo casuale di temp, al termine del quale trasmetto soltanto se il canale è libero, altrimenti lo raddoppio. Una volta trasmesso il dato, il ricevitore risponde con un ACK dopo un \textit{SIFS} (sempre minore del \textit{DIFS}, per garantire che altri non confondano questo tempo come canale libero). \\
-Per evitare le collisioni invece, il sender prima trasmette un piccolo pacchetto chiamato \textit{RTS} (\textit{request-to-send}): se questo non cattura collisioni, allora apro la trasmissione effettiva. In risposta all'\textit{RTS}, vi è il \textit{CTS} (\textit{clear-to-send}?).
+Un'espansione del \textit{CSMA/CA} prevede un comportamento diverso da parte del sender: se il canale è libero (dato ottenibile tramite il \textit{DIFS}, il \textit{Distributed InterFrame Spacing}), allora trasmetto l'intero frame, altrimenti aspetto per un intervallo casuale di tempo, al termine del quale trasmetto soltanto se il canale è libero, altrimenti lo raddoppio. Una volta trasmesso il dato, il ricevitore risponde con un ACK dopo un \textit{SIFS} (sempre minore del \textit{DIFS}, per garantire che altri non confondano questo tempo come canale libero). \\
+Per evitare le collisioni invece, il sender prima trasmette un piccolo pacchetto chiamato \textit{RTS} (\textit{request-to-send}): se questo non cattura collisioni, allora apro la trasmissione effettiva. In risposta all'\textit{RTS}, vi è il \textit{CTS} (\textit{clear-to-send}).
 Poiché questo flusso porta ad un \textit{overhead} dovuto alle trasmissioni di \textit{RTS} e \textit{CTS}, \textit{802.11} include una ottimizzazione sull'adattabilità alla banda.
 
 \paragraph{Trame}
@@ -81,7 +81,7 @@ Il formato della trama in \textit{802.11} è dato da:
 		\item \textit{indirizzo 2}: sorgente (indirizzo MAC del wireless host o AP che trasmette il frame);
 		\item \textit{indirizzo 3}: indirizzo MAC dell'interfaccia router al quale l'AP è conneso (colui che fa da ponte per internet, per esempio).
 	\end{itemize}
-	\item 2 byte di \textit{seq control};
+	\item 2 byte di \textit{sequence control};
 	\item 6 byte per l'\textit{indirizzo 4} (usato solo nella modalità ad hoc);
 	\item 0-2312 byte di \textit{payload};
 	\item 4 byte di \textit{CRC}.
@@ -98,14 +98,14 @@ Lo standard associato è l'\textit{802.15} e il suo obiettivo è quello di avere
 La modalità di comunicazione è \textit{master/slave}, dove gli slave fanno richieste unicamente al master, che risponde a ciascuna di esse.
 Si tratta di una rete \textit{ad hoc}, in cui la trasmissione ha una banda pari a 2,4-5 GHz e raggiunge una capacità trasmissiva massima di 721kbps. \\
 Il primo standard fu rilasciato nel 1999. Il \textit{Bluetooth Special Interest Group} conta oltre 1800 membri, tra cui Ericsson, Nokia, IBM, Intel, Toschiba, Microsoft, Lucent, 3Com, Motorola, e così via \ldots \\
-La cosa più interessante è che viene adoperato un approccio totalmente nuovo: il \textit{Frequency Hopping Spread Spectrum}. I deviecs seguono una sequenza \textit{FHSS} pseudocasuale generata utilizzando l'ID del master (accessibile non solo al msater ma anche a tutti gli slaves). La frequenza usata per la trasmissione cambia per ogni pacchetto, garantendo scarsa interferenza ed elevata sicurezza. \\
+La cosa più interessante è che viene adoperato un approccio totalmente nuovo: il \textit{Frequency Hopping Spread Spectrum}. I devices seguono una sequenza \textit{FHSS} pseudocasuale generata utilizzando l'ID del master (accessibile non solo dal master ma anche da tutti gli slaves). La frequenza usata per la trasmissione cambia per ogni pacchetto, garantendo scarsa interferenza ed elevata sicurezza. \\
 I devices bluetooth sono organizzati in \textit{piconets}, cluster formati da un master e diversi slaves (per un massimo di 7 in comunicazione). La formazione di una \textit{scatternet} (interconnessione di \textit{piconet}) è definita da tre problemi fondamentali:
 \begin{itemize}
 	\item la scoperta di devices (tramite la procedura bluetooth standard \textit{inquiry}/\textit{inquiry scan});
 	\item la formazione di una \textit{piconet};
 	\item l'interconessione delle \textit{piconet}.
 \end{itemize}
-Di fondamentale importanza è il fatto che master sia appartenenete in una \textit{piconet} alla volta, perché altrimenti l'attività presso di una comprometterebbe la necessità dell'attività dello stesso master in un'altra \textit{piconet}. \\
+Di fondamentale importanza è il fatto che il master sia appartenenete ad una \textit{piconet} per volta, perché altrimenti l'attività presso di una comprometterebbe la necessità dell'attività dello stesso master in un'altra \textit{piconet}. \\
 Il punto dolente della tecnologia bluetooth è la \textit{device discovery}: impiega troppo tempo per il detecting ed è troppo altalenante nel mantenere la connnessione. Questa fase è definita dall'\textit{inquiry scan}: viene fatto uno scan per individuare tutti i possibili nodi, ai quali viene mandato un pacchetto \textit{FHS} che mette al corrente dell'ID del master, così da permettere il calcolo della sequenza. Un nodo può essere o in modalità \textit{inquiry} o \textit{inquiry scan}: si può stabilire quindi una connesione soltanto tra nodi in modalità opposta. Per questo ogni nodo salta costantemente da uno stato di \textit{inquiry} a \textit{inquiry scan}, e viceversa. \\
 Se esistono piu di 7 nodi in una \textit{piconet}, occorre formare una \textit{scatternet}. Per gestirle coerentemente, vengono utilizzati due tipi di scheduling: lo scheduler \textit{interpiconet} e \textit{intrapiconet}. Il primo si occupa di gestire quando e per quanto tempo considerare uno slave come attivo in una data \textit{piconet}. Il secondo invece determina lo schema da adottare in ciascuna \textit{piconet}: per esempio, in maniera proporzionale alla quantità di dati trasmessi da un device, saranno allocate risorse per questo, in modo tale da evitare di fare \textit{polling} continuo su device poco attivi, risparmiando risorse. L'obiettivo di entrambi è fare \textit{load balancing}.
 
@@ -121,7 +121,7 @@ Uno dei problemi più importanti è quello della mobilità, in quanto occorre ga
 	\item \textit{let end-system handle it}: lo stesso end-system notifica ogni spostamento ai vari router.
 \end{itemize}
 Sostanzialmente, ogni device ha una \textit{home network} (la propria rete, la rete casalinga), dentro la quale gli viene assegnato un IP permanente che è sempre utilizzato per raggiungere il device. All'interno della stessa rete c'è un \textit{home agent}, il responsabile della rete. Quando ci si muove, si raggiunge una \textit{visited network}, dove il responsabile è un \textit{foreign agent}: al device viene assegnato un IP temporaneo \textit{care-of-address} valido in quella \textit{visited network}. Come può un qualsiasi altro device a raggiungere quel device? Nel momento in cui quest'ultimo entra in una \textit{visited network}, deve contattare il \textit{foreign agent} per avvertirlo che si trova ora in quella rete e che ha un dato indirizzo permanente. L'agent utilizzerà quell'indirizzo per raggiungere il suo \textit{home agent}, segnalandogli lo spostamento. Allora il device esterno che desiderava contattarlo, conoscendo l'IP permanente del device, sarà in grado di contattare la \textit{home network} che lo reindizzerà alla \textit{visited network}. \\
-Questo sistema di routing è detto \textit{routing indiretto}: l'inefficienza è data dal fatto che se due device si trovano entrambi in una stessa \textit{visisted network}, per contattarsi passeranno comunque ad interrogare la \textit{home network} di ciascuno. L'alternativa è il \textit{routing diretto}: viene fatta - in fase di creazione di una connessione tra due devices - richiesta all'\textit{home agent} di ciascuno. Una volta ottenuta la risposta, non viene più richiesto, e viene utilizzato quello che ho chiesto in fase di configurazione. Il rischio è che, se nel frattempo uno dei devices si sposta, l'indirizzo risulterà sbagliato. Allora si introduce il concetto di \textit{anchor foreign agent}, il precedente \textit{foreign agent} di un device, il quale verrò contattato in ogni spostamento dello stesso device in nuove \textit{visited network}.
+Questo sistema di routing è detto \textit{routing indiretto}: l'inefficienza è data dal fatto che se due device si trovano entrambi in una stessa \textit{visisted network}, per contattarsi passeranno comunque ad interrogare la \textit{home network} di ciascuno. L'alternativa è il \textit{routing diretto}: viene fatta - in fase di creazione di una connessione tra due devices - richiesta all'\textit{home agent} di ciascuno. Una volta ottenuta la risposta, non viene più richiesto, e viene utilizzato quello che ho chiesto in fase di configurazione. Il rischio è che, se nel frattempo uno dei devices si sposta, l'indirizzo risulterà sbagliato. Allora si introduce il concetto di \textit{anchor foreign agent}, il precedente \textit{foreign agent} di un device, il quale verrà contattato in ogni spostamento dello stesso device in nuove \textit{visited network}.
 
 \paragraph{Agent discovery}
-La scoperta dell'agent della rete avviene attraverso il broadcasting di un messaggio \textit{ICMP}, detto \textit{advertisement}. La notifica degli agent invece per l'avviso del nuovo indirizzo nella \textit{visited network} invece è fatto tramite datagrammi \textit{UDP} sulla porta 434.
+La scoperta dell'agent della rete avviene attraverso il broadcasting di un messaggio \textit{ICMP}, detto \textit{advertisement}. La notifica degli \textit{agent} invece per l'avviso del nuovo indirizzo nella \textit{visited network} è fatto tramite datagrammi \textit{UDP} sulla porta 434.

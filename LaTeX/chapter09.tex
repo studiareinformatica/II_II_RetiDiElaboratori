@@ -50,3 +50,70 @@ Con la tecnica ADPCM si riesce a garantire un bitrate di 32kbps in campo telefon
 \subsection{Source Codecs}
 Questi codificatori sono detti anche \textit{Vocoders} perchè si basano su modelli di generazione della voce umana che permettono di "togliere la ridondanza" da segmenti vocali fino ad un'informazione base sufficiente a riprodurre la voce.\\
 Sono caratterizzati da un'elevata complessità, ritardi mediamente elevati e forte sensibilità ad errori, rumori di fondo e suoni non umani.
+
+\section{Multimedia: video}
+Un'immagine digitale è un array di pixel rappresentati da bit.\\
+Un \textit{video} è una sequenza di immagini digitali visualizzate a tasso costante.\\
+Per codificare un video si sfrutta la ridondanza spaziale (nelle immagini) e temporale (da un'immagine all'altra) per ridurre il numero di bit necessari per la codifica.
+
+\paragraph{Streaming stored videos}
+Nel progettare meccanismi di riproduzione di video locali, bisogna tenere conto di alcuni requisiti. Tra questi, uno dei più significativi ed impegnativi è quello del playout continuo: una volta iniziato il playout del client, il playback deve corrispondere al tempo originale, indipendentemente dai ritardi di rete (questo richiederà quindi un buffer client-side). Altri esempi sono l'interattività (possibilità di mettere in pausa, saltare da un fotogramma all'altro, mandare avanti velocemente) e la ritrasmissione di pacchetti persi.\\
+% manca un pezzo
+
+\section{Streaming multimedia: UDP}
+Il server invia a tasso appropriato per il client. Spesso il tasso di invio e il tasso di codifica sono uguali e costanti; il tasso di trasmissione può essere indipendente dal livello di trasmissione. Il ritardo di playout è molto breve (solitamente da 2 a 5 secondi) per rimuovere il jitter; per quanto riguarda l'aspetto dell'\textit{error recovery}, va ricordato che questo è effettuato solo a livello applicativo. Bisogna inoltre tenere conto del fatto che UDP potrebbe essere bloccato dai firewall.
+
+\section{Streaming multimedia: HTTP}
+Con lo streaming HTTP, i file multimediali sono recuperati direttamente tramite HTTP GETs e inviati via TCP a tasso più alto possibile.\\
+È necessario un maggiore playout delay che tenga conto della variabilità delle sorgenti nel tempo.\\
+Un \textit{hyperlink} per un file multimediale contiene l'URL dell'audio/video in questione. Quando un utente clicca su di esso, la risposta include un header con il tipo di contenuto; il browser esamina l'header e lancia il riproduttore associato.\\
+Con questo metodo la possibilità di perdita di informazioni è molto alta (playout buffer, playout delay, prefetching...). Per minimizzare gli errori di trasmissione sono state adottate delle tecniche di codifica che tentino il più possibile di limitare flipping etc., adottando policies che preferiscono molta ridondanza purchè ci sia error detection. In questo caso, il \textit{throughput} varia da utente ad utente.
+
+\paragraph{Dynamic Adaptive Streaming over Http}
+Lo stesso contenuto è memorizzato sul server per codifiche diverse che variano in base all'endsystem che lo richiede. Solitamente è preferita una qualità più bassa per evitare errori di trasmissione.\\
+Lato server, il file è diviso in \textit{chunks}, ognuno dei quali è conservato e codificato a diverse frequenze.\\
+Il client misura la \textit{bandwidth}, consulta il manifest e richiede un chunk alla volta. Deve essere in grado di determinare quando richiedere il chunk, come richiederlo e \textit{a chi} richiederlo: i contenuti sono infatti replicati in batterie di server che possono essere geograficamente distribuiti su server propri o di hosting (CDN) secondo due logiche:
+\begin{itemize}
+    \item \textit{enter deep}: i server sono in prossimità degli ISP, vicino agli end users;
+    \item \textit{bring home}: i server sono posizionati in cluster presso POP (points of presence)
+\end{itemize}
+
+\section{Voice Over IP}
+Caratteristiche particolari:
+\begin{itemize}
+    \item forti requisiti in termini di ritardo (è considerato 'buono' fino a 150 millisecondi, 400 è il massimo tollerato)
+    \item inizializzazione di sessione (determinare come raggiungere un utente)
+    \item codifica
+\end{itemize}
+I pacchetti vengono generati solo se non c'è silenzio.\\
+Si sceglie di trasmettere a 64Kbps solo se c'è segnale audio sul canale; altrimenti viene inviato un suono di sottofondo precedentemente campionato.\\
+Tra i problemi di questa tecnica:
+\begin{itemize}
+    \item network loss
+    \begin{itemize}
+        \item router buffer overflow
+        \item congestione
+    \end{itemize}
+    \item delay loss - datagrammi IP in ritardo
+    \item tolleranza limitata per la perdita di pacchetti: da 1\% a 10\%
+    \item i pacchetti che superano il ritardo tollerato vengono solitamente scartati
+\end{itemize}
+Il ricevente proverà a riprodurre ogni chunk esattamente \textit{q} millisecondi dopo la sua generazione (necessariamente $ q < 400msec $). Ogni chunk presenterà un timestamp t; il playout sarà $ p+q $. Appare quindi chiaro che più $ q $ è alto, minore è la perdita di pacchetti; più $ q $ è basso, migliore è l'esperienza utente (per le prestazioni).\\
+Si parla di \textbf{adaptive playout delay} perchè $ q $ varia in base al tipo di trasmissione; si avrà un ritardo maggiore appena finito un periodo di silenzio poichè impercettibile per l'utente.\\
+Per quanto riguarda la perdita di informazioni, è adottata una \textbf{Forward Error Correction}: sono inviati abbastanza bit da permettere il recupero delle informazioni dallo strato applicativo, senza bisogno di ritrasmissione.\\
+Un esempio di FEC può essere l'invio, ogni $ n $ chunk, di un chunk $ n + 1 $ di ridondanza calcolato come XOR dei precedenti.\\
+Una FEC molto utilizzata prevede che i pacchetti, normalmente inviati con codifica PCM a 64Kbps, presentino anche una codifica GSM a 13Kbps del pacchetto precedente. In questo modo, in caso di perdita di un pacchetto, si potrà comunque recuperare una sua versione a bassa qualità con il pacchetto successivo.\\
+Uno degli applicativi VOIP più famosi, \textbf{Skype}, utilizza UDP per la trasmissione dati, TCP per controllo e recovery (in caso il firewall blocchi UDP), la codifica FEC a livello applicativo e conserva inoltre le porte e gli IP (SN).
+
+\paragraph{Real Time Streaming Protocol}
+Questo protocollo risiede sugli endsystem (tra UDP e lo strato applicativo) e specifica la struttura dei pacchetti trasportanti audio/video. La sua unica funzione è estendere l'header dei pacchetti per fornire:
+\begin{itemize}
+    \item time stamping
+    \item sequence numbering
+    \item identificazione tipo di payload
+    \item IP/porte
+\end{itemize}
+
+\paragraph{Real Time Control Protocol}
+Com'è facilmente intuibile, solitamente è associato a RTSP e funge da canale di controllo dedicato.\\
+Ogni fruitore di RTSP invia periodicamente pacchetti di controllo RTCP contenenti report/feedback (numero di pacchetti inviati e ricevuti, jitter etc.). Tenta di non consumare più del 5\% della banda totale.

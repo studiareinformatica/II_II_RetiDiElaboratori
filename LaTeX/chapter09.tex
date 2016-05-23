@@ -1,0 +1,52 @@
+\section{Multimedia: audio}
+I segnali audio analogici sono campionati a tasso costante (8000 campioni/secondo per il telefono, 44100 campioni/secondo per i CD...); ogni campione viene quantizzato (per esempio arrotondato) ed ogni valore quantizzato viene rappresentato da un flusso di bit attraverso appositi \textit{codificatori vocali}.\\
+Questi codificatori vocali possono essere di tre tipi:
+\begin{itemize}
+	\item waveform codecs
+	\item source codecs (\textit{vocoders})
+	\item hybrid codecs
+\end{itemize}
+
+\subsection{Waveform Codecs}\hfill\\
+Non avendo nessuna conoscenza a priori di come il segnale sia stato generato, è necessario sapere la banda del segnale (minore ai 4KHz per la telefonia classica) e il massimo rumore di quantizzazione tollerabile.\\
+Questo tipo di codifica è caratterizzato da un'alta qualità finale, una bassa complessità e un basso ritardo, e da robustezza agli errori e al rumore di fondo.
+
+\paragraph{Pulse Code Modulation}
+Questo metodo provvede a salvare i dati audio senza nessun tipo di compressione dati; la forma d'onda viene direttamente digitalizzata. In questo modo, i file risultanti sono di elevate dimensioni ma non richiedono elevata potenza di calcolo per essere riprodotti.\\
+Si assume una banda  $ B = 4KHz $ e una frequenza di campionamento $ Bc=8KHz $m 8 bit/campione, 64kb/s.\\
+L'onda è campionata a intervalli regolari sull'asse delle x; per ogni campione, uno dei valori disponibili sull'asse delle y è scelto da opportuni algoritmi (in genere viene approssimato al più vicino). Questo produce una rappresentazione discreta del segnale di ingresso che può essere facilmente codificata in digitale per essere memorizzata e manipolata. Queste operazioni sono effettuate da un unico circuito integrato chiamato ADC (analog-to-digital converter) a cui va fornito solamente il clock e l'alimentazione, in uscita produce direttamente la codifica digitale del segnale analogico in ingresso.\\ 
+Per la \textit{demodulazione} (quindi per ricavare in ricezione il segnale campionato di ingresso), passato ogni periodo di campionamento è letto il valore seguente e l'uscita si porta quasi istantaneamente al nuovo valore. Come risultato di queste variazioni istantanee si avrà un alto numero di armoniche indesiderate (maggiori di $ \frac{1}{2} f_c $ ) che si possono eliminare attraverso un filtro analogico. Teoricamente è impossibile rappresentare discretamente un segnale con banda infinita ma secondo il teorema del campionamento se si utilizza una frequenza di campionamento molto più alta di quella del segnale (pari a due volte la sua banda di frequenza) il segnale ricostruito in ricezione non si discosterà molto da quello originario. L'elettronica utilizzata per riprodurre un accurato segnale analogico da dati discreti è simile a quella usata per generare il segnale digitale. Questi dispositivi sono chiamati DAC (digital-to-analog converters), e operano in modo simile agli ADC. Producono in uscita una tensione o una corrente (dipende dal tipo) secondo il valore presente in ingresso. Questo segnale di uscita viene generalmente filtrato e amplificato prima di essere utilizzato.\\
+La quantizzazione del segnale può essere:
+\begin{itemize}
+	\item \textbf{Quantizzazione uniforme}	
+	\begin{itemize}
+		\item L'errore di quantizzazione è fisso (minore di $ \frac{q}{2} $, con $ q $ passo di quantizzazione)
+		\item Servono 12 bit/campione per riuscire ad ottenere un errore di quantizzazione sufficiente; basso nel caso di valori piccoli.
+	\end{itemize}
+	\item \textbf{Quantizzazione non uniforme}
+	\begin{itemize}
+		\item Valori grandi possono sopportare errori maggiori
+		\item Sono sufficienti 8 bit/campione in questo caso
+	\end{itemize}
+\end{itemize}
+
+\paragraph{Differential PCM}
+Aggiunge alcune funzionalità rispetto a PCM basandosi sulla predizione dei campioni del segnale. L'input può essere analogico o digitale.\\
+Se l'input è un segnale analogico a tempo continuo, deve essere campionato prima per fare in modo che l'input dell'encoder DPCM sia un segnale a tempo discreto.\\
+Abbiamo due alternative:
+\begin{enumerate}
+	\item prendere i valori di due campioni consecutivi; se sono campioni analogici, quantizzarli; restituire la differenza tra il primo e il secondo.
+	\item invece di prendere la differenza relativa ad un campione precendente, prendere la differenza relativa all'output di un modello locale del processo di decodifica; in questa opzione la differenza può essere quantizzata - ciò consente di incorporare una perdita controllata nella codifica.
+\end{enumerate}
+Applicando uno di questi due processi, la ridondanza a breve termine del segnale è eliminata; i vantaggi di questo metodo sono una notevole riduzione della velocità di emissione (da 64Kbps a 32Kbps) e  una maggiore qualità datarate disponibile per ogni canale vocale.\\
+In questo modo, inoltre, i campioni vocali successivi sono correlati a quelli precedenti, ed è possibile utilizzare metodi di predizione per valutare il campione successivo noti i precedenti.\\
+L'unica informazione trasmessa è la differenza tra valore predetto e valore reale. A causa della correlazione la varianza della differenza è minore ed è possibile codificarla con un minor numero di bit.\\
+
+\paragraph{Adaptive DPCM}
+Questo tipo di compressione è un'estensione della codifica digitale PCM di base, usata largamente soprattutto nel campo della telefonia fissa.\\
+A differenza della PCM di base, che campiona il segnale audio, lo quantizza secondo un codificatore non lineare e trasmette direttamente i valori quantizzati in formato numerico, l'ADPCM si basa sulla predicibilità di un campione a partire da un numero di campioni precedenti ad esso. È quindi sufficiente predire il campione n-esimo, valutare l'errore rispetto a quello reale e trasmettere soltanto l'errore di predizione. Dal canto suo, il decoder farà la stessa predizione e sommerà ad essa l'errore di predizione ricevuto. In questo modo il tutto funziona se la varianza dell'errore è minore della varianza dei campioni, nel senso che si avrà un reale risparmio di bit da trasmettere.\\
+Con la tecnica ADPCM si riesce a garantire un bitrate di 32kbps in campo telefonico, contro i 64kbps del PCM tradizionale.
+
+\subsection{Source Codecs}
+Questi codificatori sono detti anche \textit{Vocoders} perchè si basano su modelli di generazione della voce umana che permettono di "togliere la ridondanza" da segmenti vocali fino ad un'informazione base sufficiente a riprodurre la voce.\\
+Sono caratterizzati da un'elevata complessità, ritardi mediamente elevati e forte sensibilità ad errori, rumori di fondo e suoni non umani.

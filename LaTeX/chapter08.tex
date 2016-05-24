@@ -27,6 +27,18 @@ Esistono moltissime alternative per le tecnologie di link wireless, che garantis
 	\item \textit{IS95}, \textit{CDMA}, \textit{GSM}: 50m - 15km.
 \end{itemize}
 
+\paragraph{Protocollo CDMA}
+Il protocollo \textit{Code Division Multiple Access} è largamente utilizzato nell'ambito delle reti mobili: un solo canale occupa l'intera ampiezza di banda, e tutte le stazioni possono inviare contemporaneamente. \\
+Si basa sulla teoria di codifica: ad ogni stazione viene assegnato un codice che è una sequenza di numeri, chiamati \textit{chip}, che rappresenta una \textit{sequenza ortogonale}, che prevede che:
+\begin{enumerate}
+	\item Ogni sequenza composta da $n$ elementi ($n = $ stazioni, potenza di 2);
+	\item Se moltiplichiamo una sequenza per un numero, goni elemento della sequenza viene moltiplicato per quel numero;
+	\item Se moltiplichiamo due sequenze uguali e sommiamo i risultati otteniamo $n$;
+	\item Se moltiplichiamo due sequenze diverse e sommiamo i risultato otteniamo 0;
+	\item Sommare due sequenze significa sommare gli elementi corrispondenti.
+\end{enumerate}
+Si stabilisce una regola per la codifica: il bit di dati 0 corrisponde a $-1$, il bit di dati 1 corrisponde a $+1$, e il silenzio corrisponde a 0. Dunque, la sequenza risultante nel canale sarà la somma delle sequenze inviate dalle stazioni.
+
 \paragraph{Reti infrastrutturali}
 Nelle reti infrastrutturali vi sono terminali mobili, un'infrastruttura e dei punti di accesso ad essa, garantendo tipicamente accesso ad internet.
 \begin{itemize}
@@ -65,10 +77,18 @@ Diverse tecnologie (più è alto lo spettro della banda, più si è aperti ad at
 	\item 802.11n (con più trasmettenti): spettro di 2.4-5GHz, con un tetto di 200Mbps.
 \end{itemize}
 
-In una LAN wireless, il \textit{BSS} (\textit{Basic Service Set}) è una cella dell'infrastruttura, che contiene gli host wireless, l'access point (AP) e che supporta la modalità \textit{ad hoc}. \\
-Un'espansione del \textit{CSMA/CA} prevede un comportamento diverso da parte del sender: se il canale è libero (dato ottenibile tramite il \textit{DIFS}, il \textit{Distributed InterFrame Spacing}), allora trasmetto l'intero frame, altrimenti aspetto per un intervallo casuale di tempo, al termine del quale trasmetto soltanto se il canale è libero, altrimenti lo raddoppio. Una volta trasmesso il dato, il ricevitore risponde con un ACK dopo un \textit{SIFS} (sempre minore del \textit{DIFS}, per garantire che altri non confondano questo tempo come canale libero). \\
+In una LAN wireless, il \textit{BSS} (\textit{Basic Service Set}) è una cella dell'infrastruttura, che contiene gli host wireless, l'access point (AP) e che supporta la modalità \textit{ad hoc}. Una struttura \textit{ESS} (\textit{Extended Service Set}) è costituita da due o più \textit{BSS} con infrastruttura, dove i \textit{BSS} sono collegati tramite un sistema di distribuzione che è una rete cablat o wireless. \\
+Un'espansione del \textit{CSMA/CA} prevede un comportamento diverso da parte del sender: se il canale è libero (dato ottenibile tramite il \textit{DIFS}, il \textit{Distributed InterFrame Spacing}, che altro non è che un intervallo di tempo costante), allora trasmetto l'intero frame, altrimenti aspetto per un intervallo casuale di tempo, al termine del quale trasmetto soltanto se il canale è libero, altrimenti lo raddoppio. Una volta trasmesso il dato, il ricevitore risponde con un ACK dopo un \textit{SIFS} (sempre minore del \textit{DIFS}, per garantire che altri non confondano questo tempo come canale libero). \\
 Per evitare le collisioni invece, il sender prima trasmette un piccolo pacchetto chiamato \textit{RTS} (\textit{request-to-send}): se questo non cattura collisioni, allora apro la trasmissione effettiva. In risposta all'\textit{RTS}, vi è il \textit{CTS} (\textit{clear-to-send}).
 Poiché questo flusso porta ad un \textit{overhead} dovuto alle trasmissioni di \textit{RTS} e \textit{CTS}, \textit{802.11} include una ottimizzazione sull'adattabilità alla banda.
+
+\paragraph{Accesso e associazione}
+Lo spettro 2.4GHz-2.485GHz è diviso in 11 canali parzialmente sovrapposti ed è l'amministratore dell'AP a sceglierlo. Sono possibili interferenze, se AP vicini utilizzano lo stesso canale: il numero massimo di frequenze utilizzabili da diversi AP per evitare interferenze è 3 (usando canali 1,6,11), perché i canali non interferiscono se separati da 4 o più canali. \\
+Esistono due tecniche di accesso al mezzo:
+\begin{itemize}
+	\item \textit{DCF} (\textit{Distributed Coordination Function}): i nodi si contendono l'access al canale;
+	\item \textit{\textit{PCF}} (\textit{Point Coordination Function}): non c'è contesa e l'AP coordina l'accesso dei nodi al canale.
+\end{itemize}
 
 \paragraph{Trame}
 Il formato della trama in \textit{802.11} è dato da:

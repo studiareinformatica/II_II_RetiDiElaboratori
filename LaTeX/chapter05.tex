@@ -325,3 +325,35 @@ Nella pratica, vengono utilizzati entrambi gli approcci:
 	\item \textit{DVMRP} (o \textit{Distance Vector Multicast Routing Protocol}): utilizza un approccio \textit{flood and prune} e \textit{reverse path forwarding}. Ad ogni minuto, \textit{dimentica} gli endpoint esclusi, per cui risulta poco performante se sono pochi gli host inclusi nel gruppo multicast per le troppe richiestte di pruning;
 	\item \textit{PIM}: (o \textit{Protocol Indepenetent Multicast}): non dipende da nessun algoritmo di routing di unicast. Due metodi di distribuzione in multicast: \textit{dense} e \textit{sparse}.
 \end{itemize}
+
+\subsection{Broadcast e Multicast}
+Nel caso in cui un nodo voglia inviare un pacchetto a molteplici nodi, esistono due algoritmi di instradamento diversi.
+\paragraph{Broadcast}
+Servizio di consegna di un pacchetto spedito da un nodo a tutti gli altri nodi nella stessa rete.
+Il modo più semplice e diretto di realizzare un servizio del genere potrebbe essere pensare di duplicare il pacchetto tante volte quanti sono i nodi a cui è destinato, ma non sarebbe granché ottimale a livello di prestazioni:
+\begin{itemize}
+	\item Se il nodo sorgente è connesso al resto della rete tramite un singolo nodo, questo sarà attraversato da $N$ copie dello stesso pacchetto.
+	\item Si è presupposto che il nodo mittente sia a conoscenza degli indirizzi di ciascun nodo di destinazione, quando in una prima fase questo deve calcolarsi ciascuno di essi.
+	\item Sarebbe poco ragionevole affidarsi all'infrastruttura di instradamento unicas per ottenerne un instradamento broadcast.
+\end{itemize}
+\subparagraph{Flooding}
+Dunque la tecnica più ragionevole risulta essere il \textit{flooding non controllato}: il nodo che manda il pacchetto broadcast ne invia una copia per ciascun nodo adiacente, che fa lo stesso con i suoi adiacenti, fatta eccezione per il nodo da cui ha ricevuto il pacchetto. Questo sistema, se si tratta di una struttura a grafo connesso, è molto elegante ma presenta due casi disastrosi:
+\begin{itemize}
+	\item Se esistono cicli nel grafo, il pacchetto continuerà a girare all'interno di essi all'infinito.
+	\item Se ciascun nodo ha più di due nodi adiacenti, per ognuno saranno generate $N$ duplicazioni del pacchetto, che per ogni nodo attraverso cui passerà verrà ancora duplicato, provocando una \textit{broadcast storm} (\textit{tempesta di broadcast}) che renderà la rete inutilizzabile.
+\end{itemize}
+L'alternativa è il \textit{flooding controllato}, in cui oltre a questo sistema, ciascun nodo detiene una lista di indirizzi di origine dei pacchetti broadcast associati ad un numero di sequenza. Quando riceve un pacchetto broadcast, controlla se si trova nella lista e, in caso affermativo, lo elimina; altrimenti viene inoltrato ai nodi adiacenti (ad eccezione del mittente). \\
+\subparagraph{Reverse Path Forwarding (o Reverse Path Broadcast)}
+L'alternativa al \textit{flooding} si basa sulla seguente idea: quando un router riceve un pacchetto broadcast, lo trasmette su tutti i propri collegamenti in uscita (ad eccezione di quello da cui l'ha ricevuto) soltanto se è pervenuto attraverso il percorso unicast più breve tra il router e la sorgente. In caso contrario, lo scarta, perché sa che lo avrà già ricevuto (o lo riceverà) proprio sul collegamento che forma il percorso unicast più breve con il nodo sorgente.
+\subparagraph{Albero di copertura}
+Nei casi precedenti si è risolto (parzialmente) il problema della \textit{broadcast storm}, ma non quello della ritrasmissione di pacchetti ridondanti. Per questo nasce il sistema attraverso alberi di copertura (\textit{spanning tree}): si tratta di un grafo connesso che non contiene cicli, contiene tutti i nodi originali del grafo di partenza e ogni arco è selezionato come quello con peso minore per unire un nodo $a$ ad un nodo $b$. Di conseguenza, quando un nodo sorgente vuole inviare un pacchetto broadcast, lo spedisce su tutti i collegamenti incidenti che appartengono allo \textit{spanning tree}. Il nodo che riceve un pacchetto broadcast lo inoltra a tutti i suoi vicini (sempre ad eccezione per quello che glielo ha spedito). Questo sistema non solo elimina i pacchetti broadcast ridondanti, ma una volta creati possono essere utilizzati dai nodi per dare inizio ad un broadcast. Il lato negativo è che il costo di creazione ed aggiornamento dello \textit{spanning tree} è decisamente alto.
+
+\paragraph{Multicast}
+Servizio di consegna di un pacchetto spedito da un nodo ad un sottoinsieme di nodi della rete.
+Il problema fondamentale nella creazione di algoritmi di instradamento multicast è che non è possibile pensare di poter associare ad un pacchetto la lista degli indirizzi di destinazione, perché nel caso in cui questi fossero centinaia di migliaia - per esempio - il pacchetto superebbe di gran lunga la dimensione consentita nella maggior parte dei casi di default. Per quest nasce la definizione di \textit{gruppo multicast}, un indirizzo che sia identificativo dell'insieme dei nodi di destinazione del pacchetto da trasmettere in multicast. Per molte funzionalità richieste da questo sistema, si fa uso di quanto offerto dal protocollo \textit{IGMP}. \\
+Sostanzialmente, l'obiettivo dell'instradamento è trovare un albero di collegamenti che colleghi tutti i router connessi ad host appartenenti al gruppo multicast:
+\begin{itemize}
+	\item \textit{instradamento multicast con albero condiviso dal gruppo}: approccio centralizzato che prevede che i router connessi agli host interessati inviino messaggi di adesione indirizzati al nodo centrale. Si viene quindi a costruire un singolo albero di instradamento condiviso per il multicast originato da tutti i mittenti.
+	\item \textit{instradamento multicast con albero basato sull'origine}: si crea un albero per ciascuna origine nel gruppo multicast. Si utilizza un algoritmo \textit{RPF} per costruire un albero di distribuzione multicast dedicato ai datagrammi multicast. Questo sistema apre a problemi di ricezione di pacchetti indesiderati: \textit{RPF} utilizza un sistema noto come \textit{potatura} (\textit{pruning}).
+\end{itemize}
+Il primo protocollo di instradamento multicast utilizzato in internet è stato il \textit{distance-vector multicast routing protocol} (\textit{DVMRP}) (sistema con alberi basati sull'origine con RPF e potatura). Il protocollo più diffuso è però il \textit{protocol-indipendent multicast} (\textit{PIM}).

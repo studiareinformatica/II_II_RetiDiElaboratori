@@ -1,216 +1,145 @@
-\section{Informazioni generali}
-La sicurezza informatica si fonda su diversi concetti:
+Per anni - nonostante già esistessero le reti mobili - si è usato accedere ad internet con dispositivi fissi cablati. Negli ultimi anni, invece, la situazione si è evoluta drasticamente, grazie all'arrivo degli smartphones: si è passati da un accesso cablato ad un accesso wireless/mobile ed è cambiato il tipo e l'intensità di traffico, molto più multimediale.
+Diventa quindi di rilevante importanza la questione della gestione dei consumi energetici. \\
+I dispositivi che accedono ad internet sono molto variegati: da desktop/laptop, a palmari, a smartphone, a dispositivi dell'\textit{internet delle cose}. Tutto risulta essere connesso ed interagire con internet. I punti di accesso ad internet diventano sempre più radio. \\
+Occorre quindi imparare a gestire questa tipologia di accesso, che si articola di due tipi:
 \begin{itemize}
-	\item \textbf{confidenzialità}: soltanto \textit{sender} e \textit{receiver} possono \textit{capire} il contenuto di un messaggio;
-	\item \textbf{autenticazione}: soltanto \textit{sender} e \textit{receiver} possono confermare l'identità di ciascuno;
-	\item \textbf{integrità di messaggio}: \textit{sender} e \textit{receiver} devono essere sicuri che il messaggio sia integro;
-	\item \textbf{accesso e disponibilità}: i servizi devono essere accessibili e disponibili agli utenti.
+	\item wireless \textit{anywhere/anytime}: possibilità di accedere ad internet da mobile anche se in movimento;
+	\item wireless senza mobilità (rete universitaria): un link wireless (un \textit{access point}, o \textit{relay}) che offre accesso wifi, collegato a sua volta - attraverso una parabola ad alta ricezione (come per esempio la tecnologia \textit{WiMAX}) - ad un dispositivo radio centrale (la \textit{stazione base}).
 \end{itemize}
 
-\paragraph{Personaggi noti}
-\textit{Bob} e \textit{Alice} vogliono comunicare in maniera sicura; \textit{Eve} è l'intruso, che vuole ottenere - senza permesso - le informazioni tra i due precedenti comunicanti, tramite \textit{eavesrop} (intercettazione), \textit{iniettazione} dei messaggi nella rete, \textit{personificazione} (pretendendo di essere qualcun altro); \textit{hijacking} (sostituendo uno dei capi della trasmissione con sé stesso), provocazione di \textit{denial of service} (prevenendo il servizio dall'essere usato dagli utenti, attraverso l'\textit{overload} delle risorse, per esempio).
-\newpage
+\paragraph{Nomadic computing}
+Insieme delle circostanze riguardanti un endpoint che si connette - anche con accesso cablato - in reti differenti (eventualmente con IP diversi).
 
-\section{Crittografia}
-Il messaggio in chiaro si dice \textit{plain-text}; una volta crittografato, invece, \textit{cipher-text}. \\
-Avendo soltanto il \textit{cipher-text} posso:
+\paragraph{Mobile computing}
+Insieme delle circostanze riguardanti endpoint non connessi in maniera cablata. \\
+
+Il link che connette i dispositivi alla \textit{stazione base} lavora a livello due della pila \textit{TCP/IP}, è utilizzato come \textit{backbone link} e garantisce accesso multiplo attraverso protocolli che ne coordinano l'accesso. \\
+Esistono moltissime alternative per le tecnologie di link wireless, che garantiscono copertura di aree più o meno vaste:
+\begin{itemize}
+	\item \textit{802.11n}: 10m - 30m;
+	\item \textit{802.11a,g}: 10m - 30m;
+	\item \textit{802.11a,g point-to-point}: 50m - 5km;
+	\item \textit{802.11b}: 10m - 30m;
+	\item \textit{802.15}: 10m - 25m;
+	\item \textit{802.16} (\textit{WiMAX}): 30m - 20km;
+	\item \textit{UMTS/WCDMA-HSPDA}, \textit{CDMA2000-1xEVDO}: 30m - 15km;
+	\item \textit{UMTS/WCDMA}, \textit{CDMA2000}: 50m - 15km;
+	\item \textit{IS95}, \textit{CDMA}, \textit{GSM}: 50m - 15km.
+\end{itemize}
+
+\paragraph{Reti infrastrutturali}
+Nelle reti infrastrutturali vi sono terminali mobili, un'infrastruttura e dei punti di accesso ad essa, garantendo tipicamente accesso ad internet.
+\begin{itemize}
+	\item Profondità a singolo hop: l'host si connette ad una \textit{stazione base} che si connette ad internet;
+	\item Profondità ad hop multipli: l'host può fare da \textit{relay} per altri nodi per permettergli di connettersi a loro volta ad internet.
+\end{itemize}
+
+\paragraph{Reti \textit{ad hoc} (non infrastrutturali)}
+Nelle reti \textit{ad hoc} non esiste \textit{stazione base} e i nodi possono soltanto trasmettere agli altri nodi nell'arco di coperatura del link wireless a cui sono connessi. Inoltre i nodi si organizzano in una network indipendente, in cui essere capaci di stabilire delle rotte funzionanti.
+\begin{itemize}
+	\item Profondità a singolo hop: non c'è né \textit{stazione base}, né connessione ad internet;
+	\item Profondità ad hop multipli: non c'è né \textit{stazione base}, né connessione ad internet, ma alcuni nodi potrebbero ugualmente funzionare da \textit{relay} per permettere accessi da alcuni nodi, ad altri. Si tratta di reti \textit{manet} e/o \textit{vanet}.
+\end{itemize}
+
+\section{Caratteristiche dei link Wireless}
+Le differenze sostanziali dai link cablati:
+\begin{itemize}
+	\item La densità di potenza del segnale trasmesso - propagandosi - decresce;
+	\item Possono verificarsi interferenze causate da sorgenti non necessariamente coinvolte direttamente nella connessione (e.g., dispositivi a micro-onde, motori, e così via \ldots);
+	\item Propagazione \textit{multipath}: il segnale radio in base alla diffrazione che ne varia il percorso, arriva in momenti diversi in punti diversi.
+\end{itemize}
+Tutte queste differenze rendono la comunicazione wireless molto più difficile da gestire rispetto alla comune rete cablata.
+
+\paragraph{SNR}
+Il \textit{signal-to-noise ratio} è il rapporto segnale-rumore, che deve essere entro una certa soglia per poter garantire ricezione. Chiaramente può variare nel tempo. E' importante perché è collegato alla probabilità di errore. \\
+
+Il link wireless rappresenta un canale \textit{broadcast}: a creare nuovi problemi è la gestione della interazioni multiple tra un \textit{sender} ed un \textit{receiver} wireless. Il motivo per cui non è possibile utilizzare il protocollo \textit{CSMA/CD} è rappresentato dal problema dell'\textit{hidden terminal}: vi sono tre terminali \textit{A}, \textit{B} e \textit{C}, dove \textit{A} e \textit{B} possono comunicare senza problemi, così come \textit{B}, \textit{C}, ma non come \textit{A} e \textit{C}, perché esiste un impedimento fisico tra i due. Ancora può verificarsi il problema dell'attenuazione del segnale, dove \textit{B} si trova nel raggio trasmissivo di \textit{A} e \textit{C}, ma \textit{A} e \textit{C} non sono nel raggio trasmissivo l'uno dell'altro; anche se decidessero comunque di provare a trasmettersi, porterebbero ad una collisione su \textit{B}. \\
+Un'alternativa sviluppata è il Code Division Multiple Access (CDMA): viene utilizzato in diversi standard per canali di broadcast wireless. Ad ogni utente viene assegnato un codice univoco, tutti gli utenti condividono la stessa banda di frequenza e ad ogni utente viene assegnata una sequenza che lo autentichi (come il codice univoco): quando avviene la trasmissione, viene moltiplicato quanto da trasmettere con la sequenza, detta \textit{chipping code}. CDMA passa per tutta una serie di difficoltà, che permettono il sovrapporsi di trasmissioni, garantendo la capacità di decomporle autonomamente.
+Un solo canale occupa l'intera ampiezza di banda, e tutte le stazioni possono inviare contemporaneamente. \\
+Si basa sulla teoria di codifica: ad ogni stazione viene assegnato un codice che è una sequenza di numeri, chiamati \textit{chip}, che rappresenta una \textit{sequenza ortogonale}, che prevede che:
 \begin{enumerate}
-	\item fare \textit{brute-force}: tentare utilizzando tutte le chiavi in mio possesso per \textit{decriptare} il messaggio;
-	\item utilizzare un'analisi statistica per risalire attraverso calcoli probabilistici a sequenze di caratteri noti (nel caso in cui si utilizzino metodi di cifrature \textit{monoalfabetici}).
+	\item Ogni sequenza composta da $n$ elementi ($n = $ stazioni, potenza di 2);
+	\item Se moltiplichiamo una sequenza per un numero, goni elemento della sequenza viene moltiplicato per quel numero;
+	\item Se moltiplichiamo due sequenze uguali e sommiamo i risultati otteniamo $n$;
+	\item Se moltiplichiamo due sequenze diverse e sommiamo i risultato otteniamo 0;
+	\item Sommare due sequenze significa sommare gli elementi corrispondenti.
 \end{enumerate}
+Si stabilisce una regola per la codifica: il bit di dati 0 corrisponde a $-1$, il bit di dati 1 corrisponde a $+1$, e il silenzio corrisponde a 0. Dunque, la sequenza risultante nel canale sarà la somma delle sequenze inviate dalle stazioni.
 
-\subsection{Crittografia a chiave simmetrica}
-Due o più persone condividono la stessa chiave (simmetrica), utilizzata come pattern ci cifratura a sostituzione mono alfabetica. Come si accordano, però, Bob e Alice? Occorre un sistema di scambio di chiavi attraverso un canale sicuro (anche fisico, per esempio).
-\subsubsection{Schema di cifratura di Cesare}
-Sistema di cifratura basato su uno spostamento/slittamento di \textit{n} lettere sulla sequenza dell'alfabeto. In questo caso, la chiave è proprio \textit{n}.
-
-\subsubsection{DES: Data Encryption Standard}
-Standard di criptazione, che utilizza chiavi lunghe \textit{56bit}, di cui si usano \textit{48bit}. Il messaggio viene spezzato in frammenti da 64bit, e passa per l'algoritmo blocco per blocco, tramite sistemi di permutazione. E' stato necessario nemmeno un giorno per \textit{bucarlo}. \\
-Per questa ragione hanno sviluppato il \textit{3DES}, algoritmo di criptazione che prevede 3 passaggi: una \textit{encryption} iniziale utilizzando una chiave iniziale, una \textit{decription}, utilizzando una seconda chiave, e una \textit{encryption} finale, tramite la chiave iniziale.
-
-\subsubsection{AES: Advanced Encryption Standard}
-Standard molto più attuale. Utilizza un sistema di criptazione simmetrica che nel 2001 ha rimpiazzato \textit{DES}. Processa dati in blocchi da \textit{128bit}, con chiavi da \textit{128}/\textit{192}/\textit{256 bit}, per cui si dice abbia sicurezza di un ordine di $2^{128}$. \\
-Mentre occorreva 1s per decriptare lo standard \textit{DES}, occorrono 149 trilioni di anni per farlo con \textit{AES}.
-\newpage
-
-\subsection{Modus operandi}
-Il \textit{modus operandi} di un algoritmo di cifratura è il modo con cui vengono scambiati i blocchi, e prende il nome di \textit{ECB} (o \textit{Elecronic CodeBook}).
-Altro metodo è quello del \textit{CBC} (o \textit{Cipher Block Chaining}), dove l'output del blocco precedente è l'input del blocco successivo.
-
-\subsection{Crittrogafia a chiave pubblica}
-Utilizza un approccio totalmente differente: il \textit{sender} e il \textit{receiver} hanno rispettivamente due chiavi: una privata e una pubblica. Non condividono la loro chiave privata, ma solo la pubblica, quindi la chiave di decriptazione privata è nota solo al \textit{receiver}. \\
-Sostanzialmente, quando Alice vuole inviare un messaggio a Bob, lo cripta con la chiave pubblica di Bob, il quale - quando riceverà il messaggio criptato - lo decripterà con la propria chiave privata, e/o viceversa. \\
-Tra gli algoritmi di crittografia a chiave pubblica più importanti troviamo l'\textit{RSA} (dai suoi creatori: \textit{Rivest}, \textit{Shamir} e \textit{Adelson}), che si basa sul fatto che bit può essere univocamente rappresentabile da un numero. Per creare un paio di chiavi \textit{RSA} occorre:
+\paragraph{IEEE 802.11}
+Diverse tecnologie (più è alto lo spettro della banda, più si è aperti ad attenuazioni), che però usano tutte il protocollo \textit{CSMA/CA} per l'accesso multiplo e tutte supportano sia una rete di tipo infrastrutturale che non:
 \begin{itemize}
-	\item scegliere due numeri \textit{p} e \textit{q} (utilizzando, ad esempio, 1024 bit per ciascuno);
-	\item si calcola $n=p\times q$ e $z=(p-1)\times (q-1)$;
-	\item si sceglie una $e < n$ che non ha nulla in comune con \textit{z} (per cui si dicono \textit{relativamente primi});
-	\item si sceglie una \textit{d} in modo tale che $(e\times d)-1$ sia divisibile per \textit{z}.
-\end{itemize}
-Infine:
-\begin{center}
-	Criptazione: $c = m^e$ $mod$ $n$ \\
-	Decriptazione: $m = c^d$ $mod$ $n$
-\end{center}
-
-\section{Autenticazione}
-\subsection{Firme digitali}
-Una firma digitale rappresenta un insieme di dati in forma elettronica, allegati oppure connessi tramite associazione logica ad altri dati elettronici, utilizzati come metodo di identificazione informatica.
-
-Si propone di soddisfare le seguenti esigenze:
-\begin{itemize}
-	\item \textbf{autenticazione:} il destinatario può verificare l'identità del mittente.
-	\item \textbf{integrità:} il destinatario non può creare o modificare un documento firmato da qualcun altro.
-	\item \textbf{non ripudio:} il mittente non può disconoscere un documento da lui firmato. La firma digitale è l'unico meccanismo basato su crittografia a chiave pubblica ad avere questa caratteristica.	
+	\item 802.11b: spettro non licenziato tipicamente di 2.4-5GHz, raggiunge un massimo di 11Mbps e tutti gli host usano lo stesso chipping code;
+	\item 802.11a: spettro di 5-6GHz, con un tetto di 54Mbps;
+	\item 802.11g: spettro di 2.4-5GHz, con un tetto di 54Mbps;
+	\item 802.11n (con più trasmettenti): spettro di 2.4-5GHz, con un tetto di 200Mbps.
 \end{itemize}
 
-Un tipico schema di firma elettronica basato sulla tecnologia della chiave pubblica consiste di tre algoritmi:
-\begin{enumerate}
-	\item Un algoritmo che genera una coppia di chiavi $ (PK, SK) $, dove \textit{PK} è la chiave pubblica di verifica della firma e \textit{SK} è la chiave privata utilizzata per firmare il documento.
-	\item Un algoritmo di firma che prende in input un messaggio \textit{m} e una chiave privata \textit{SK}, calcola il codice hash del messaggio e, crittografandolo con \textit{SK}, produce una firma $ \sigma $.
-	\item un algoritmo di verifica che prende in input la tripla $(m, PK, \sigma)$ e accetta o rifiuta la firma.
-\end{enumerate}
-La firma digitale è l'unico caso in cui l'uso delle chiavi è invertito: la chiave pubblica serve a decrittare la firma e trovare poi il \textit{digest} iniziale attraverso l'hash, mentre la chiave privata serve a crittografare una stringa anzichè aprirla.
+In una LAN wireless, il \textit{BSS} (\textit{Basic Service Set}) è una cella dell'infrastruttura, che contiene gli host wireless, l'access point (AP) e che supporta la modalità \textit{ad hoc}. Una struttura \textit{ESS} (\textit{Extended Service Set}) è costituita da due o più \textit{BSS} con infrastruttura, dove i \textit{BSS} sono collegati tramite un sistema di distribuzione che è una rete cablata o wireless. \\
+Un'espansione del \textit{CSMA/CA} prevede un comportamento diverso da parte del sender: se il canale è libero (dato ottenibile tramite il \textit{DIFS}, il \textit{Distributed InterFrame Spacing}, che altro non è che un intervallo di tempo costante), allora trasmetto l'intero frame, altrimenti aspetto per un intervallo casuale di tempo, al termine del quale trasmetto soltanto se il canale è libero, altrimenti lo raddoppio. Una volta trasmesso il dato, il ricevitore risponde con un ACK dopo un \textit{SIFS} (sempre minore del \textit{DIFS}, per garantire che altri non confondano questo tempo come canale libero). \\
+Per evitare le collisioni invece, il sender prima trasmette un piccolo pacchetto chiamato \textit{RTS} (\textit{request-to-send}): se questo non cattura collisioni, allora apro la trasmissione effettiva. In risposta all'\textit{RTS}, vi è il \textit{CTS} (\textit{clear-to-send}).
+Poiché questo flusso porta ad un \textit{overhead} dovuto alle trasmissioni di \textit{RTS} e \textit{CTS}, \textit{802.11} include una ottimizzazione sull'adattabilità alla banda.
 
-\subsection{Message digests}
-Per dare una sorta di \textit{impronta digitale} di un'entità vengono utilizzati i cosiddetti \textbf{message digests}: partendo da un insieme enorme di combinazioni applicabili su ogni tipo di file digitale, una funzione di \textit{hashing} fa corrispondere un'entità a (quasi) una ed una sola sequenza di caratteri. In questo modo è possibile determinare una firma univoca per provare l'integrità di ogni file, potendo garantire che questa sia tale soltanto per quel file. La lunghezza dei valori di hash varia a seconda degli algoritmi utilizzati; il valore più comunemente adottato è di 128 bit, che offre una buona affidabilità in uno spazio relativamente ridotto\footnote{Va registrata la possibilità d'uso di hash di dimensione maggiore (SHA, ad esempio, può anche fornire stringhe di 224, 256, 384 e 512 bit) e minore (anche se fortemente sconsigliato).}. La sicurezza di questo sistema è data dal fatto che ogni \textit{hash} è dato da una stringa di lunghezza fissa indipendentemente dalla lunghezza del messaggio.\\
-La firma digitale pul essere definita come \textit{digest} di un documento crittografato con chiave privata.
-
-
-\subsubsection{Checksum}
-La \textit{checksum} fa una sorta di \textit{hash} come è stato appena introdotto: produce una stringa da 16 bit. Il problema in questo caso riguarda il fatto che è molto più semplice trovare file diversi che abbiano lo stesso \textit{checksum}.\\\\
-A questo punto possiamo arrivare alla combinazione ottimale: Bob manda un pacchetto di informazioni contenente:
+\paragraph{Accesso e associazione}
+Lo spettro 2.4GHz-2.485GHz è diviso in 11 canali parzialmente sovrapposti ed è l'amministratore dell'AP a sceglierlo. Sono possibili interferenze, se AP vicini utilizzano lo stesso canale: il numero massimo di frequenze utilizzabili da diversi AP per evitare interferenze è 3 (usando canali 1,6,11), perché i canali non interferiscono se separati da 4 o più canali. \\
+Esistono due tecniche di accesso al mezzo:
 \begin{itemize}
-	\item messaggio puro;
-	\item hash del messaggio, crittato con la chiave privata dello stesso Bob.
-\end{itemize}
-A questo punto, Alice, per verificare l'autenticità del messaggio, fa l'hash del messaggio e lo confronta con l'output della decrittazione tramite chiave pubblica di Bob dell'hash crittato precedentemente da Bob con la sua chiave privata. Se questi corrispondono, allora il messaggio risulta autentico.
-
-Attualmente esistono diversi tipi di hash, in base al livello di sicurezza: leggermente datato è l'\textit{MD5} (da 128 bit, crittato in 4 passi), più aggiornato è invece lo \textit{SHA-1} (da 160 bit, ancora più sicuro è invece lo \textit{SHA-2}).
-
-\subsection{CA (Certification Authority)}
-La \textit{CA} rappresenta l'autorità che assegna un \textit{certificato digitale} (comprensivo dei dati di Bob con la sua firma digitale) ad una specifica entità E appartenente a Bob sulla base della chiave pubblica di E, in modo tale che sia garantita l'identità di E presso la \textit{CA}. Sostanzialmente, le informazioni del certificato digitale vengono prodotte dalla \textit{CA}, crittate con la chiave pubblica di Bob e poi con la chiave privata della \textit{CA}.
-\newpage
-
-\subsection{Sicurezza e-mail}
-Alice vuole mandare una email confidenziale a Bob:
-\begin{enumerate}
-	\item genera una chiave privata simmetrica randomica, $K_{s}$;
-	\item critta il messaggio con questa chiave $K_{s}$;
-	\item critta l'output con la chiave pubblica di Bob;
-	\item invia l'output e la chiave generata randomicamente a Bob, crittata ancora con la chiave pubblica di Bob.
-\end{enumerate}
-Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segreta generata randomicamente da Alice con la sua chiave privata e - ancora - decritterà il messaggio in definitiva utilizzando la chiave-output della decrittazione della chiave segreta generata randomicamente da Alice. \\
-In alternativa:
-\begin{enumerate}
-	\item Alice fa un \textit{hash} del messaggio;
-	\item impacchetta il messaggio in chiaro e la firma digitale (come già visto con i message digests);
-	\item il pacchetto viene crittato con una chiave privata simmetrica randomica, $K_{s}$;
-	\item viene mandato il pacchetto e la chiave generata randomicamente a Bob, crittata ancora con la chiave pubblica di Bob.
-\end{enumerate}
-Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segreta generata randomicamente da Alice con la sua chiave privata e - ancora - decritterà il messaggio in definitiva utilizzando la chiave-output della decrittazione della chiave segreta generata randomicamente da Alice. Bob, per verificare l'autenticità del messaggio, fa l'hash del messaggio e lo confronta con l'output della decrittazione tramite chiave pubblica di Alice dell'hash crittato precedentemente da Alice con la sua chiave privata. Se questi corrispondono, allora il messaggio risulta autentico.
-
-\section{Secure Socket Layer}
-Con l'apertura della Rete a fini pubblici, le problematiche di prevenzione di danni, perdite e attacchi via via sempre più importanti portarono alla nascita di strati aggiuntivi con lo specifico compito di assicurarsi la delle comunicazioni.
-Le prime implementazioni di SSL erano limitate a una cifratura a chiave simmetrica di soli 40 bit\footnote{Tale limitazione fu dovuta da restrizioni imposte dal governo statunitense sull'esportazione di tecnologie crittografiche. Fu esplicitamente imposta per rendere la cifratura abbastanza debole da poter essere forzata dalle autorità giudiziarie che volessero decifrare il traffico, ma sufficientemente resistente ad attacchi esterni poichè facente affidamento alle minori disponibilità di risorse tecnologiche e finanziarie dell'epoca.}; fu succesivamente aggiornato a TLS (\textit{Transport Layer Security}), con chiavi da 128+ bit.\\\\
-Il protocollo TLS consente alle applicazioni client/server di comunicare attraverso una rete in modo tale da prevenire il \textit{tampering}(manomissione), la falsificazione e l'intecettazione dei dati.\\
-Nell'utilizzo tipico del browser di un end-user, l'autenticazione è \textit{unilaterale}: è il solo server ad autenticarsi presso il client. Il browser valida il certificato del server controllando che la firma digitale dei certificati sia valida e riconosciuta da una \textit{certification authority} conosciuta utilizzando una cifratura a chiave pubblica. Dopo questa autenticazione, il browser indica una connessione sicura.\\
-Quest'autenticazione, però, non è sufficiente per garantire che il sito con cui ci si è collegati sia quello richiesto. Per esserne sicuri è necessario analizzare il contenuto del certificato rilasciato e controllarne la catena di certificazione. I siti che intendono ingannare l'utente non possono utilizzare un certificato del sito che vogliono impersonare, perchè non hanno la possibilità di cifrare in modo valido il certificato, 
-che include l'indirizzo, in modo tale che risulti valido alla destinazione.\\
-Il protocollo TLS permette anche un'autenticazione \textit{bilaterale}, tipicamente utilizzata in applicazioni aziendali, in cui entrambe le parti si autenticano in modo sicuro scambiandosi i relativi certificati. Questa autenticazione (definita \textit\textit{Mutual authentication}), richiede che anche il client possieda un proprio certificato digitale.\\
-
-\subsection{Principi di funzionamento}
-Il funzionamento del protocollo TLS può essere suddiviso in tre fasi principali:
-\begin{enumerate}
-	\item Negoziazione dell'algoritmo da utilizzare;
-	\item Scambio delle chiavi e autenticazione;
-	\item Cifratura simmetrica e autenticazione dei messaggi.
-\end{enumerate}
-Nella prima fase, il client e il server negoziano il protocollo di cifratura che sarà utilizzato nella comunicazione sicura, il protocollo per lo scambio delle chiavi, il MAC (\textit{message authentication code}) e l'algoritmo di autenticazione. L'algoritmo per lo scambio delle chiavi e quello per l'autenticazione normalmente sono a chiave pubblica; l'integrità dei messaggi è garantita da un algoritmo di hash che utilizza funzioni pseudorandom non standard.
-
-\paragraph{Protocolli.} All'interno di una sessione vengono tipicamente utilizzati i seguenti protocolli:
-\begin{itemize}
-	\item RSA, Diffie-Hellman, ECDH, SRP, PSK per lo scambio di chiavi;
-	\item RSA, DSA, ECDSA per l'autenticazione;
-	\item RC4, DES, 3DES, AES, IDEA o Camellia (anche RC2 nei vecchi SSL) per la cifratura simmetrica;
-	\item HMAC-MD5, HMAC-SHA (TLS); MD5, SHA (SSL) come funzioni di hash per le funzioni crittografiche d'integrità. 
+	\item \textit{DCF} (\textit{Distributed Coordination Function}): i nodi si contendono l'access al canale;
+	\item \textit{\textit{PCF}} (\textit{Point Coordination Function}): non c'è contesa e l'AP coordina l'accesso dei nodi al canale.
 \end{itemize}
 
-\paragraph{ARP}
-Una richiesta \textit{ARP} consiste in una richiesta di risoluzione inversa: invece di chiedere la risoluzione di un nome host, richiediamo la risoluzione inversa, ovvero quella che associa univocamente un IP ad un nome host. Il protocollo \textit{ARP} lavora a livello \textit{datalink} della pila \textit{TCP/IP}, quindi utilizzando come nomi identificativi gli indirizzi \textit{MAC}. Per la richiesta viene richiamato il gateway dell'IP richiesto, il quale fa una richiesta in \textit{broadcast} nella subnet per cercare il dato IP. \\
-In un attacco \textit{arp-spoofing} (o \textit{arp-poisoning}), l'attaccante fa un attacco \textit{man-in-the-middle}, \textit{spacciandosi} per l'IP richiesto.
-
-\section{IPsec}
-Simile al protocollo \textit{TLS} (che lavora sopra al livello di trasporto, per cui inutile in caso di attacci su livelli inferiori rispetto a quest'ultimo), che lavora a livello di rete. L'obiettivo è cifrare il \textit{payload} (un segmento \textit{TCP}/U\textit{DP}, un messaggio \textit{ICMP}/\textit{OSPF}, \ldots): per motivi di sicurezza spesso si usano reti private, motivo per cui diventa necessaria una \textit{VPN} (o \textit{Virtual Private Network}), per mettere in comunicazione reti private attraverso internet, mantenendo tutto quello che passa per internet cifrato e separato logicamente dal traffico comune. Le \textit{VPN} quindi stabiliscono reti private virtuali, per racchiudere \textit{n} non fisicamente - e al contempo privatamente - collegate. \\
-\textit{IPsec} fornisce i seguenti servizi:
+\paragraph{Trame}
+Il formato della trama in \textit{802.11} è dato da:
 \begin{itemize}
-	\item integrità dei dati;
-	\item autenticazione;
-	\item prevenzione ad attacchi di tipo \textit{replay}\footnote{Nell'ambito della sicurezza informatica il replay-attack è una forma di attacco di rete che consiste nell'impossessarsi di una credenziale di autenticazione comunicata da un host ad un altro, e riproporla successivamente simulando l'identità dell'emittente. In genere l'azione viene compiuta da un attaccante che s'interpone tra i due lati comunicanti.};
-	\item confidenzialità.
+	\item 2 byte di \textit{frame control};
+	\item 2 byte di \textit{duration};
+	\item 6 byte per ciascun indirizzo MAC:
+	\begin{itemize}
+		\item \textit{indirizzo 1}: destinazione (indirizzo MAC del wireless host o AP che riceve il frame);
+		\item \textit{indirizzo 2}: sorgente (indirizzo MAC del wireless host o AP che trasmette il frame);
+		\item \textit{indirizzo 3}: indirizzo MAC dell'interfaccia router al quale l'AP è conneso (colui che fa da ponte per internet, per esempio).
+	\end{itemize}
+	\item 2 byte di \textit{sequence control};
+	\item 6 byte per l'\textit{indirizzo 4} (usato solo nella modalità ad hoc);
+	\item 0-2312 byte di \textit{payload};
+	\item 4 byte di \textit{CRC}.
 \end{itemize}
-Può lavorare - in base alla decisione presa dall'amministratore dell'infrastruttura - con due protocolli:
+Il dialogo tra l'access point e l'interfaccia router avviene secondo \textit{802.3}, il cui formato della trama prevede vi siano solo due indirizzi: l'indirizzo MAC di destinazione (MAC del router) e quello mittente (MAC dell'access point).
+
+\paragraph{Gestione energetica}
+Per migliorare i consumi energetici, i nodi allertano l'AP che \textit{vanno a dormire} fino al successivo \textit{beacon frame}, così che l'AP sa di non dover trasmettere frame a quel nodo e il nodo stesso non \textit{si sveglia} entro il successivo \textit{beacon frame}.
+Il \textit{beacon frame} (o \textit{pacchetto faro}) è definito come il frame che contiene una lista di device con frame \textit{AP-to-mobile} che attendono l'invio: ciascun nodo rimarrà \textit{sveglio} se i frame sono inviati; altrimenti in \textit{sleep} fino al prossimo \textit{beacon frame}. \\
+Il \textit{duty cycle} è definito come l'intervallo che intercorre tra il tempo di \textit{ON} e il tempo di \textit{ON} sommato al tempo di \textit{OFF}.
+
+\section{Tecnologia Bluetooth}
+Lo standard associato è l'\textit{802.15} e il suo obiettivo è quello di avere un raggio di azione più corto rispetto all'\textit{802.11}.
+La modalità di comunicazione è \textit{master/slave}, dove gli slave fanno richieste unicamente al master, che risponde a ciascuna di esse.
+Si tratta di una rete \textit{ad hoc}, in cui la trasmissione ha una banda pari a 2,4-5 GHz e raggiunge una capacità trasmissiva massima di 721kbps. \\
+Il primo standard fu rilasciato nel 1999. Il \textit{Bluetooth Special Interest Group} conta oltre 1800 membri, tra cui Ericsson, Nokia, IBM, Intel, Toschiba, Microsoft, Lucent, 3Com, Motorola, e così via \ldots \\
+La cosa più interessante è che viene adoperato un approccio totalmente nuovo: il \textit{Frequency Hopping Spread Spectrum}. I devices seguono una sequenza \textit{FHSS} pseudocasuale generata utilizzando l'ID del master (accessibile non solo dal master ma anche da tutti gli slaves). La frequenza usata per la trasmissione cambia per ogni pacchetto, garantendo scarsa interferenza ed elevata sicurezza. \\
+I devices bluetooth sono organizzati in \textit{piconets}, cluster formati da un master e diversi slaves (per un massimo di 7 in comunicazione). La formazione di una \textit{scatternet} (interconnessione di \textit{piconet}) è definita da tre problemi fondamentali:
 \begin{itemize}
-	\item \textit{AH} (\textit{Authentication Header}): fornisce garanzie su integrità e autenticazione;
-	\item \textit{ESP} (\textit{Encapsulation Security Protocol}): fornisce garanzie su integrità, autenticazione e confidenzialità.
+	\item la scoperta di devices (tramite la procedura bluetooth standard \textit{inquiry}/\textit{inquiry scan});
+	\item la formazione di una \textit{piconet};
+	\item l'interconessione delle \textit{piconet}.
 \end{itemize}
-e due modalità:
+Di fondamentale importanza è il fatto che il master sia appartenenete ad una \textit{piconet} per volta, perché altrimenti l'attività presso di una comprometterebbe la necessità dell'attività dello stesso master in un'altra \textit{piconet}. \\
+Il punto dolente della tecnologia bluetooth è la \textit{device discovery}: impiega troppo tempo per il detecting ed è troppo altalenante nel mantenere la connnessione. Questa fase è definita dall'\textit{inquiry scan}: viene fatto uno scan per individuare tutti i possibili nodi, ai quali viene mandato un pacchetto \textit{FHS} che mette al corrente dell'ID del master, così da permettere il calcolo della sequenza. Un nodo può essere o in modalità \textit{inquiry} o \textit{inquiry scan}: si può stabilire quindi una connesione soltanto tra nodi in modalità opposta. Per questo ogni nodo salta costantemente da uno stato di \textit{inquiry} a \textit{inquiry scan}, e viceversa. \\
+Se esistono piu di 7 nodi in una \textit{piconet}, occorre formare una \textit{scatternet}. Per gestirle coerentemente, vengono utilizzati due tipi di scheduling: lo scheduler \textit{interpiconet} e \textit{intrapiconet}. Il primo si occupa di gestire quando e per quanto tempo considerare uno slave come attivo in una data \textit{piconet}. Il secondo invece determina lo schema da adottare in ciascuna \textit{piconet}: per esempio, in maniera proporzionale alla quantità di dati trasmessi da un device, saranno allocate risorse per questo, in modo tale da evitare di fare \textit{polling} continuo su device poco attivi, risparmiando risorse. L'obiettivo di entrambi è fare \textit{load balancing}.
+
+\section{Rete cellulare}
+La rete cellulare è garantita tramite il tassellamento di un'area con \textit{stazioni base} in modo tale da garantire copertura per la totalità del territorio. \\ Gruppi di stazioni base, le celle, sono collegate ad un \textit{mobile switching center} (o \textit{MSC}), al quale trasmettono tramite \textit{FDMA} e \textit{TDMA} (lo spettro viene diviso in canali di frequenza, a loro volta divisi in slot di tempo), nel caso di infrastrutture precedenti alla terza generazione (nelle successive viene usato il \textit{CDMA}), e che a sua volta è collegato alla rete telefonica e/o internet pubblica del gestore. \\
+Nel passaggio delle generazioni sono migliorate le velocità di tramissione e qualità di trasmissione della voce e dei dati. Infatti, nella generazione \textit{2G} (in cui era possible trasmettere soltanto la voce), tra le celle e l'\textit{MSC} era frapposta una \textit{BSC} (\textit{Base Station Controller}), che gestiva soltanto un numero molto limitato di celle. \\
+Nelle infrastrutture delle generazioni successive, dal \textit{2.5G} in poi (in cui fu introdotta la possibilità di trasmissione di dati, oltre alla voce), ogni \textit{BSC} è collegato non solo ad un \textit{MSC} per il supporto voce, ma anche ad un \textit{SGSN} (\textit{Serving GPRS Support Node}) per il supporto internet, che è collegato a sua volta ad un \textit{GGSN} (\textit{Gateway GPRS Support Node}) che fa effettivamente da ponte verso internet. \\
+Nelle generazioni successive al \textit{2.5G}, è stato modificata la struttura per raggiungere miglioramenti nella qualità e nell'intensità del servizio offerto. \\ \\
+
+Uno dei problemi più importanti è quello della mobilità, in quanto occorre garantire una connessione continua anche a device in costante movimento, che si agganciano/sganciano continuamente a/da celle distinte adiacenti. Come garantire che, nonostante tutti questi spostamenti, un device qualsiasi sia comunque capace di definire un indirizzo attraverso cui raggiungere il device in costante movimento? Vi sono due approcci:
 \begin{itemize}
-	\item Modalità \textit{transport}: il processo di rendere sicuri i pacchetti è fatto direttamente dagli host delle reti;
-	\item Modalità \textit{tunneling}: il processo è gestito unicamente dagli \textit{edge router}.
+	\item \textit{let routing handle it}: il router richiede l'aggiornamento delle \textit{routing table}, così da mantenerle costantemente aggiornate sugli spostamenti dei devices. E' una soluzione decisamente non scalabile su milioni di devices;
+	\item \textit{let end-system handle it}: lo stesso end-system notifica ogni spostamento ai vari router.
 \end{itemize}
-Attualmente la combinazione migliore e più diffusa è la \textit{ESP}-\textit{tunneling}. \\ \\
+Sostanzialmente, ogni device ha una \textit{home network} (la propria rete, la rete casalinga), dentro la quale gli viene assegnato un IP permanente che è sempre utilizzato per raggiungere il device. All'interno della stessa rete c'è un \textit{home agent}, il responsabile della rete. Quando ci si muove, si raggiunge una \textit{visited network}, dove il responsabile è un \textit{foreign agent}: al device viene assegnato un IP temporaneo \textit{care-of-address} valido in quella \textit{visited network}. Come può un qualsiasi altro device a raggiungere quel device? Nel momento in cui quest'ultimo entra in una \textit{visited network}, deve contattare il \textit{foreign agent} per avvertirlo che si trova ora in quella rete e che ha un dato indirizzo permanente. L'agent utilizzerà quell'indirizzo per raggiungere il suo \textit{home agent}, segnalandogli lo spostamento. Allora il device esterno che desiderava contattarlo, conoscendo l'IP permanente del device, sarà in grado di contattare la \textit{home network} che lo reindizzerà alla \textit{visited network}. \\
+Questo sistema di routing è detto \textit{routing indiretto}: l'inefficienza è data dal fatto che se due device si trovano entrambi in una stessa \textit{visisted network}, per contattarsi passeranno comunque ad interrogare la \textit{home network} di ciascuno. L'alternativa è il \textit{routing diretto}: viene fatta - in fase di creazione di una connessione tra due devices - richiesta all'\textit{home agent} di ciascuno. Una volta ottenuta la risposta, non viene più richiesto, e viene utilizzato quello che ho chiesto in fase di configurazione. Il rischio è che, se nel frattempo uno dei devices si sposta, l'indirizzo risulterà sbagliato. Allora si introduce il concetto di \textit{anchor foreign agent}, il precedente \textit{foreign agent} di un device, il quale verrà contattato in ogni spostamento dello stesso device in nuove \textit{visited network}.
 
-Per ciascun host che entri in comunicazione con un altro della seconda (o \textit{n}-esima) rete appartenente alla \textit{VPN}, viene stabilita una \textit{Security Association} (\textit{SA}) un canale di comunicazione privato a questi due, che contiene:
-\begin{itemize}
-	\item identificativo (da 32 bit);
-	\item interfaccia \textit{SA} di origine (\textit{edge router} di origine);
-	\item interfaccia \textit{SA} di destinazione (\textit{edge router} di destinazione);
-	\item tipo di cifratura usata (e.g. \textit{3DES} con \textit{CBC});
-	\item chiave di cifratura;
-	\item tipo di algoritmo di integrità (e.g. \textit{HMAC} con \textit{MD5});
-	\item chiave di autenticazione.
-\end{itemize}
-Tutte le \textit{SA} sono memorizzate in un database, chiamato \textit{Security Association Database} (\textit{SAD}). \\ \\
-
-Nella modalità di \textit{tunneling} con \textit{ESP}, viene gestito un datagramma, composto da diversi passaggi: partendo dal messaggio originario in chiaro, seguito dal \textit{padding} del messaggio (necessario a saturare lo spazio in bit dedicato al messaggio), viene cifrato, e poi viene aggiunto in testa l'header \textit{ESP}. Su tutta questa sequenza viene applicato un primo protocollo di autenticazione, che prende il nome di \textit{enchilada}. A questa ultima sequenza viene aggiunto, infine, l'IP di destinazione e applicato il protocollo di autenticazione relativo a tutto il datagramma. \\
-Il \textit{Security Policy Database} (\textit{SPD}) gestisce invece un insieme di regole generali che stabiliscono che reagire a tutti i datagrammi uscenti dalla rete: come/se elaborarli. \\
-Per la generazione delle \textit{SA} automatica arriva in aiuto il protocollo \textit{IKE} (o \textit{Internet Key Exchange}), sfruttabile tramite \textit{PKI} e/o \textit{PSK}:
-\begin{enumerate}
-	\item \textit{IKE} stabilisce una \textit{SA} bidirezionale;
-	\item \textit{ISAKMP} viene utilizzato per negoziare la tupla di connessioni speculari delle \textit{SA}.
-\end{enumerate}
-
-\section{Sicurezza nelle reti Wireless}
-\subsection{WEP}
-Primo protocollo noto sulla sicurezza wireless è il \textit{WEP} (\textit{Wired Equivalent Protocol}), nato nel tentativo di raggiungere la sicurezza come nelle reti via capo, ottenendo:
-\begin{itemize}
-	\item confidenzialità;
-	\item autorizzazione dell'end-host;
-	\item integrità.
-\end{itemize}
-Inoltre occorreva avere un protocollo non solo efficiente, ma che potesse allo stesso tempo cifrare ogni pacchetto trasmesso indipendentemente l'uno dall'altro (anche se uno dei precedenti fosse andato perso, a differenza del \textit{Cipher Block Chaining}, \textit{CBC}, in cui l'output della cifratura del pacchetto precedente era preso come input per quella del successivo). Usava un \textit{cifrario a flusso}: cioè una funzione che prendesse in input una chiave - costante - e un \textit{initialization vector}, che potesse dare uno stream di chiavi utile per cifrare (facendo lo \textit{XOR} tra stream e messaggio da cifrare), ma soprattutto per decifrare (facendo lo \textit{XOR} tra stream e messaggio cifrato). \\
-Tra i problemi principali troviamo che il campo relativo all'\textit{initialization vector} è troppo piccolo per evitare che si ripeti dopo un quantitativo di tempo ridotto. Questo rende il \textit{WEP} quasi totalmente insicuro, perdendo integrità e confidenzialità.
-
-\subsection{802.11i}
-Protocollo molto più sicuro rispetto al \textit{WEP}, che mette a disposizione numerosi tipi di cifratura (e.g. \textit{WPA}, \textit{WPA2}) e utilizza un server separato per l'autenticazione, rispetto a quello utilizzato per l'accesso. Mentre \textit{WPA2} è molto sicuro, è stata introdotta una funziona che potrebbe facilmente \textit{disarcionarlo}: \textit{WPS}. \\
-\textit{WPS} è un protocollo per facilitare la connessione per l'estensione del segnale: che sostanzialmente permette la decifratura per parti, così da dare un eventuale OK, se è stata decifrata correttamente la prima parte. Negli ultimi anni si è pensato di mettere un numero di tentativi massimi, al termine dei quali viene sganciato il richiedente. \\
-\textit{802.11i} ha 4 fasi di operazione che sostanzialmente permettono di generare \textit{n} per \textit{n} client connessi: questa funzione prende il nome di \textit{EAP} (\textit{Extensible Authentication Protocol}).
-\newpage
-
-\section{Firewall}
-I firewall si occupano di gestire delle policy volte all'autorizzazione di utilizzo di determinati servizi, attraverso la generazione di regole che lavorano su a livello di porte e servizi per \textit{TCP}, di tipologia di messaggio \textit{ICMP} e di bit \textit{TCP} \textit{SYN} e \textit{ACK}. \\
-Un firewall può implementare uno \textit{stateless packet-filter}, cioè basato unicamente su indirizzo e porta, o anche \textit{stateful packet-filter}, che non solo ammette le possibilità della versione \textit{staless}, ma anche quella di monitorare e gestire lo stato delle connessioni \textit{TCP} già aperte e in corso.
-
-\subsection{IDS}
-Gli \textit{Intrusion Detectiom System} può fare un molteplice attività:
-\begin{itemize}
-	\item ispezione dei pacchetti: controlla il contenuto di ciascun pacchetto transitato, istruito con le \textit{signature} prelevate da database di \textit{virus}, o attacchi noti;
-	\item esaminare la correlazione tra diversi pacchetti, per evitare si possa fare uno scan delle porte, un mapping della rete o un attacco \textit{DoS}.
-\end{itemize}
-
-\section{Tor}
-\textit{Tor} è un servizio di comunicazione anonimo distribuito che usa un livello indipendente di rete che permette alle persone di migliorare la loro privacy su Internet. Si usa \textit{tor} per mantenere i siti web liberi da meccanismi di \textit{tracking}. \\
-Essendo una rete, è formato da un numero decisamente elevato di host che funzionano da router - gli \textit{onion router} (o \textit{OR}), che dirigono il traffico - ma soprattutto da un \textit{onion proxy} (o \textit{OP}), installato sul client utilizzato per navigare sul \textit{deep web}. \\
-Tutte le informazioni che passano dal client ai vari nodi della rete vengono cifrate: l'unico \textit{hop} che rimane in chiaro è quello che lega l'ultimo nodo che lega il primo client al secondo da raggiungere: sostanziamente, Alice - che cerca di mandare un messaggio a Tor - invierà delle informazioni; queste informazioni passeranno per un numero $n$ di \textit{OR}, e ciascuno di essi applicherà una cifratura sul pacchetto ricevuto. Toccherà decifrare all'$n$esimo \textit{OR} - l'\textit{exit router} -, che consegnerà le informazioni a Bob. \\
-Il metodo di cifratura utilizzato da \textit{Tor} è \textit{TLS}.
+\paragraph{Agent discovery}
+La scoperta dell'agent della rete avviene attraverso il broadcasting di un messaggio \textit{ICMP}, detto \textit{advertisement}. La notifica degli \textit{agent} invece per l'avviso del nuovo indirizzo nella \textit{visited network} è fatto tramite datagrammi \textit{UDP} sulla porta 434.

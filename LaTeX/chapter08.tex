@@ -1,147 +1,119 @@
-Per anni - nonostante già esistessero le reti mobili - si è usato accedere ad internet con dispositivi fissi cablati. Negli ultimi anni, invece, la situazione si è evoluta drasticamente, grazie all'arrivo degli smartphones: si è passati da un accesso cablato ad un accesso wireless/mobile ed è cambiato il tipo e l'intensità di traffico, molto più multimediale.
-Diventa quindi di rilevante importanza la questione della gestione dei consumi energetici. \\
-I dispositivi che accedono ad internet sono molto variegati: da desktop/laptop, a palmari, a smartphone, a dispositivi dell'\textit{internet delle cose}. Tutto risulta essere connesso ed interagire con internet. I punti di accesso ad internet diventano sempre più radio. \\
-Occorre quindi imparare a gestire questa tipologia di accesso, che si articola di due tipi:
+\section{Multimedia: audio}
+I segnali audio analogici sono campionati a tasso costante (8000 campioni/secondo per il telefono, 44100 campioni/secondo per i CD, e così via \ldots); ogni campione viene quantizzato (arrotondato) ed ogni valore quantizzato viene rappresentato da un flusso di bit attraverso appositi \textit{codificatori vocali}.\\
+Questi codificatori vocali possono essere di tre tipi:
 \begin{itemize}
-	\item wireless \textit{anywhere/anytime}: possibilità di accedere ad internet da mobile anche se in movimento;
-	\item wireless senza mobilità (rete universitaria): un link wireless (un \textit{access point}, o \textit{relay}) che offre accesso wifi, collegato a sua volta - attraverso una parabola ad alta ricezione (come per esempio la tecnologia \textit{WiMAX}) - ad un dispositivo radio centrale (la \textit{stazione base}).
+	\item waveform codecs
+	\item source codecs (\textit{vocoders})
+	\item hybrid codecs
 \end{itemize}
 
-\paragraph{Nomadic computing}
-Insieme delle circostanze riguardanti un endpoint che si connette - anche con accesso cablato - in reti differenti (eventualmente con IP diversi).
+\subsection{Waveform Codecs}\hfill\\
+Non avendo nessuna conoscenza a priori di come il segnale sia stato generato, è necessario sapere la banda del segnale (minore ai 4KHz per la telefonia classica) e il massimo rumore di quantizzazione tollerabile.\\
+Questo tipo di codifica è caratterizzato da un'alta qualità finale, una bassa complessità e un basso ritardo, e da robustezza agli errori e al rumore di fondo.
 
-\paragraph{Mobile computing}
-Insieme delle circostanze riguardanti endpoint non connessi in maniera cablata. \\
-
-Il link che connette i dispositivi alla \textit{stazione base} lavora a livello due della pila \textit{TCP/IP}, è utilizzato come \textit{backbone link} e garantisce accesso multiplo attraverso protocolli che ne coordinano l'accesso. \\
-Esistono moltissime alternative per le tecnologie di link wireless, che garantiscono copertura di aree più o meno vaste:
+\paragraph{Pulse Code Modulation}
+Questo metodo provvede a salvare i dati audio senza nessun tipo di compressione dati; la forma d'onda viene direttamente digitalizzata. In questo modo, i file risultanti sono di elevate dimensioni ma non richiedono elevata potenza di calcolo per essere riprodotti.\\
+Si assume una banda  $ B = 4KHz $ e una frequenza di campionamento $ Bc=8KHz $m 8 bit/campione, 64kb/s.\\
+L'onda è campionata a intervalli regolari sull'asse delle x; per ogni campione, uno dei valori disponibili sull'asse delle y è scelto da opportuni algoritmi (in genere viene approssimato al più vicino). Questo produce una rappresentazione discreta del segnale di ingresso che può essere facilmente codificata in digitale per essere memorizzata e manipolata. Queste operazioni sono effettuate da un unico circuito integrato chiamato \textit{ADC} (\textit{analog-to-digital converter}) a cui va fornito solamente il clock e l'alimentazione, in uscita produce direttamente la codifica digitale del segnale analogico in ingresso.\\ 
+Per la \textit{demodulazione} (quindi per ricavare in ricezione il segnale campionato di ingresso), passato ogni periodo di campionamento, è letto il valore seguente e l'uscita si porta quasi istantaneamente al nuovo valore. Come risultato di queste variazioni istantanee si avrà un alto numero di armoniche indesiderate (maggiori di $ \frac{1}{2} f_c $ ) che si possono eliminare attraverso un filtro analogico. Teoricamente è impossibile rappresentare discretamente un segnale con banda infinita ma secondo il teorema del campionamento se si utilizza una frequenza di campionamento molto più alta di quella del segnale (pari a due volte la sua banda di frequenza) il segnale ricostruito in ricezione non si discosterà molto da quello originario. L'elettronica utilizzata per riprodurre un accurato segnale analogico da dati discreti è simile a quella usata per generare il segnale digitale. Questi dispositivi sono chiamati \textit{DAC} (\textit{digital-to-analog converters}), e operano in modo simile agli \textit{ADC}. Producono in uscita una tensione o una corrente (dipende dal tipo) secondo il valore presente in ingresso. Questo segnale di uscita viene generalmente filtrato e amplificato prima di essere utilizzato.\\
+La quantizzazione del segnale può essere:
 \begin{itemize}
-	\item \textit{802.11n}: 10m - 30m;
-	\item \textit{802.11a,g}: 10m - 30m;
-	\item \textit{802.11a,g point-to-point}: 50m - 5km;
-	\item \textit{802.11b}: 10m - 30m;
-	\item \textit{802.15}: 10m - 25m;
-	\item \textit{802.16} (\textit{WiMAX}): 30m - 20km;
-	\item \textit{UMTS/WCDMA-HSPDA}, \textit{CDMA2000-1xEVDO}: 30m - 15km;
-	\item \textit{UMTS/WCDMA}, \textit{CDMA2000}: 50m - 15km;
-	\item \textit{IS95}, \textit{CDMA}, \textit{GSM}: 50m - 15km.
-\end{itemize}
-
-\paragraph{Protocollo CDMA}
-Il protocollo \textit{Code Division Multiple Access} è largamente utilizzato nell'ambito delle reti mobili: un solo canale occupa l'intera ampiezza di banda, e tutte le stazioni possono inviare contemporaneamente. \\
-Si basa sulla teoria di codifica: ad ogni stazione viene assegnato un codice che è una sequenza di numeri, chiamati \textit{chip}, che rappresenta una \textit{sequenza ortogonale}, che prevede che:
-\begin{enumerate}
-	\item Ogni sequenza composta da $n$ elementi ($n = $ stazioni, potenza di 2);
-	\item Se moltiplichiamo una sequenza per un numero, goni elemento della sequenza viene moltiplicato per quel numero;
-	\item Se moltiplichiamo due sequenze uguali e sommiamo i risultati otteniamo $n$;
-	\item Se moltiplichiamo due sequenze diverse e sommiamo i risultato otteniamo 0;
-	\item Sommare due sequenze significa sommare gli elementi corrispondenti.
-\end{enumerate}
-Si stabilisce una regola per la codifica: il bit di dati 0 corrisponde a $-1$, il bit di dati 1 corrisponde a $+1$, e il silenzio corrisponde a 0. Dunque, la sequenza risultante nel canale sarà la somma delle sequenze inviate dalle stazioni.
-
-\paragraph{Reti infrastrutturali}
-Nelle reti infrastrutturali vi sono terminali mobili, un'infrastruttura e dei punti di accesso ad essa, garantendo tipicamente accesso ad internet.
-\begin{itemize}
-	\item Profondità a singolo hop: l'host si connette ad una \textit{stazione base} che si connette ad internet;
-	\item Profondità ad hop multipli: l'host può fare da \textit{relay} per altri nodi per permettergli di connettersi a loro volta ad internet.
-\end{itemize}
-
-\paragraph{Reti \textit{ad hoc} (non infrastrutturali)}
-Nelle reti \textit{ad hoc} non esiste \textit{stazione base} e i nodi possono soltanto trasmettere agli altri nodi nell'arco di coperatura del link wireless a cui sono connessi. Inoltre i nodi si organizzano in una network indipendente, in cui essere capaci di stabilire delle rotte funzionanti.
-\begin{itemize}
-	\item Profondità a singolo hop: non c'è né \textit{stazione base}, né connessione ad internet;
-	\item Profondità ad hop multipli: non c'è né \textit{stazione base}, né connessione ad internet, ma alcuni nodi potrebbero ugualmente funzionare da \textit{relay} per permettere accessi da alcuni nodi, ad altri. Si tratta di reti \textit{manet} e/o \textit{vanet}.
-\end{itemize}
-
-\section{Caratteristiche dei link Wireless}
-Le differenze sostanziali dai link cablati:
-\begin{itemize}
-	\item La densità di potenza del segnale trasmesso - propagandosi - decresce;
-	\item Possono verificarsi interferenze causate da sorgenti non necessariamente coinvolte direttamente nella connessione (e.g., dispositivi a micro-onde, motori, \ldots);
-	\item Propagazione \textit{multipath}: il segnale radio in base alla diffrazione che ne varia il percorso, arriva in momenti diversi in punti diversi.
-\end{itemize}
-Tutte queste differenze rendono la comunicazione wireless molto più difficile da gestire rispetto alla comune rete cablata.
-
-\paragraph{SNR}
-Il \textit{signal-to-noise ratio} è il rapporto segnale-rumore, che deve essere entro una certa soglia per poter garantire ricezione. Chiaramente può variare nel tempo. E' importante perché è collegato alla probabilità di errore. \\
-
-Il link wireless rappresenta un canale \textit{broadcast}: a creare nuovi problemi è la gestione della interazioni multiple tra un \textit{sender} ed un \textit{receiver} wireless. Il motivo per cui non è possibile utilizzare il protocollo \textit{CSMA/CD} è rappresentato dal problema dell'\textit{hidden terminal}: vi sono tre terminali \textit{A}, \textit{B} e \textit{C}, dove \textit{A} e \textit{B} possono comunicare senza problemi, così come \textit{B}, \textit{C}, ma non come \textit{A} e \textit{C}, perché esiste un impedimento fisico tra i due. Ancora può verificarsi il problema dell'attenuazione del segnale, dove \textit{B} si trova nel raggio trasmissivo di \textit{A} e \textit{C}, ma \textit{A} e \textit{C} non sono nel raggio trasmissivo l'uno dell'altro; anche se decidessero comunque di provare a trasmettersi, porterebbero ad una collisione su \textit{B}. \\
-Un'alternativa sviluppata è il Code Division Multiple Access (CDMA): viene utilizzato in diversi standard per canali di broadcast wireless. Ad ogni utente viene assegnato un codice univoco, tutti gli utenti condividono la stessa banda di frequenza e ad ogni utente viene assegnata una sequenza che lo autentichi (come il codice univoco): quando avviene la trasmissione, viene moltiplicato quanto da trasmettere con la sequenza, detta \textit{chipping code}. CDMA passa per tutta una serie di difficoltà, che permettono il sovrapporsi di trasmissioni, garantendo la capacità di decomporle autonomamente.
-
-\paragraph{IEEE 802.11}
-Diverse tecnologie (più è alto lo spettro della banda, più si è aperti ad attenuazioni), che però usano tutte il protocollo \textit{CSMA/CA} per l'accesso multiplo e tutte supportano sia una rete di tipo infrastrutturale che non:
-\begin{itemize}
-	\item 802.11b: spettro non licenziato tipicamente di 2.4-5GHz, raggiunge un massimo di 11Mbps e tutti gli host usano lo stesso chipping code;
-	\item 802.11a: spettro di 5-6GHz, con un tetto di 54Mbps;
-	\item 802.11g: spettro di 2.4-5GHz, con un tetto di 54Mbps;
-	\item 802.11n (con più trasmettenti): spettro di 2.4-5GHz, con un tetto di 200Mbps.
-\end{itemize}
-
-In una LAN wireless, il \textit{BSS} (\textit{Basic Service Set}) è una cella dell'infrastruttura, che contiene gli host wireless, l'access point (AP) e che supporta la modalità \textit{ad hoc}. Una struttura \textit{ESS} (\textit{Extended Service Set}) è costituita da due o più \textit{BSS} con infrastruttura, dove i \textit{BSS} sono collegati tramite un sistema di distribuzione che è una rete cablat o wireless. \\
-Un'espansione del \textit{CSMA/CA} prevede un comportamento diverso da parte del sender: se il canale è libero (dato ottenibile tramite il \textit{DIFS}, il \textit{Distributed InterFrame Spacing}, che altro non è che un intervallo di tempo costante), allora trasmetto l'intero frame, altrimenti aspetto per un intervallo casuale di tempo, al termine del quale trasmetto soltanto se il canale è libero, altrimenti lo raddoppio. Una volta trasmesso il dato, il ricevitore risponde con un ACK dopo un \textit{SIFS} (sempre minore del \textit{DIFS}, per garantire che altri non confondano questo tempo come canale libero). \\
-Per evitare le collisioni invece, il sender prima trasmette un piccolo pacchetto chiamato \textit{RTS} (\textit{request-to-send}): se questo non cattura collisioni, allora apro la trasmissione effettiva. In risposta all'\textit{RTS}, vi è il \textit{CTS} (\textit{clear-to-send}).
-Poiché questo flusso porta ad un \textit{overhead} dovuto alle trasmissioni di \textit{RTS} e \textit{CTS}, \textit{802.11} include una ottimizzazione sull'adattabilità alla banda.
-
-\paragraph{Accesso e associazione}
-Lo spettro 2.4GHz-2.485GHz è diviso in 11 canali parzialmente sovrapposti ed è l'amministratore dell'AP a sceglierlo. Sono possibili interferenze, se AP vicini utilizzano lo stesso canale: il numero massimo di frequenze utilizzabili da diversi AP per evitare interferenze è 3 (usando canali 1,6,11), perché i canali non interferiscono se separati da 4 o più canali. \\
-Esistono due tecniche di accesso al mezzo:
-\begin{itemize}
-	\item \textit{DCF} (\textit{Distributed Coordination Function}): i nodi si contendono l'access al canale;
-	\item \textit{\textit{PCF}} (\textit{Point Coordination Function}): non c'è contesa e l'AP coordina l'accesso dei nodi al canale.
-\end{itemize}
-
-\paragraph{Trame}
-Il formato della trama in \textit{802.11} è dato da:
-\begin{itemize}
-	\item 2 byte di \textit{frame control};
-	\item 2 byte di \textit{duration};
-	\item 6 byte per ciascun indirizzo MAC:
+	\item \textbf{Quantizzazione uniforme}	
 	\begin{itemize}
-		\item \textit{indirizzo 1}: destinazione (indirizzo MAC del wireless host o AP che riceve il frame);
-		\item \textit{indirizzo 2}: sorgente (indirizzo MAC del wireless host o AP che trasmette il frame);
-		\item \textit{indirizzo 3}: indirizzo MAC dell'interfaccia router al quale l'AP è conneso (colui che fa da ponte per internet, per esempio).
+		\item L'errore di quantizzazione è fisso (minore di $ \frac{q}{2} $, con $ q $ passo di quantizzazione)
+		\item Servono 12 bit/campione per riuscire ad ottenere un errore di quantizzazione sufficiente; basso nel caso di valori piccoli.
 	\end{itemize}
-	\item 2 byte di \textit{sequence control};
-	\item 6 byte per l'\textit{indirizzo 4} (usato solo nella modalità ad hoc);
-	\item 0-2312 byte di \textit{payload};
-	\item 4 byte di \textit{CRC}.
+	\item \textbf{Quantizzazione non uniforme}
+	\begin{itemize}
+		\item Valori grandi possono sopportare errori maggiori
+		\item Sono sufficienti 8 bit/campione in questo caso
+	\end{itemize}
 \end{itemize}
-Il dialogo tra l'access point e l'interfaccia router avviene secondo \textit{802.3}, il cui formato della trama prevede vi siano solo due indirizzi: l'indirizzo MAC di destinazione (MAC del router) e quello mittente (MAC dell'access point).
 
-\paragraph{Gestione energetica}
-Per migliorare i consumi energetici, i nodi allertano l'AP che \textit{vanno a dormire} fino al successivo \textit{beacon frame}, così che l'AP sa di non dover trasmettere frame a quel nodo e il nodo stesso non \textit{si sveglia} entro il successivo \textit{beacon frame}.
-Il \textit{beacon frame} (o \textit{pacchetto faro}) è definito come il frame che contiene una lista di device con frame \textit{AP-to-mobile} che attendono l'invio: ciascun nodo rimarrà \textit{sveglio} se i frame sono inviati; altrimenti in \textit{sleep} fino al prossimo \textit{beacon frame}. \\
-Il \textit{duty cycle} è definito come l'intervallo che intercorre tra il tempo di \textit{ON} e il tempo di \textit{ON} sommato al tempo di \textit{OFF}.
+\paragraph{Differential PCM}
+Aggiunge alcune funzionalità rispetto a PCM basandosi sulla predizione dei campioni del segnale. L'input può essere analogico o digitale.\\
+Se l'input è un segnale analogico a tempo continuo, deve essere campionato prima per fare in modo che l'input dell'encoder DPCM sia un segnale a tempo discreto.\\
+Abbiamo due alternative:
+\begin{enumerate}
+	\item prendere i valori di due campioni consecutivi; se sono campioni analogici, quantizzarli; restituire la differenza tra il primo e il secondo.
+	\item invece di prendere la differenza relativa ad un campione precendente, prendere la differenza relativa all'output di un modello locale del processo di decodifica; in questa opzione la differenza può essere quantizzata - ciò consente di incorporare una perdita controllata nella codifica.
+\end{enumerate}
+Applicando uno di questi due processi, la ridondanza a breve termine del segnale è eliminata; i vantaggi di questo metodo sono una notevole riduzione della velocità di emissione (da 64Kbps a 32Kbps) e  una maggiore qualità \textit{datarate} disponibile per ogni canale vocale.\\
+In questo modo, inoltre, i campioni vocali successivi sono correlati a quelli precedenti, ed è possibile utilizzare metodi di predizione per valutare il campione successivo noti i precedenti.\\
+L'unica informazione trasmessa è la differenza tra valore predetto e valore reale. A causa della correlazione, la varianza della differenza è minore ed è possibile codificarla con un minor numero di bit.\\
 
-\section{Tecnologia Bluetooth}
-Lo standard associato è l'\textit{802.15} e il suo obiettivo è quello di avere un raggio di azione più corto rispetto all'\textit{802.11}.
-La modalità di comunicazione è \textit{master/slave}, dove gli slave fanno richieste unicamente al master, che risponde a ciascuna di esse.
-Si tratta di una rete \textit{ad hoc}, in cui la trasmissione ha una banda pari a 2,4-5 GHz e raggiunge una capacità trasmissiva massima di 721kbps. \\
-Il primo standard fu rilasciato nel 1999. Il \textit{Bluetooth Special Interest Group} conta oltre 1800 membri, tra cui Ericsson, Nokia, IBM, Intel, Toschiba, Microsoft, Lucent, 3Com, Motorola, e così via \ldots \\
-La cosa più interessante è che viene adoperato un approccio totalmente nuovo: il \textit{Frequency Hopping Spread Spectrum}. I devices seguono una sequenza \textit{FHSS} pseudocasuale generata utilizzando l'ID del master (accessibile non solo dal master ma anche da tutti gli slaves). La frequenza usata per la trasmissione cambia per ogni pacchetto, garantendo scarsa interferenza ed elevata sicurezza. \\
-I devices bluetooth sono organizzati in \textit{piconets}, cluster formati da un master e diversi slaves (per un massimo di 7 in comunicazione). La formazione di una \textit{scatternet} (interconnessione di \textit{piconet}) è definita da tre problemi fondamentali:
+\paragraph{Adaptive DPCM}
+Questo tipo di compressione è un'estensione della codifica digitale PCM di base, usata largamente soprattutto nel campo della telefonia fissa.\\
+A differenza della PCM di base, che campiona il segnale audio, lo quantizza secondo un codificatore non lineare e trasmette direttamente i valori quantizzati in formato numerico, l'ADPCM si basa sulla predicibilità di un campione a partire da un numero di campioni precedenti ad esso. È quindi sufficiente predire il campione n-esimo, valutare l'errore rispetto a quello reale e trasmettere soltanto l'errore di predizione. Dal canto suo, il decoder farà la stessa predizione e sommerà ad essa l'errore di predizione ricevuto. In questo modo il tutto funziona se la varianza dell'errore è minore della varianza dei campioni, nel senso che si avrà un reale risparmio di bit da trasmettere.\\
+Con la tecnica ADPCM si riesce a garantire un bitrate di 32kbps in campo telefonico, contro i 64kbps del PCM tradizionale.
+
+\subsection{Source Codecs}
+Questi codificatori sono detti anche \textit{Vocoders} perchè si basano su modelli di generazione della voce umana che permettono di "togliere la ridondanza" da segmenti vocali fino ad un'informazione base sufficiente a riprodurre la voce.\\
+Sono caratterizzati da un'elevata complessità, ritardi mediamente elevati e forte sensibilità ad errori, rumori di fondo e suoni non umani.
+
+\section{Multimedia: video}
+Un'immagine digitale è un array di pixel rappresentati da bit.\\
+Un \textit{video} è una sequenza di immagini digitali visualizzate a tasso costante.\\
+Per codificare un video si sfrutta la ridondanza spaziale (nelle immagini) e temporale (da un'immagine all'altra) per ridurre il numero di bit necessari per la codifica.
+
+\paragraph{Streaming stored videos}
+Nel progettare meccanismi di riproduzione di video locali, bisogna tenere conto di alcuni requisiti. Tra questi, uno dei più significativi ed impegnativi è quello del playout continuo: una volta iniziato il playout del client, il playback deve corrispondere al tempo originale, indipendentemente dai ritardi di rete (questo richiederà quindi un buffer client-side). Altri esempi sono l'interattività (possibilità di mettere in pausa, saltare da un fotogramma all'altro, mandare avanti velocemente) e la ritrasmissione di pacchetti persi.\\
+% manca un pezzo
+
+\section{Streaming multimedia: UDP}
+Il server invia a tasso appropriato per il client. Spesso il tasso di invio e il tasso di codifica sono uguali e costanti; il tasso di trasmissione può essere indipendente dal livello di trasmissione. Il ritardo di playout è molto breve (solitamente da 2 a 5 secondi) per rimuovere il \textit{jitter}; per quanto riguarda l'aspetto dell'\textit{error recovery}, va ricordato che questo è effettuato solo a livello applicativo. Bisogna inoltre tenere conto del fatto che UDP potrebbe essere bloccato dai firewall.
+
+\section{Streaming multimedia: HTTP}
+Con lo streaming HTTP, i file multimediali sono recuperati direttamente tramite HTTP GETs e inviati via TCP a tasso più alto possibile.\\
+È necessario un maggiore \textit{playout delay} che tenga conto della variabilità delle sorgenti nel tempo.\\
+Un \textit{hyperlink} per un file multimediale contiene l'URL dell'audio/video in questione. Quando un utente clicca su di esso, la risposta include un header con il tipo di contenuto; il browser esamina l'header e lancia il riproduttore associato.\\
+Con questo metodo la possibilità di perdita di informazioni è molto alta (\textit{playout buffer}, \textit{playout delay}, \textit{prefetching}, e così via \ldots). Per minimizzare gli errori di trasmissione sono state adottate delle tecniche di codifica che tentino il più possibile di limitare \textit{flipping}, adottando politiche che preferiscono molta ridondanza purchè ci sia \textit{error detection}. In questo caso, il \textit{throughput} varia da utente ad utente.
+
+\paragraph{Dynamic Adaptive Streaming over HTTP}
+Lo stesso contenuto è memorizzato sul server per codifiche diverse che variano in base all'endsystem che lo richiede. Solitamente è preferita una qualità più bassa per evitare errori di trasmissione.\\
+Lato server, il file è diviso in \textit{chunks}, ognuno dei quali è conservato e codificato a diverse frequenze.\\
+Il client misura la \textit{bandwidth}, consulta il manifest e richiede un chunk alla volta. Deve essere in grado di determinare quando richiedere il chunk, come richiederlo e \textit{a chi} richiederlo: i contenuti sono infatti replicati in batterie di server che possono essere geograficamente distribuiti su server propri o di hosting (CDN) secondo due logiche:
 \begin{itemize}
-	\item la scoperta di devices (tramite la procedura bluetooth standard \textit{inquiry}/\textit{inquiry scan});
-	\item la formazione di una \textit{piconet};
-	\item l'interconessione delle \textit{piconet}.
+    \item \textit{enter deep}: i server sono in prossimità degli ISP, vicino agli end users;
+    \item \textit{bring home}: i server sono posizionati in cluster presso \textit{POP} (\textit{points of presence}).
 \end{itemize}
-Di fondamentale importanza è il fatto che il master sia appartenenete ad una \textit{piconet} per volta, perché altrimenti l'attività presso di una comprometterebbe la necessità dell'attività dello stesso master in un'altra \textit{piconet}. \\
-Il punto dolente della tecnologia bluetooth è la \textit{device discovery}: impiega troppo tempo per il detecting ed è troppo altalenante nel mantenere la connnessione. Questa fase è definita dall'\textit{inquiry scan}: viene fatto uno scan per individuare tutti i possibili nodi, ai quali viene mandato un pacchetto \textit{FHS} che mette al corrente dell'ID del master, così da permettere il calcolo della sequenza. Un nodo può essere o in modalità \textit{inquiry} o \textit{inquiry scan}: si può stabilire quindi una connesione soltanto tra nodi in modalità opposta. Per questo ogni nodo salta costantemente da uno stato di \textit{inquiry} a \textit{inquiry scan}, e viceversa. \\
-Se esistono piu di 7 nodi in una \textit{piconet}, occorre formare una \textit{scatternet}. Per gestirle coerentemente, vengono utilizzati due tipi di scheduling: lo scheduler \textit{interpiconet} e \textit{intrapiconet}. Il primo si occupa di gestire quando e per quanto tempo considerare uno slave come attivo in una data \textit{piconet}. Il secondo invece determina lo schema da adottare in ciascuna \textit{piconet}: per esempio, in maniera proporzionale alla quantità di dati trasmessi da un device, saranno allocate risorse per questo, in modo tale da evitare di fare \textit{polling} continuo su device poco attivi, risparmiando risorse. L'obiettivo di entrambi è fare \textit{load balancing}.
 
-\section{Rete cellulare}
-La rete cellulare è garantita tramite il tassellamento di un'area con \textit{stazioni base} in modo tale da garantire copertura per la totalità del territorio. \\ Gruppi di stazioni base, le celle, sono collegate ad un \textit{mobile switching center} (o \textit{MSC}), al quale trasmettono tramite \textit{FDMA} e \textit{TDMA} (lo spettro viene diviso in canali di frequenza, a loro volta divisi in slot di tempo), nel caso di infrastrutture precedenti alla terza generazione (nelle successive viene usato il \textit{CDMA}), e che a sua volta è collegato alla rete telefonica e/o internet pubblica del gestore. \\
-Nel passaggio delle generazioni sono migliorate le velocità di tramissione e qualità di trasmissione della voce e dei dati. Infatti, nella generazione \textit{2G} (in cui era possible trasmettere soltanto la voce), tra le celle e l'\textit{MSC} era frapposta una \textit{BSC} (\textit{Base Station Controller}), che gestiva soltanto un numero molto limitato di celle. \\
-Nelle infrastrutture delle generazioni successive, dal \textit{2.5G} in poi (in cui fu introdotta la possibilità di trasmissione di dati, oltre alla voce), ogni \textit{BSC} è collegato non solo ad un \textit{MSC} per il supporto voce, ma anche ad un \textit{SGSN} (\textit{Serving GPRS Support Node}) per il supporto internet, che è collegato a sua volta ad un \textit{GGSN} (\textit{Gateway GPRS Support Node}) che fa effettivamente da ponte verso internet. \\
-Nelle generazioni successive al \textit{2.5G}, è stato modificata la struttura per raggiungere miglioramenti nella qualità e nell'intensità del servizio offerto. \\ \\
-
-Uno dei problemi più importanti è quello della mobilità, in quanto occorre garantire una connessione continua anche a device in costante movimento, che si agganciano/sganciano continuamente a/da celle distinte adiacenti. Come garantire che, nonostante tutti questi spostamenti, un device qualsiasi sia comunque capace di definire un indirizzo attraverso cui raggiungere il device in costante movimento? Vi sono due approcci:
+\section{Voice Over IP}
+Caratteristiche particolari:
 \begin{itemize}
-	\item \textit{let routing handle it}: il router richiede l'aggiornamento delle \textit{routing table}, così da mantenerle costantemente aggiornate sugli spostamenti dei devices. E' una soluzione decisamente non scalabile su milioni di devices;
-	\item \textit{let end-system handle it}: lo stesso end-system notifica ogni spostamento ai vari router.
+    \item forti requisiti in termini di ritardo (è considerato 'buono' fino a 150 millisecondi, 400 è il massimo tollerato)
+    \item inizializzazione di sessione (determinare come raggiungere un utente)
+    \item codifica
 \end{itemize}
-Sostanzialmente, ogni device ha una \textit{home network} (la propria rete, la rete casalinga), dentro la quale gli viene assegnato un IP permanente che è sempre utilizzato per raggiungere il device. All'interno della stessa rete c'è un \textit{home agent}, il responsabile della rete. Quando ci si muove, si raggiunge una \textit{visited network}, dove il responsabile è un \textit{foreign agent}: al device viene assegnato un IP temporaneo \textit{care-of-address} valido in quella \textit{visited network}. Come può un qualsiasi altro device a raggiungere quel device? Nel momento in cui quest'ultimo entra in una \textit{visited network}, deve contattare il \textit{foreign agent} per avvertirlo che si trova ora in quella rete e che ha un dato indirizzo permanente. L'agent utilizzerà quell'indirizzo per raggiungere il suo \textit{home agent}, segnalandogli lo spostamento. Allora il device esterno che desiderava contattarlo, conoscendo l'IP permanente del device, sarà in grado di contattare la \textit{home network} che lo reindizzerà alla \textit{visited network}. \\
-Questo sistema di routing è detto \textit{routing indiretto}: l'inefficienza è data dal fatto che se due device si trovano entrambi in una stessa \textit{visisted network}, per contattarsi passeranno comunque ad interrogare la \textit{home network} di ciascuno. L'alternativa è il \textit{routing diretto}: viene fatta - in fase di creazione di una connessione tra due devices - richiesta all'\textit{home agent} di ciascuno. Una volta ottenuta la risposta, non viene più richiesto, e viene utilizzato quello che ho chiesto in fase di configurazione. Il rischio è che, se nel frattempo uno dei devices si sposta, l'indirizzo risulterà sbagliato. Allora si introduce il concetto di \textit{anchor foreign agent}, il precedente \textit{foreign agent} di un device, il quale verrà contattato in ogni spostamento dello stesso device in nuove \textit{visited network}.
+I pacchetti vengono generati solo se non c'è silenzio.\\
+Si sceglie di trasmettere a 64Kbps solo se c'è segnale audio sul canale; altrimenti viene inviato un suono di sottofondo precedentemente campionato.\\
+Tra i problemi di questa tecnica:
+\begin{itemize}
+    \item network loss
+    \begin{itemize}
+        \item router buffer overflow
+        \item congestione
+    \end{itemize}
+    \item delay loss - datagrammi IP in ritardo
+    \item tolleranza limitata per la perdita di pacchetti: da 1\% a 10\%
+    \item i pacchetti che superano il ritardo tollerato vengono solitamente scartati
+\end{itemize}
+Il ricevente proverà a riprodurre ogni chunk esattamente \textit{q} millisecondi dopo la sua generazione (necessariamente $ q < 400msec $). Ogni chunk presenterà un timestamp t; il playout sarà $ p+q $. Appare quindi chiaro che più $ q $ è alto, minore è la perdita di pacchetti; più $ q $ è basso, migliore è l'esperienza utente (per le prestazioni).\\
+Si parla di \textit{adaptive playout delay} perchè $ q $ varia in base al tipo di trasmissione; si avrà un ritardo maggiore appena finito un periodo di silenzio poichè impercettibile per l'utente.\\
+Per quanto riguarda la perdita di informazioni, è adottata una \textit{Forward Error Correction}: sono inviati abbastanza bit da permettere il recupero delle informazioni dallo strato applicativo, senza bisogno di ritrasmissione.\\
+Un esempio di \textit{FEC} può essere l'invio, ogni $ n $ chunk, di un chunk $ n + 1 $ di ridondanza calcolato come XOR dei precedenti.\\
+Una \textit{FEC} molto utilizzata prevede che i pacchetti, normalmente inviati con codifica PCM a 64Kbps, presentino anche una codifica GSM a 13Kbps del pacchetto precedente. In questo modo, in caso di perdita di un pacchetto, si potrà comunque recuperare una sua versione a bassa qualità con il pacchetto successivo.\\
+Uno degli applicativi VOIP più famosi, \textit{Skype}, utilizza UDP per la trasmissione dati, TCP per controllo e recovery (in caso il firewall blocchi UDP), la codifica FEC a livello applicativo e conserva inoltre le porte e gli IP (SN).
 
-\paragraph{Agent discovery}
-La scoperta dell'agent della rete avviene attraverso il broadcasting di un messaggio \textit{ICMP}, detto \textit{advertisement}. La notifica degli \textit{agent} invece per l'avviso del nuovo indirizzo nella \textit{visited network} è fatto tramite datagrammi \textit{UDP} sulla porta 434.
+\paragraph{Real Time Streaming Protocol}
+Questo protocollo risiede sugli endsystem (tra UDP e lo strato applicativo) e specifica la struttura dei pacchetti trasportanti audio/video. La sua unica funzione è estendere l'header dei pacchetti per fornire:
+\begin{itemize}
+    \item time stamping
+    \item sequence numbering
+    \item identificazione tipo di payload
+    \item IP/porte
+\end{itemize}
+
+\paragraph{Real Time Control Protocol}
+Com'è facilmente intuibile, solitamente è associato a RTSP e funge da canale di controllo dedicato.\\
+Ogni fruitore di RTSP invia periodicamente pacchetti di controllo RTCP contenenti report/feedback (numero di pacchetti inviati e ricevuti, \textit{jitter}, e così via \ldots). Tenta di non consumare più del 5\% della banda totale.

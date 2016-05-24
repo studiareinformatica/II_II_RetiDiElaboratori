@@ -1,119 +1,216 @@
-\section{Multimedia: audio}
-I segnali audio analogici sono campionati a tasso costante (8000 campioni/secondo per il telefono, 44100 campioni/secondo per i CD...); ogni campione viene quantizzato (per esempio arrotondato) ed ogni valore quantizzato viene rappresentato da un flusso di bit attraverso appositi \textit{codificatori vocali}.\\
-Questi codificatori vocali possono essere di tre tipi:
+\section{Informazioni generali}
+La sicurezza informatica si fonda su diversi concetti:
 \begin{itemize}
-	\item waveform codecs
-	\item source codecs (\textit{vocoders})
-	\item hybrid codecs
+	\item \textbf{confidenzialità}: soltanto \textit{sender} e \textit{receiver} possono \textit{capire} il contenuto di un messaggio;
+	\item \textbf{autenticazione}: soltanto \textit{sender} e \textit{receiver} possono confermare l'identità di ciascuno;
+	\item \textbf{integrità di messaggio}: \textit{sender} e \textit{receiver} devono essere sicuri che il messaggio sia integro;
+	\item \textbf{accesso e disponibilità}: i servizi devono essere accessibili e disponibili agli utenti.
 \end{itemize}
 
-\subsection{Waveform Codecs}\hfill\\
-Non avendo nessuna conoscenza a priori di come il segnale sia stato generato, è necessario sapere la banda del segnale (minore ai 4KHz per la telefonia classica) e il massimo rumore di quantizzazione tollerabile.\\
-Questo tipo di codifica è caratterizzato da un'alta qualità finale, una bassa complessità e un basso ritardo, e da robustezza agli errori e al rumore di fondo.
+\paragraph{Personaggi noti}
+\textit{Bob} e \textit{Alice} vogliono comunicare in maniera sicura; \textit{Eve} è l'intruso, che vuole ottenere - senza permesso - le informazioni tra i due precedenti comunicanti, tramite \textit{eavesrop} (intercettazione), \textit{iniettazione} dei messaggi nella rete, \textit{personificazione} (pretendendo di essere qualcun altro); \textit{hijacking} (sostituendo uno dei capi della trasmissione con sé stesso), provocazione di \textit{denial of service} (prevenendo il servizio dall'essere usato dagli utenti, attraverso l'\textit{overload} delle risorse, per esempio).
+\newpage
 
-\paragraph{Pulse Code Modulation}
-Questo metodo provvede a salvare i dati audio senza nessun tipo di compressione dati; la forma d'onda viene direttamente digitalizzata. In questo modo, i file risultanti sono di elevate dimensioni ma non richiedono elevata potenza di calcolo per essere riprodotti.\\
-Si assume una banda  $ B = 4KHz $ e una frequenza di campionamento $ Bc=8KHz $m 8 bit/campione, 64kb/s.\\
-L'onda è campionata a intervalli regolari sull'asse delle x; per ogni campione, uno dei valori disponibili sull'asse delle y è scelto da opportuni algoritmi (in genere viene approssimato al più vicino). Questo produce una rappresentazione discreta del segnale di ingresso che può essere facilmente codificata in digitale per essere memorizzata e manipolata. Queste operazioni sono effettuate da un unico circuito integrato chiamato ADC (analog-to-digital converter) a cui va fornito solamente il clock e l'alimentazione, in uscita produce direttamente la codifica digitale del segnale analogico in ingresso.\\ 
-Per la \textit{demodulazione} (quindi per ricavare in ricezione il segnale campionato di ingresso), passato ogni periodo di campionamento è letto il valore seguente e l'uscita si porta quasi istantaneamente al nuovo valore. Come risultato di queste variazioni istantanee si avrà un alto numero di armoniche indesiderate (maggiori di $ \frac{1}{2} f_c $ ) che si possono eliminare attraverso un filtro analogico. Teoricamente è impossibile rappresentare discretamente un segnale con banda infinita ma secondo il teorema del campionamento se si utilizza una frequenza di campionamento molto più alta di quella del segnale (pari a due volte la sua banda di frequenza) il segnale ricostruito in ricezione non si discosterà molto da quello originario. L'elettronica utilizzata per riprodurre un accurato segnale analogico da dati discreti è simile a quella usata per generare il segnale digitale. Questi dispositivi sono chiamati DAC (digital-to-analog converters), e operano in modo simile agli ADC. Producono in uscita una tensione o una corrente (dipende dal tipo) secondo il valore presente in ingresso. Questo segnale di uscita viene generalmente filtrato e amplificato prima di essere utilizzato.\\
-La quantizzazione del segnale può essere:
-\begin{itemize}
-	\item \textbf{Quantizzazione uniforme}	
-	\begin{itemize}
-		\item L'errore di quantizzazione è fisso (minore di $ \frac{q}{2} $, con $ q $ passo di quantizzazione)
-		\item Servono 12 bit/campione per riuscire ad ottenere un errore di quantizzazione sufficiente; basso nel caso di valori piccoli.
-	\end{itemize}
-	\item \textbf{Quantizzazione non uniforme}
-	\begin{itemize}
-		\item Valori grandi possono sopportare errori maggiori
-		\item Sono sufficienti 8 bit/campione in questo caso
-	\end{itemize}
-\end{itemize}
-
-\paragraph{Differential PCM}
-Aggiunge alcune funzionalità rispetto a PCM basandosi sulla predizione dei campioni del segnale. L'input può essere analogico o digitale.\\
-Se l'input è un segnale analogico a tempo continuo, deve essere campionato prima per fare in modo che l'input dell'encoder DPCM sia un segnale a tempo discreto.\\
-Abbiamo due alternative:
+\section{Crittografia}
+Il messaggio in chiaro si dice \textit{plain-text}; una volta crittografato, invece, \textit{cipher-text}. \\
+Avendo soltanto il \textit{cipher-text} posso:
 \begin{enumerate}
-	\item prendere i valori di due campioni consecutivi; se sono campioni analogici, quantizzarli; restituire la differenza tra il primo e il secondo.
-	\item invece di prendere la differenza relativa ad un campione precendente, prendere la differenza relativa all'output di un modello locale del processo di decodifica; in questa opzione la differenza può essere quantizzata - ciò consente di incorporare una perdita controllata nella codifica.
+	\item fare \textit{brute-force}: tentare utilizzando tutte le chiavi in mio possesso per \textit{decriptare} il messaggio;
+	\item utilizzare un'analisi statistica per risalire attraverso calcoli probabilistici a sequenze di caratteri noti (nel caso in cui si utilizzino metodi di cifrature \textit{monoalfabetici}).
 \end{enumerate}
-Applicando uno di questi due processi, la ridondanza a breve termine del segnale è eliminata; i vantaggi di questo metodo sono una notevole riduzione della velocità di emissione (da 64Kbps a 32Kbps) e  una maggiore qualità datarate disponibile per ogni canale vocale.\\
-In questo modo, inoltre, i campioni vocali successivi sono correlati a quelli precedenti, ed è possibile utilizzare metodi di predizione per valutare il campione successivo noti i precedenti.\\
-L'unica informazione trasmessa è la differenza tra valore predetto e valore reale. A causa della correlazione la varianza della differenza è minore ed è possibile codificarla con un minor numero di bit.\\
 
-\paragraph{Adaptive DPCM}
-Questo tipo di compressione è un'estensione della codifica digitale PCM di base, usata largamente soprattutto nel campo della telefonia fissa.\\
-A differenza della PCM di base, che campiona il segnale audio, lo quantizza secondo un codificatore non lineare e trasmette direttamente i valori quantizzati in formato numerico, l'ADPCM si basa sulla predicibilità di un campione a partire da un numero di campioni precedenti ad esso. È quindi sufficiente predire il campione n-esimo, valutare l'errore rispetto a quello reale e trasmettere soltanto l'errore di predizione. Dal canto suo, il decoder farà la stessa predizione e sommerà ad essa l'errore di predizione ricevuto. In questo modo il tutto funziona se la varianza dell'errore è minore della varianza dei campioni, nel senso che si avrà un reale risparmio di bit da trasmettere.\\
-Con la tecnica ADPCM si riesce a garantire un bitrate di 32kbps in campo telefonico, contro i 64kbps del PCM tradizionale.
+\subsection{Crittografia a chiave simmetrica}
+Due o più persone condividono la stessa chiave (simmetrica), utilizzata come pattern ci cifratura a sostituzione mono alfabetica. Come si accordano, però, Bob e Alice? Occorre un sistema di scambio di chiavi attraverso un canale sicuro (anche fisico, per esempio).
+\subsubsection{Schema di cifratura di Cesare}
+Sistema di cifratura basato su uno spostamento/slittamento di \textit{n} lettere sulla sequenza dell'alfabeto. In questo caso, la chiave è proprio \textit{n}.
 
-\subsection{Source Codecs}
-Questi codificatori sono detti anche \textit{Vocoders} perchè si basano su modelli di generazione della voce umana che permettono di "togliere la ridondanza" da segmenti vocali fino ad un'informazione base sufficiente a riprodurre la voce.\\
-Sono caratterizzati da un'elevata complessità, ritardi mediamente elevati e forte sensibilità ad errori, rumori di fondo e suoni non umani.
+\subsubsection{DES: Data Encryption Standard}
+Standard di criptazione, che utilizza chiavi lunghe \textit{56bit}, di cui si usano \textit{48bit}. Il messaggio viene spezzato in frammenti da 64bit, e passa per l'algoritmo blocco per blocco, tramite sistemi di permutazione. E' stato necessario nemmeno un giorno per \textit{bucarlo}. \\
+Per questa ragione hanno sviluppato il \textit{3DES}, algoritmo di criptazione che prevede 3 passaggi: una \textit{encryption} iniziale utilizzando una chiave iniziale, una \textit{decription}, utilizzando una seconda chiave, e una \textit{encryption} finale, tramite la chiave iniziale.
 
-\section{Multimedia: video}
-Un'immagine digitale è un array di pixel rappresentati da bit.\\
-Un \textit{video} è una sequenza di immagini digitali visualizzate a tasso costante.\\
-Per codificare un video si sfrutta la ridondanza spaziale (nelle immagini) e temporale (da un'immagine all'altra) per ridurre il numero di bit necessari per la codifica.
+\subsubsection{AES: Advanced Encryption Standard}
+Standard molto più attuale. Utilizza un sistema di criptazione simmetrica che nel 2001 ha rimpiazzato \textit{DES}. Processa dati in blocchi da \textit{128bit}, con chiavi da \textit{128}/\textit{192}/\textit{256 bit}, per cui si dice abbia sicurezza di un ordine di $2^{128}$. \\
+Mentre occorreva 1s per decriptare lo standard \textit{DES}, occorrono 149 trilioni di anni per farlo con \textit{AES}.
+\newpage
 
-\paragraph{Streaming stored videos}
-Nel progettare meccanismi di riproduzione di video locali, bisogna tenere conto di alcuni requisiti. Tra questi, uno dei più significativi ed impegnativi è quello del playout continuo: una volta iniziato il playout del client, il playback deve corrispondere al tempo originale, indipendentemente dai ritardi di rete (questo richiederà quindi un buffer client-side). Altri esempi sono l'interattività (possibilità di mettere in pausa, saltare da un fotogramma all'altro, mandare avanti velocemente) e la ritrasmissione di pacchetti persi.\\
-% manca un pezzo
+\subsection{Modus operandi}
+Il \textit{modus operandi} di un algoritmo di cifratura è il modo con cui vengono scambiati i blocchi, e prende il nome di \textit{ECB} (o \textit{Elecronic CodeBook}).
+Altro metodo è quello del \textit{CBC} (o \textit{Cipher Block Chaining}), dove l'output del blocco precedente è l'input del blocco successivo.
 
-\section{Streaming multimedia: UDP}
-Il server invia a tasso appropriato per il client. Spesso il tasso di invio e il tasso di codifica sono uguali e costanti; il tasso di trasmissione può essere indipendente dal livello di trasmissione. Il ritardo di playout è molto breve (solitamente da 2 a 5 secondi) per rimuovere il jitter; per quanto riguarda l'aspetto dell'\textit{error recovery}, va ricordato che questo è effettuato solo a livello applicativo. Bisogna inoltre tenere conto del fatto che UDP potrebbe essere bloccato dai firewall.
-
-\section{Streaming multimedia: HTTP}
-Con lo streaming HTTP, i file multimediali sono recuperati direttamente tramite HTTP GETs e inviati via TCP a tasso più alto possibile.\\
-È necessario un maggiore playout delay che tenga conto della variabilità delle sorgenti nel tempo.\\
-Un \textit{hyperlink} per un file multimediale contiene l'URL dell'audio/video in questione. Quando un utente clicca su di esso, la risposta include un header con il tipo di contenuto; il browser esamina l'header e lancia il riproduttore associato.\\
-Con questo metodo la possibilità di perdita di informazioni è molto alta (playout buffer, playout delay, prefetching...). Per minimizzare gli errori di trasmissione sono state adottate delle tecniche di codifica che tentino il più possibile di limitare flipping etc., adottando policies che preferiscono molta ridondanza purchè ci sia error detection. In questo caso, il \textit{throughput} varia da utente ad utente.
-
-\paragraph{Dynamic Adaptive Streaming over Http}
-Lo stesso contenuto è memorizzato sul server per codifiche diverse che variano in base all'endsystem che lo richiede. Solitamente è preferita una qualità più bassa per evitare errori di trasmissione.\\
-Lato server, il file è diviso in \textit{chunks}, ognuno dei quali è conservato e codificato a diverse frequenze.\\
-Il client misura la \textit{bandwidth}, consulta il manifest e richiede un chunk alla volta. Deve essere in grado di determinare quando richiedere il chunk, come richiederlo e \textit{a chi} richiederlo: i contenuti sono infatti replicati in batterie di server che possono essere geograficamente distribuiti su server propri o di hosting (CDN) secondo due logiche:
+\subsection{Crittrogafia a chiave pubblica}
+Utilizza un approccio totalmente differente: il \textit{sender} e il \textit{receiver} hanno rispettivamente due chiavi: una privata e una pubblica. Non condividono la loro chiave privata, ma solo la pubblica, quindi la chiave di decriptazione privata è nota solo al \textit{receiver}. \\
+Sostanzialmente, quando Alice vuole inviare un messaggio a Bob, lo cripta con la chiave pubblica di Bob, il quale - quando riceverà il messaggio criptato - lo decripterà con la propria chiave privata, e/o viceversa. \\
+Tra gli algoritmi di crittografia a chiave pubblica più importanti troviamo l'\textit{RSA} (dai suoi creatori: \textit{Rivest}, \textit{Shamir} e \textit{Adelson}), che si basa sul fatto che bit può essere univocamente rappresentabile da un numero. Per creare un paio di chiavi \textit{RSA} occorre:
 \begin{itemize}
-    \item \textit{enter deep}: i server sono in prossimità degli ISP, vicino agli end users;
-    \item \textit{bring home}: i server sono posizionati in cluster presso POP (points of presence)
+	\item scegliere due numeri \textit{p} e \textit{q} (utilizzando, ad esempio, 1024 bit per ciascuno);
+	\item si calcola $n=p\times q$ e $z=(p-1)\times (q-1)$;
+	\item si sceglie una $e < n$ che non ha nulla in comune con \textit{z} (per cui si dicono \textit{relativamente primi});
+	\item si sceglie una \textit{d} in modo tale che $(e\times d)-1$ sia divisibile per \textit{z}.
+\end{itemize}
+Infine:
+\begin{center}
+	Criptazione: $c = m^e$ $mod$ $n$ \\
+	Decriptazione: $m = c^d$ $mod$ $n$
+\end{center}
+
+\section{Autenticazione}
+\subsection{Firme digitali}
+Una firma digitale rappresenta un insieme di dati in forma elettronica, allegati oppure connessi tramite associazione logica ad altri dati elettronici, utilizzati come metodo di identificazione informatica.
+
+Si propone di soddisfare le seguenti esigenze:
+\begin{itemize}
+	\item \textbf{autenticazione:} il destinatario può verificare l'identità del mittente.
+	\item \textbf{integrità:} il destinatario non può creare o modificare un documento firmato da qualcun altro.
+	\item \textbf{non ripudio:} il mittente non può disconoscere un documento da lui firmato. La firma digitale è l'unico meccanismo basato su crittografia a chiave pubblica ad avere questa caratteristica.	
 \end{itemize}
 
-\section{Voice Over IP}
-Caratteristiche particolari:
-\begin{itemize}
-    \item forti requisiti in termini di ritardo (è considerato 'buono' fino a 150 millisecondi, 400 è il massimo tollerato)
-    \item inizializzazione di sessione (determinare come raggiungere un utente)
-    \item codifica
-\end{itemize}
-I pacchetti vengono generati solo se non c'è silenzio.\\
-Si sceglie di trasmettere a 64Kbps solo se c'è segnale audio sul canale; altrimenti viene inviato un suono di sottofondo precedentemente campionato.\\
-Tra i problemi di questa tecnica:
-\begin{itemize}
-    \item network loss
-    \begin{itemize}
-        \item router buffer overflow
-        \item congestione
-    \end{itemize}
-    \item delay loss - datagrammi IP in ritardo
-    \item tolleranza limitata per la perdita di pacchetti: da 1\% a 10\%
-    \item i pacchetti che superano il ritardo tollerato vengono solitamente scartati
-\end{itemize}
-Il ricevente proverà a riprodurre ogni chunk esattamente \textit{q} millisecondi dopo la sua generazione (necessariamente $ q < 400msec $). Ogni chunk presenterà un timestamp t; il playout sarà $ p+q $. Appare quindi chiaro che più $ q $ è alto, minore è la perdita di pacchetti; più $ q $ è basso, migliore è l'esperienza utente (per le prestazioni).\\
-Si parla di \textbf{adaptive playout delay} perchè $ q $ varia in base al tipo di trasmissione; si avrà un ritardo maggiore appena finito un periodo di silenzio poichè impercettibile per l'utente.\\
-Per quanto riguarda la perdita di informazioni, è adottata una \textbf{Forward Error Correction}: sono inviati abbastanza bit da permettere il recupero delle informazioni dallo strato applicativo, senza bisogno di ritrasmissione.\\
-Un esempio di FEC può essere l'invio, ogni $ n $ chunk, di un chunk $ n + 1 $ di ridondanza calcolato come XOR dei precedenti.\\
-Una FEC molto utilizzata prevede che i pacchetti, normalmente inviati con codifica PCM a 64Kbps, presentino anche una codifica GSM a 13Kbps del pacchetto precedente. In questo modo, in caso di perdita di un pacchetto, si potrà comunque recuperare una sua versione a bassa qualità con il pacchetto successivo.\\
-Uno degli applicativi VOIP più famosi, \textbf{Skype}, utilizza UDP per la trasmissione dati, TCP per controllo e recovery (in caso il firewall blocchi UDP), la codifica FEC a livello applicativo e conserva inoltre le porte e gli IP (SN).
+Un tipico schema di firma elettronica basato sulla tecnologia della chiave pubblica consiste di tre algoritmi:
+\begin{enumerate}
+	\item Un algoritmo che genera una coppia di chiavi $ (PK, SK) $, dove \textit{PK} è la chiave pubblica di verifica della firma e \textit{SK} è la chiave privata utilizzata per firmare il documento.
+	\item Un algoritmo di firma che prende in input un messaggio \textit{m} e una chiave privata \textit{SK}, calcola il codice hash del messaggio e, crittografandolo con \textit{SK}, produce una firma $ \sigma $.
+	\item un algoritmo di verifica che prende in input la tripla $(m, PK, \sigma)$ e accetta o rifiuta la firma.
+\end{enumerate}
+La firma digitale è l'unico caso in cui l'uso delle chiavi è invertito: la chiave pubblica serve a decrittare la firma e trovare poi il \textit{digest} iniziale attraverso l'hash, mentre la chiave privata serve a crittografare una stringa anzichè aprirla.
 
-\paragraph{Real Time Streaming Protocol}
-Questo protocollo risiede sugli endsystem (tra UDP e lo strato applicativo) e specifica la struttura dei pacchetti trasportanti audio/video. La sua unica funzione è estendere l'header dei pacchetti per fornire:
+\subsection{Message digests}
+Per dare una sorta di \textit{impronta digitale} di un'entità vengono utilizzati i cosiddetti \textbf{message digests}: partendo da un insieme enorme di combinazioni applicabili su ogni tipo di file digitale, una funzione di \textit{hashing} fa corrispondere un'entità a (quasi) una ed una sola sequenza di caratteri. In questo modo è possibile determinare una firma univoca per provare l'integrità di ogni file, potendo garantire che questa sia tale soltanto per quel file. La lunghezza dei valori di hash varia a seconda degli algoritmi utilizzati; il valore più comunemente adottato è di 128 bit, che offre una buona affidabilità in uno spazio relativamente ridotto\footnote{Va registrata la possibilità d'uso di hash di dimensione maggiore (SHA, ad esempio, può anche fornire stringhe di 224, 256, 384 e 512 bit) e minore (anche se fortemente sconsigliato).}. La sicurezza di questo sistema è data dal fatto che ogni \textit{hash} è dato da una stringa di lunghezza fissa indipendentemente dalla lunghezza del messaggio.\\
+La firma digitale pul essere definita come \textit{digest} di un documento crittografato con chiave privata.
+
+
+\subsubsection{Checksum}
+La \textit{checksum} fa una sorta di \textit{hash} come è stato appena introdotto: produce una stringa da 16 bit. Il problema in questo caso riguarda il fatto che è molto più semplice trovare file diversi che abbiano lo stesso \textit{checksum}.\\\\
+A questo punto possiamo arrivare alla combinazione ottimale: Bob manda un pacchetto di informazioni contenente:
 \begin{itemize}
-    \item time stamping
-    \item sequence numbering
-    \item identificazione tipo di payload
-    \item IP/porte
+	\item messaggio puro;
+	\item hash del messaggio, crittato con la chiave privata dello stesso Bob.
+\end{itemize}
+A questo punto, Alice, per verificare l'autenticità del messaggio, fa l'hash del messaggio e lo confronta con l'output della decrittazione tramite chiave pubblica di Bob dell'hash crittato precedentemente da Bob con la sua chiave privata. Se questi corrispondono, allora il messaggio risulta autentico.
+
+Attualmente esistono diversi tipi di hash, in base al livello di sicurezza: leggermente datato è l'\textit{MD5} (da 128 bit, crittato in 4 passi), più aggiornato è invece lo \textit{SHA-1} (da 160 bit, ancora più sicuro è invece lo \textit{SHA-2}).
+
+\subsection{CA (Certification Authority)}
+La \textit{CA} rappresenta l'autorità che assegna un \textit{certificato digitale} (comprensivo dei dati di Bob con la sua firma digitale) ad una specifica entità E appartenente a Bob sulla base della chiave pubblica di E, in modo tale che sia garantita l'identità di E presso la \textit{CA}. Sostanzialmente, le informazioni del certificato digitale vengono prodotte dalla \textit{CA}, crittate con la chiave pubblica di Bob e poi con la chiave privata della \textit{CA}.
+\newpage
+
+\subsection{Sicurezza e-mail}
+Alice vuole mandare una email confidenziale a Bob:
+\begin{enumerate}
+	\item genera una chiave privata simmetrica randomica, $K_{s}$;
+	\item critta il messaggio con questa chiave $K_{s}$;
+	\item critta l'output con la chiave pubblica di Bob;
+	\item invia l'output e la chiave generata randomicamente a Bob, crittata ancora con la chiave pubblica di Bob.
+\end{enumerate}
+Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segreta generata randomicamente da Alice con la sua chiave privata e - ancora - decritterà il messaggio in definitiva utilizzando la chiave-output della decrittazione della chiave segreta generata randomicamente da Alice. \\
+In alternativa:
+\begin{enumerate}
+	\item Alice fa un \textit{hash} del messaggio;
+	\item impacchetta il messaggio in chiaro e la firma digitale (come già visto con i message digests);
+	\item il pacchetto viene crittato con una chiave privata simmetrica randomica, $K_{s}$;
+	\item viene mandato il pacchetto e la chiave generata randomicamente a Bob, crittata ancora con la chiave pubblica di Bob.
+\end{enumerate}
+Bob, quindi, quando riceve la email, decritterà il messaggio e la chiave segreta generata randomicamente da Alice con la sua chiave privata e - ancora - decritterà il messaggio in definitiva utilizzando la chiave-output della decrittazione della chiave segreta generata randomicamente da Alice. Bob, per verificare l'autenticità del messaggio, fa l'hash del messaggio e lo confronta con l'output della decrittazione tramite chiave pubblica di Alice dell'hash crittato precedentemente da Alice con la sua chiave privata. Se questi corrispondono, allora il messaggio risulta autentico.
+
+\section{Secure Socket Layer}
+Con l'apertura della Rete a fini pubblici, le problematiche di prevenzione di danni, perdite e attacchi via via sempre più importanti portarono alla nascita di strati aggiuntivi con lo specifico compito di assicurarsi la delle comunicazioni.
+Le prime implementazioni di SSL erano limitate a una cifratura a chiave simmetrica di soli 40 bit\footnote{Tale limitazione fu dovuta da restrizioni imposte dal governo statunitense sull'esportazione di tecnologie crittografiche. Fu esplicitamente imposta per rendere la cifratura abbastanza debole da poter essere forzata dalle autorità giudiziarie che volessero decifrare il traffico, ma sufficientemente resistente ad attacchi esterni poichè facente affidamento alle minori disponibilità di risorse tecnologiche e finanziarie dell'epoca.}; fu succesivamente aggiornato a TLS (\textit{Transport Layer Security}), con chiavi da 128+ bit.\\\\
+Il protocollo TLS consente alle applicazioni client/server di comunicare attraverso una rete in modo tale da prevenire il \textit{tampering}(manomissione), la falsificazione e l'intecettazione dei dati.\\
+Nell'utilizzo tipico del browser di un end-user, l'autenticazione è \textit{unilaterale}: è il solo server ad autenticarsi presso il client. Il browser valida il certificato del server controllando che la firma digitale dei certificati sia valida e riconosciuta da una \textit{certification authority} conosciuta utilizzando una cifratura a chiave pubblica. Dopo questa autenticazione, il browser indica una connessione sicura.\\
+Quest'autenticazione, però, non è sufficiente per garantire che il sito con cui ci si è collegati sia quello richiesto. Per esserne sicuri è necessario analizzare il contenuto del certificato rilasciato e controllarne la catena di certificazione. I siti che intendono ingannare l'utente non possono utilizzare un certificato del sito che vogliono impersonare, perchè non hanno la possibilità di cifrare in modo valido il certificato, 
+che include l'indirizzo, in modo tale che risulti valido alla destinazione.\\
+Il protocollo TLS permette anche un'autenticazione \textit{bilaterale}, tipicamente utilizzata in applicazioni aziendali, in cui entrambe le parti si autenticano in modo sicuro scambiandosi i relativi certificati. Questa autenticazione (definita \textit\textit{Mutual authentication}), richiede che anche il client possieda un proprio certificato digitale.\\
+
+\subsection{Principi di funzionamento}
+Il funzionamento del protocollo TLS può essere suddiviso in tre fasi principali:
+\begin{enumerate}
+	\item Negoziazione dell'algoritmo da utilizzare;
+	\item Scambio delle chiavi e autenticazione;
+	\item Cifratura simmetrica e autenticazione dei messaggi.
+\end{enumerate}
+Nella prima fase, il client e il server negoziano il protocollo di cifratura che sarà utilizzato nella comunicazione sicura, il protocollo per lo scambio delle chiavi, il MAC (\textit{message authentication code}) e l'algoritmo di autenticazione. L'algoritmo per lo scambio delle chiavi e quello per l'autenticazione normalmente sono a chiave pubblica; l'integrità dei messaggi è garantita da un algoritmo di hash che utilizza funzioni pseudorandom non standard.
+
+\paragraph{Protocolli.} All'interno di una sessione vengono tipicamente utilizzati i seguenti protocolli:
+\begin{itemize}
+	\item RSA, Diffie-Hellman, ECDH, SRP, PSK per lo scambio di chiavi;
+	\item RSA, DSA, ECDSA per l'autenticazione;
+	\item RC4, DES, 3DES, AES, IDEA o Camellia (anche RC2 nei vecchi SSL) per la cifratura simmetrica;
+	\item HMAC-MD5, HMAC-SHA (TLS); MD5, SHA (SSL) come funzioni di hash per le funzioni crittografiche d'integrità. 
 \end{itemize}
 
-\paragraph{Real Time Control Protocol}
-Com'è facilmente intuibile, solitamente è associato a RTSP e funge da canale di controllo dedicato.\\
-Ogni fruitore di RTSP invia periodicamente pacchetti di controllo RTCP contenenti report/feedback (numero di pacchetti inviati e ricevuti, jitter etc.). Tenta di non consumare più del 5\% della banda totale.
+\paragraph{ARP}
+Una richiesta \textit{ARP} consiste in una richiesta di risoluzione inversa: invece di chiedere la risoluzione di un nome host, richiediamo la risoluzione inversa, ovvero quella che associa univocamente un IP ad un nome host. Il protocollo \textit{ARP} lavora a livello \textit{datalink} della pila \textit{TCP/IP}, quindi utilizzando come nomi identificativi gli indirizzi \textit{MAC}. Per la richiesta viene richiamato il gateway dell'IP richiesto, il quale fa una richiesta in \textit{broadcast} nella subnet per cercare il dato IP. \\
+In un attacco \textit{arp-spoofing} (o \textit{arp-poisoning}), l'attaccante fa un attacco \textit{man-in-the-middle}, \textit{spacciandosi} per l'IP richiesto.
+
+\section{IPsec}
+Simile al protocollo \textit{TLS} (che lavora sopra al livello di trasporto, per cui inutile in caso di attacci su livelli inferiori rispetto a quest'ultimo), che lavora a livello di rete. L'obiettivo è cifrare il \textit{payload} (un segmento \textit{TCP}/U\textit{DP}, un messaggio \textit{ICMP}/\textit{OSPF}, \ldots): per motivi di sicurezza spesso si usano reti private, motivo per cui diventa necessaria una \textit{VPN} (o \textit{Virtual Private Network}), per mettere in comunicazione reti private attraverso internet, mantenendo tutto quello che passa per internet cifrato e separato logicamente dal traffico comune. Le \textit{VPN} quindi stabiliscono reti private virtuali, per racchiudere \textit{n} non fisicamente - e al contempo privatamente - collegate. \\
+\textit{IPsec} fornisce i seguenti servizi:
+\begin{itemize}
+	\item integrità dei dati;
+	\item autenticazione;
+	\item prevenzione ad attacchi di tipo \textit{replay}\footnote{Nell'ambito della sicurezza informatica il replay-attack è una forma di attacco di rete che consiste nell'impossessarsi di una credenziale di autenticazione comunicata da un host ad un altro, e riproporla successivamente simulando l'identità dell'emittente. In genere l'azione viene compiuta da un attaccante che s'interpone tra i due lati comunicanti.};
+	\item confidenzialità.
+\end{itemize}
+Può lavorare - in base alla decisione presa dall'amministratore dell'infrastruttura - con due protocolli:
+\begin{itemize}
+	\item \textit{AH} (\textit{Authentication Header}): fornisce garanzie su integrità e autenticazione;
+	\item \textit{ESP} (\textit{Encapsulation Security Protocol}): fornisce garanzie su integrità, autenticazione e confidenzialità.
+\end{itemize}
+e due modalità:
+\begin{itemize}
+	\item Modalità \textit{transport}: il processo di rendere sicuri i pacchetti è fatto direttamente dagli host delle reti;
+	\item Modalità \textit{tunneling}: il processo è gestito unicamente dagli \textit{edge router}.
+\end{itemize}
+Attualmente la combinazione migliore e più diffusa è la \textit{ESP}-\textit{tunneling}. \\ \\
+
+Per ciascun host che entri in comunicazione con un altro della seconda (o \textit{n}-esima) rete appartenente alla \textit{VPN}, viene stabilita una \textit{Security Association} (\textit{SA}) un canale di comunicazione privato a questi due, che contiene:
+\begin{itemize}
+	\item identificativo (da 32 bit);
+	\item interfaccia \textit{SA} di origine (\textit{edge router} di origine);
+	\item interfaccia \textit{SA} di destinazione (\textit{edge router} di destinazione);
+	\item tipo di cifratura usata (e.g. \textit{3DES} con \textit{CBC});
+	\item chiave di cifratura;
+	\item tipo di algoritmo di integrità (e.g. \textit{HMAC} con \textit{MD5});
+	\item chiave di autenticazione.
+\end{itemize}
+Tutte le \textit{SA} sono memorizzate in un database, chiamato \textit{Security Association Database} (\textit{SAD}). \\ \\
+
+Nella modalità di \textit{tunneling} con \textit{ESP}, viene gestito un datagramma, composto da diversi passaggi: partendo dal messaggio originario in chiaro, seguito dal \textit{padding} del messaggio (necessario a saturare lo spazio in bit dedicato al messaggio), viene cifrato, e poi viene aggiunto in testa l'header \textit{ESP}. Su tutta questa sequenza viene applicato un primo protocollo di autenticazione, che prende il nome di \textit{enchilada}. A questa ultima sequenza viene aggiunto, infine, l'IP di destinazione e applicato il protocollo di autenticazione relativo a tutto il datagramma. \\
+Il \textit{Security Policy Database} (\textit{SPD}) gestisce invece un insieme di regole generali che stabiliscono che reagire a tutti i datagrammi uscenti dalla rete: come/se elaborarli. \\
+Per la generazione delle \textit{SA} automatica arriva in aiuto il protocollo \textit{IKE} (o \textit{Internet Key Exchange}), sfruttabile tramite \textit{PKI} e/o \textit{PSK}:
+\begin{enumerate}
+	\item \textit{IKE} stabilisce una \textit{SA} bidirezionale;
+	\item \textit{ISAKMP} viene utilizzato per negoziare la tupla di connessioni speculari delle \textit{SA}.
+\end{enumerate}
+
+\section{Sicurezza nelle reti Wireless}
+\subsection{WEP}
+Primo protocollo noto sulla sicurezza wireless è il \textit{WEP} (\textit{Wired Equivalent Protocol}), nato nel tentativo di raggiungere la sicurezza come nelle reti via capo, ottenendo:
+\begin{itemize}
+	\item confidenzialità;
+	\item autorizzazione dell'end-host;
+	\item integrità.
+\end{itemize}
+Inoltre occorreva avere un protocollo non solo efficiente, ma che potesse allo stesso tempo cifrare ogni pacchetto trasmesso indipendentemente l'uno dall'altro (anche se uno dei precedenti fosse andato perso, a differenza del \textit{Cipher Block Chaining}, \textit{CBC}, in cui l'output della cifratura del pacchetto precedente era preso come input per quella del successivo). Usava un \textit{cifrario a flusso}: cioè una funzione che prendesse in input una chiave - costante - e un \textit{initialization vector}, che potesse dare uno stream di chiavi utile per cifrare (facendo lo \textit{XOR} tra stream e messaggio da cifrare), ma soprattutto per decifrare (facendo lo \textit{XOR} tra stream e messaggio cifrato). \\
+Tra i problemi principali troviamo che il campo relativo all'\textit{initialization vector} è troppo piccolo per evitare che si ripeti dopo un quantitativo di tempo ridotto. Questo rende il \textit{WEP} quasi totalmente insicuro, perdendo integrità e confidenzialità.
+
+\subsection{802.11i}
+Protocollo molto più sicuro rispetto al \textit{WEP}, che mette a disposizione numerosi tipi di cifratura (e.g. \textit{WPA}, \textit{WPA2}) e utilizza un server separato per l'autenticazione, rispetto a quello utilizzato per l'accesso. Mentre \textit{WPA2} è molto sicuro, è stata introdotta una funziona che potrebbe facilmente \textit{disarcionarlo}: \textit{WPS}. \\
+\textit{WPS} è un protocollo per facilitare la connessione per l'estensione del segnale: che sostanzialmente permette la decifratura per parti, così da dare un eventuale OK, se è stata decifrata correttamente la prima parte. Negli ultimi anni si è pensato di mettere un numero di tentativi massimi, al termine dei quali viene sganciato il richiedente. \\
+\textit{802.11i} ha 4 fasi di operazione che sostanzialmente permettono di generare \textit{n} per \textit{n} client connessi: questa funzione prende il nome di \textit{EAP} (\textit{Extensible Authentication Protocol}).
+\newpage
+
+\section{Firewall}
+I firewall si occupano di gestire delle policy volte all'autorizzazione di utilizzo di determinati servizi, attraverso la generazione di regole che lavorano su a livello di porte e servizi per \textit{TCP}, di tipologia di messaggio \textit{ICMP} e di bit \textit{TCP} \textit{SYN} e \textit{ACK}. \\
+Un firewall può implementare uno \textit{stateless packet-filter}, cioè basato unicamente su indirizzo e porta, o anche \textit{stateful packet-filter}, che non solo ammette le possibilità della versione \textit{staless}, ma anche quella di monitorare e gestire lo stato delle connessioni \textit{TCP} già aperte e in corso.
+
+\subsection{IDS}
+Gli \textit{Intrusion Detectiom System} può fare un molteplice attività:
+\begin{itemize}
+	\item ispezione dei pacchetti: controlla il contenuto di ciascun pacchetto transitato, istruito con le \textit{signature} prelevate da database di \textit{virus}, o attacchi noti;
+	\item esaminare la correlazione tra diversi pacchetti, per evitare si possa fare uno scan delle porte, un mapping della rete o un attacco \textit{DoS}.
+\end{itemize}
+
+\section{Tor}
+\textit{Tor} è un servizio di comunicazione anonimo distribuito che usa un livello indipendente di rete che permette alle persone di migliorare la loro privacy su Internet. Si usa \textit{tor} per mantenere i siti web liberi da meccanismi di \textit{tracking}. \\
+Essendo una rete, è formato da un numero decisamente elevato di host che funzionano da router - gli \textit{onion router} (o \textit{OR}), che dirigono il traffico - ma soprattutto da un \textit{onion proxy} (o \textit{OP}), installato sul client utilizzato per navigare sul \textit{deep web}. \\
+Tutte le informazioni che passano dal client ai vari nodi della rete vengono cifrate: l'unico \textit{hop} che rimane in chiaro è quello che lega l'ultimo nodo che lega il primo client al secondo da raggiungere: sostanziamente, Alice - che cerca di mandare un messaggio a Tor - invierà delle informazioni; queste informazioni passeranno per un numero $n$ di \textit{OR}, e ciascuno di essi applicherà una cifratura sul pacchetto ricevuto. Toccherà decifrare all'$n$esimo \textit{OR} - l'\textit{exit router} -, che consegnerà le informazioni a Bob. \\
+Il metodo di cifratura utilizzato da \textit{Tor} è \textit{TLS}.
